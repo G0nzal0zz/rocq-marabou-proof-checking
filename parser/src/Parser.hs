@@ -1,6 +1,6 @@
 {-# LANGUAGE DeriveGeneric #-}
 
-module Main where
+module Parser (parseNetwork, ProofCertificate(..), TableauItem(..)) where
 
 import Data.Aeson (FromJSON, decode)
 import qualified Data.ByteString.Lazy as B
@@ -22,20 +22,7 @@ data ProofCertificate = ProofCertificate
 
 instance FromJSON ProofCertificate
 
--- Parse JSON file into Network
-parseNetwork :: FilePath -> IO (Maybe ProofCertificate)
-parseNetwork path = do
-  content <- B.readFile path
-  return (decode content)
-
-main :: IO ()
-main = do
-  let file = "model.json"
-
-  result <- parseNetwork file
-
-  case result of
-    Nothing -> putStrLn "Failed to parse JSON"
-    Just net -> do
-      putStrLn "Parsed network successfully:"
-      print net
+parseNetwork :: String -> IO (Maybe ProofCertificate)
+parseNetwork file = do
+  content <- B.readFile file
+  return $ decode content
