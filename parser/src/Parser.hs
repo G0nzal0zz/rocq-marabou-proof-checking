@@ -1,7 +1,7 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DuplicateRecordFields #-}
 
-module Parser (parseProofCertificatesEither, ProofCertificate (..), TableauItem (..), ProofItem(..)) where
+module Parser (parseProofCertificates, ProofCertificate (..), TableauItem (..), ProofItem(..)) where
 
 import Data.Aeson (FromJSON, eitherDecode)
 import qualified Data.ByteString.Lazy as B
@@ -73,7 +73,7 @@ data ProofCertificate = ProofCertificate
 
 instance FromJSON ProofCertificate
 
-parseProofCertificatesEither :: String -> IO (Either String ProofCertificate)
-parseProofCertificatesEither  file = do
+parseProofCertificates:: String -> IO (Either String ProofCertificate)
+parseProofCertificates file = do
   content <- B.readFile file
   return $ eitherDecode content
