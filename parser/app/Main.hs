@@ -2,17 +2,17 @@ module Main where
 
 import Generation (generateRocq)
 import Options.Applicative
-import Parser (ProofCertificate (..), ProofItem (..), parseProofCertificates)
+import Parser (parseProofCertificates)
 import Text.Printf (printf)
 
-data Sample = Sample
+data Arguments = Arguments
   { input :: String,
     output :: String
   }
 
-sample :: Parser Sample
-sample =
-  Sample
+arguments :: Parser Arguments
+arguments =
+  Arguments
     <$> strOption
       ( long "input"
           <> metavar "FILE"
@@ -23,7 +23,7 @@ sample =
       ( long "output"
           <> metavar "FILE"
           <> short 'o'
-          <> value "Certificates.v"
+          <> value "certificates.v"
           <> help "File where the generated Rocq data types will be placed"
       )
 
@@ -37,12 +37,12 @@ main = do
       putStrLn "Failed to parse JSON"
       putStrLn err
     Right cert -> do
-      writeFile "GeneratedCertificate.v" (generateRocq cert)
+      writeFile (output args) (generateRocq cert)
       printf "Generated %s\n" (output args)
   where
     opts =
       info
-        (sample <**> helper)
+        (arguments <**> helper)
         ( fullDesc
             <> header "A helper Haskell program to convert Marabou proof certificates into Rocq data types for validation."
         )
