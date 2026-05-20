@@ -1,7 +1,7 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DuplicateRecordFields #-}
 
-module Parser (parseProofCertificates, ProofCertificate (..), TableauItem (..), ProofItem(..)) where
+module Parser (parseProofCertificates, ProofCertificate (..), Tableau (..), Proof (..)) where
 
 import Data.Aeson (FromJSON, eitherDecode)
 import qualified Data.ByteString.Lazy as B
@@ -15,24 +15,24 @@ data TableauItem = TableauItem
 
 instance FromJSON TableauItem
 
-data ConstraintItem = ConstraintItem
+data Constraint = Constraint
   { constraintType :: Int,
     vars :: [Int]
   }
   deriving (Show, Generic)
 
-instance FromJSON ConstraintItem
+instance FromJSON Constraint
 
-data SplitItem = SplitItem
+data Split = Split
   { var :: Int,
     val :: Float,
     bound :: String
   }
   deriving (Show, Generic)
 
-instance FromJSON SplitItem
+instance FromJSON Split
 
-data LemmasItem = LemmasItem
+data Lemma = Lemmas
   { affVar :: Int,
     affBound :: String,
     bound :: Float,
@@ -43,37 +43,36 @@ data LemmasItem = LemmasItem
   }
   deriving (Show, Generic)
 
-instance FromJSON LemmasItem
+instance FromJSON Lemma
 
-data ChildrenItem = ChildrenItem
-  { split :: [SplitItem],
-    lemmas :: Maybe [LemmasItem],
-    children :: Maybe [ChildrenItem],
+data Child = Child
+  { split :: [Split],
+    lemmas :: Maybe [Lemma],
+    children :: Maybe [Child],
     contradiction :: Maybe [TableauItem]
   }
   deriving (Show, Generic)
 
-instance FromJSON ChildrenItem
+instance FromJSON Child
 
-data ProofItem = ProofItem
-  { children :: [ChildrenItem]
-  }
+newtype ProofTree
+  = ProofTree {children :: [Child]}
   deriving (Show, Generic)
 
-instance FromJSON ProofItem
+instance FromJSON ProofTree
 
 data ProofCertificate = ProofCertificate
   { tableau :: [[TableauItem]],
     lowerBounds :: [Float],
     upperBounds :: [Float],
-    constraints :: [ConstraintItem],
-    proof :: ProofItem
+    constraints :: [Constraint],
+    proof :: ProofTree
   }
   deriving (Show, Generic)
 
 instance FromJSON ProofCertificate
 
-parseProofCertificates:: String -> IO (Either String ProofCertificate)
+parseProofCertificates :: String -> IO (Either String ProofCertificate)
 parseProofCertificates file = do
   content <- B.readFile file
   return $ eitherDecode content
