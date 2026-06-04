@@ -1,32 +1,28 @@
 module Generation (generateRocq) where
 
 import Data.List (intercalate)
-import Parser (ProofCertificate(tableau), TableauItem(var, val))
+import Parser (ProofCertificate (tableau), Tableau, TableauItem (val, var))
 
 generateRocq :: ProofCertificate -> String
 generateRocq cert =
   unlines
-    [ "Require Import Reals."
-    , "Require Import List."
-    , "Import ListNotations."
-    , "Open Scope R_scope."
-    , ""
-    , "Record TableauItem := {"
-    , "  var : nat;"
-    , "  val : R"
-    , "}."
-    , ""
-    , "Definition certificate : list (list TableauItem) :="
-    , tableauToRocq (tableau cert) ++ "."
+    [ "Require Import Reals.",
+      "Require Import List.",
+      "Require Import Util.",
+      "Import ListNotations.",
+      "Open Scope R_scope.",
+      "",
+      "",
+      tableauToRocq (tableau cert) ++ "."
     ]
 
-tableauToRocq :: [[TableauItem]] -> String
-tableauToRocq rows =
-  "[" ++ intercalate "; " (map rowToRocq rows) ++ "]"
+--- =====================================================
+-- Tableau
+-- =====================================================
 
-rowToRocq :: [TableauItem] -> String
-rowToRocq row =
-  "[" ++ intercalate "; " (map itemToRocq row) ++ "]"
+tableauToRocq :: Tableau -> String
+tableauToRocq rows =
+  "[" ++ intercalate "; " (map itemToRocq rows) ++ "]"
 
 itemToRocq :: TableauItem -> String
 itemToRocq item =
@@ -35,3 +31,7 @@ itemToRocq item =
     ++ "; val := "
     ++ show (val item)
     ++ "%R |}"
+
+--- =====================================================
+-- Tableau
+-- =====================================================

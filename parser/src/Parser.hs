@@ -1,7 +1,7 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DuplicateRecordFields #-}
 
-module Parser (parseProofCertificates, ProofCertificate (..), Tableau (..), Proof (..)) where
+module Parser (module Parser) where
 
 import Data.Aeson (FromJSON, eitherDecode)
 import qualified Data.ByteString.Lazy as B
@@ -13,7 +13,10 @@ data TableauItem = TableauItem
   }
   deriving (Show, Generic)
 
-instance FromJSON TableauItem
+newtype Tableau = Tableau Tableau
+  deriving (Show, Generic)
+
+instance Data.Aeson.FromJSON Tableau
 
 data Constraint = Constraint
   { constraintType :: Int,
@@ -21,16 +24,16 @@ data Constraint = Constraint
   }
   deriving (Show, Generic)
 
-instance FromJSON Constraint
+instance Data.Aeson.FromJSON Constraint
 
-data Split = Split
+data RawSplit = RawSplit
   { var :: Int,
     val :: Float,
     bound :: String
   }
   deriving (Show, Generic)
 
-instance FromJSON Split
+instance Data.Aeson.FromJSON RawSplit
 
 data Lemma = Lemmas
   { affVar :: Int,
@@ -39,40 +42,47 @@ data Lemma = Lemmas
     causVar :: Int,
     causBound :: String,
     constraint :: Int,
-    expl :: [TableauItem]
+    expl :: Tableau
   }
   deriving (Show, Generic)
 
-instance FromJSON Lemma
+instance Data.Aeson.FromJSON Lemma
 
 data Child = Child
-  { split :: [Split],
+  { split :: [RawSplit],
     lemmas :: Maybe [Lemma],
-    children :: Maybe [Child],
-    contradiction :: Maybe [TableauItem]
+    children :: Maybe Children,
+    contradiction :: Maybe Tableau
   }
   deriving (Show, Generic)
 
-instance FromJSON Child
+instance Data.Aeson.FromJSON Child
 
-newtype ProofTree
-  = ProofTree {children :: [Child]}
+newtype Children = Children [Child]
   deriving (Show, Generic)
 
-instance FromJSON ProofTree
+instance Data.Aeson.FromJSON Children
+
+data Proof = Proof
+  { children      :: Maybe Children
+  , contradiction :: Maybe Tableau
+  }
+  deriving (Show, Generic)
+
+instance Data.Aeson.FromJSON Proof where
 
 data ProofCertificate = ProofCertificate
-  { tableau :: [[TableauItem]],
+  { tableau :: Tableau,
     lowerBounds :: [Float],
     upperBounds :: [Float],
     constraints :: [Constraint],
-    proof :: ProofTree
+    proof :: Proof
   }
   deriving (Show, Generic)
 
-instance FromJSON ProofCertificate
+instance Data.Aeson.FromJSON ProofCertificate
 
 parseProofCertificates :: String -> IO (Either String ProofCertificate)
 parseProofCertificates file = do
   content <- B.readFile file
-  return $ eitherDecode content
+  return $ Data.Aeson.eitherDecode content
