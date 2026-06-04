@@ -65,7 +65,6 @@ isInactive split f b = case split of
 --         (is_inactive l_tightenings f b && is_active r_tightenings b aux))
 --         | _ ->  false
 
--- TODO: Complete function
 isReluSplit :: [RawSplit] -> [RawSplit] -> Int -> Int -> Int -> Bool
 isReluSplit lSplit rSplit b f aux = case (lSplit, rSplit) of
   ([RawSplit _ 0.0 _, RawSplit _ 0.0 _], [RawSplit _ 0.0 _, RawSplit _ 0.0 _]) -> (isActive lSplit b aux && isInactive rSplit f b) || (isInactive lSplit f b && isActive rSplit b aux)
