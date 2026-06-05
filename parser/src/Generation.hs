@@ -7,6 +7,7 @@ import Split
 import Utils
 
 -- TODO: Generate Constraints
+-- TODO: Fix Tableau Generation
 generateRocq :: ProofCertificate -> ProofTree -> String
 generateRocq cert proofTree =
   unlines
