@@ -4,8 +4,7 @@ module ProofTree where
 
 import Parser
 import Split (Split, matchSplit)
-
---
+import Utils (tableauToList)
 
 -- type t =
 --   (*  left child, right child *)
@@ -15,12 +14,11 @@ import Split (Split, matchSplit)
 
 data ProofTree
   = Node Split ProofTree ProofTree -- (*  left child, right child *)
-  | Leaf Tableau -- (* contradiction vector *)
+  | Leaf [Float] -- (* contradiction vector *)
 
--- \| Leaf [Int] -- (* contradiction vector *)
 
-buildProofTree :: Proof -> [Constraint] -> Maybe ProofTree
-buildProofTree Proof {children = ch, contradiction = contra} cons =
+buildProofTree :: Proof -> [Constraint] -> Int -> Maybe ProofTree
+buildProofTree Proof {children = ch, contradiction = contra} cons tableauWidth =
   case (ch, contra) of
     (Just _, Just _) ->
       Nothing
@@ -30,23 +28,23 @@ buildProofTree Proof {children = ch, contradiction = contra} cons =
       Just (Node splitVal left right)
       where
         splitVal = matchSplit (split c1) (split c2) cons
-        left = buildProofTreeChild c1 cons
-        right = buildProofTreeChild c2 cons
+        left = buildProofTreeChild c1 cons tableauWidth
+        right = buildProofTreeChild c2 cons tableauWidth
     (Just _, Nothing) ->
       Nothing -- wrong number of children
     (Nothing, Just contra) ->
-      Just $ Leaf contra
+      Just $ Leaf (tableauToList tableauWidth contra)
 
-buildProofTreeChild :: Child -> [Constraint] -> ProofTree
-buildProofTreeChild Child {children = ch, contradiction = contra} cons =
+buildProofTreeChild :: Child -> [Constraint] -> Int -> ProofTree
+buildProofTreeChild Child {children = ch, contradiction = contra} cons tableauWidth =
   case (ch, contra) of
     (Just (Children [c1, c2]), Nothing) ->
       Node splitVal left right
       where
         splitVal = matchSplit (split c1) (split c2) cons
-        left = buildProofTreeChild c1 cons
-        right = buildProofTreeChild c2 cons
-    (Nothing, Just c) ->
-      Leaf c
+        left = buildProofTreeChild c1 cons tableauWidth
+        right = buildProofTreeChild c2 cons tableauWidth
+    (Nothing, Just contra) ->
+      Leaf (tableauToList tableauWidth contra)
     _ ->
       error "Invalid child"

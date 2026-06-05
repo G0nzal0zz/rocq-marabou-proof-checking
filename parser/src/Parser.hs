@@ -13,7 +13,9 @@ data TableauItem = TableauItem
   }
   deriving (Show, Generic)
 
-newtype Tableau = Tableau Tableau
+instance Data.Aeson.FromJSON TableauItem
+
+newtype Tableau = Tableau [[TableauItem]]
   deriving (Show, Generic)
 
 instance Data.Aeson.FromJSON Tableau
@@ -50,9 +52,10 @@ instance Data.Aeson.FromJSON Lemma
 
 data Child = Child
   { split :: [RawSplit],
-    lemmas :: Maybe [Lemma],
+    --  NOTE: lemmas are not currently needed
+    -- lemmas :: Maybe [Lemma],
     children :: Maybe Children,
-    contradiction :: Maybe Tableau
+    contradiction :: Maybe [TableauItem]
   }
   deriving (Show, Generic)
 
@@ -65,7 +68,7 @@ instance Data.Aeson.FromJSON Children
 
 data Proof = Proof
   { children      :: Maybe Children
-  , contradiction :: Maybe Tableau
+  , contradiction :: Maybe [TableauItem]
   }
   deriving (Show, Generic)
 
