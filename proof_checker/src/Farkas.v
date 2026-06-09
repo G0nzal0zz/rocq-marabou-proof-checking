@@ -11,13 +11,14 @@ From HB Require Import structures.
 Set Implicit Arguments.
 Unset Strict Implicit.
 
-Section Remi.
+Section Farkas.
 (* Variable (R : realFieldType). *)
 Variable (R : numDomainType).
 Variable (n : nat).
 Implicit Type x : 'cV[R]_n.
 Implicit Type p : 'rV[R]_n.+1.
 Variable (m : nat).
+
 Definition poly (n : nat) : Type := 'rV[R]_n.+1.
 
 Open Scope ring_scope.
@@ -202,7 +203,7 @@ Proof.
   by rewrite lt_irreflexive.
 Qed.
 
-End Remi.
+End Farkas.
 
 Section Mat.
 
