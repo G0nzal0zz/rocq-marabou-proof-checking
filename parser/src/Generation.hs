@@ -11,9 +11,9 @@ import Utils
 generateRocq :: ProofCertificate -> ProofTree -> String
 generateRocq cert proofTree =
   unlines
-    [ "Require Import Reals.",
-      "Require Import List.",
-      "Require Import Util.",
+    [ "From Stdlib Require Import Reals.",
+      "From Stdlib Require Import List.",
+      "Require Import Certificate.",
       "Import ListNotations.",
       "Open Scope R_scope.",
       "",
