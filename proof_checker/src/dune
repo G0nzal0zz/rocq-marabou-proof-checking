@@ -1,6 +1,7 @@
 (coq.theory
  (name proof_checker)
- (theories mathcomp.ssreflect
+ (theories Stdlib
+           mathcomp.ssreflect
            mathcomp.fingroup
            mathcomp.algebra
            elpi
