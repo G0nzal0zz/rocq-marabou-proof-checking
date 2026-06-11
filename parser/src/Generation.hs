@@ -7,7 +7,8 @@ import Split
 import Utils
 
 -- TODO: Generate Constraints
--- TODO: Fix Tableau Generation
+-- Fix Tableau Generation
+-- Add a comment at the beginning of the file stating that the file has been automatically generated.
 generateRocq :: ProofCertificate -> ProofTree -> String
 generateRocq cert proofTree =
   unlines
