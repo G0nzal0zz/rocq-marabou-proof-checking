@@ -19,6 +19,12 @@ Implicit Type x : 'cV[R]_n.
 Implicit Type p : 'rV[R]_n.+1.
 Variable (m : nat).
 
+(*
+   WARN:
+   - Why isn't `poly` a list of Reals like in the Imandra code?
+   - Is the variable numDomainType really needed?
+*)
+(* TODO: Explain `poly` notation in a comment*)
 Definition poly (n : nat) : Type := 'rV[R]_n.+1.
 
 Open Scope ring_scope.
@@ -55,8 +61,14 @@ Definition extract_poly e : poly n :=
   | Geq p => p
   end.
 
+(* WARN: What is the purpose of the statement below? *)
 Coercion extract_poly : expr >-> poly.
 
+(*
+  NOTE:
+   - `m.+2`: Is equal to S (S n), equivalently `m.+1` is equal to S n. In simple terms `m.+2` is m + 2.
+   - `-tuple expr`: A tuple (list) of type `expr` and length `m.+2`.
+*)
 Definition system := m.+2.-tuple expr.
 
 Let cv_addn1_succ: 'cV[R]_(n+1) -> 'cV[R]_n.+1 :=
@@ -265,3 +277,5 @@ Proof.
   split.
   rewrite /eval_mat /eval_system.
 Admitted.
+
+Print poly.
