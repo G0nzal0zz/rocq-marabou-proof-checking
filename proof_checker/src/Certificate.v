@@ -3,6 +3,7 @@ From Stdlib Require Import List.
 Import ListNotations.
 Require Import Farkas.
 
+(* WARN: Should I move each inductive definition to a separate file? (e.g. splig -> Split.v)  *)
 Inductive split :=
 | single : nat -> R -> split
 | relu : nat -> nat -> nat -> split.
