@@ -13,18 +13,15 @@ Unset Strict Implicit.
 
 Section Farkas.
 (* Variable (R : realFieldType). *)
+(* WARN:  What is the purpose of all the `Variable` statements below? *) 
 Variable (R : numDomainType).
 Variable (n : nat).
 Implicit Type x : 'cV[R]_n.
 Implicit Type p : 'rV[R]_n.+1.
 Variable (m : nat).
 
-(*
-   WARN:
-   - Why isn't `poly` a list of Reals like in the Imandra code?
-   - Is the variable numDomainType really needed?
-*)
-(* TODO: Explain `poly` notation in a comment*)
+(* WARN: Why isn't `poly` a list of Reals like in the Imandra code? (i.e., list R) *)
+(* NOTE:'rV[R]_n.+1 is the MathComp type of row vectors over R of length n + 1. *)
 Definition poly (n : nat) : Type := 'rV[R]_n.+1.
 
 Open Scope ring_scope.
@@ -217,6 +214,7 @@ Qed.
 
 End Farkas.
 
+(* WARN: What is the purpose of the following section, and how does it differ from the Farkas section? *)
 Section Mat.
 
 Open Scope ring_scope.
@@ -259,6 +257,7 @@ Notation "A <=m B" := (lermx A B) (at level 70, no associativity) : ring_scope.
 Definition eval_mat {R : numDomainType} {m n} (A : 'M[R]_(m,n)) (l x u : 'cV[R]_n) : bool :=
   (A *m x == 0) && (l <=m x) && (x <=m u).
 
+(* WARN: The following lemma is unfinished, is there any reason for it? *)
 Lemma mat_system_inv {R : numDomainType} {m n} (A : 'M[R]_(m,n)) (l u x : 'cV[R]_n)
 (es : system R n m) : system_to_mat (mat_to_system A l x u) = (A, l, u).
 Proof.
@@ -271,6 +270,7 @@ Proof.
   Check tnth_lshift.
 Admitted.
 
+(* WARN: The following lemma is unfinished, is there any reason for it? *)
 Lemma poly_equiv {R : numDomainType} {m n} (A : 'M[R]_(m,n)) (l x u : 'cV[R]_n) (es : system R n m) :
   eval_mat A l x u <-> eval_system es x.
 Proof.
@@ -278,4 +278,3 @@ Proof.
   rewrite /eval_mat /eval_system.
 Admitted.
 
-Print poly.
