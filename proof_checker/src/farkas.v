@@ -13,14 +13,14 @@ Unset Strict Implicit.
 
 Section Farkas.
 (* Variable (R : realFieldType). *)
-(* WARN:  What is the purpose of all the `Variable` statements below? *) 
+(* WARN:  What is the purpose of all the `Variable` statements below?*) 
 Variable (R : numDomainType).
 Variable (n : nat).
 Implicit Type x : 'cV[R]_n.
 Implicit Type p : 'rV[R]_n.+1.
 Variable (m : nat).
 
-(* WARN: Why isn't `poly` a list of Reals like in the Imandra code? (i.e., list R) *)
+(* WARN: Why isn't `poly` a list of Stdlib Reals like in the Imandra code? (i.e., list R) *)
 (* NOTE:'rV[R]_n.+1 is the MathComp type of row vectors over R of length n + 1. *)
 Definition poly (n : nat) : Type := 'rV[R]_n.+1.
 

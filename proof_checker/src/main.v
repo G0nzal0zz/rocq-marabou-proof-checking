@@ -1,7 +1,7 @@
 From mathcomp Require Import all_ssreflect all_algebra.
 
-Require Import GenCertificates.
-Require Import Checker.
+Require Import gen_certificates.
+Require Import checker.
 
 Print check_tree.
 Section Main.

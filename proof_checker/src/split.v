@@ -1,16 +1,16 @@
 From Stdlib Require Import Reals.
 From Stdlib Require Import List.
 
-Require Import Constraint.
-Require Import Util.
+Require Import constraint.
+Require Import util.
 
 Import ListNotations.
 
 Module Split.
 
-Inductive split :=
-| single : nat -> R -> split
-| relu : nat -> nat -> nat -> split.
+Inductive t :=
+| single : nat -> R -> t
+| relu : nat -> nat -> nat -> t.
 
 (*let update_bounds_from_split (lbs: real list) (ubs: real list) (split: t): *)
 (*        ((real list * real list) * (real list * real list)) =*)
@@ -26,7 +26,7 @@ Inductive split :=
 (*        let ubs_r = set_nth ubs aux 0. in*)
 (*        (lbs_l, ubs_l), (lbs_r, ubs_r)*)
 
-Definition update_bounds_from_split (lbs: list R) (ubs : list R) (split : split)
+Definition update_bounds_from_split (lbs: list R) (ubs : list R) (split : t)
   : ((list R * list R)  * (list R * list R)) :=
   match split with
   | single i k => ((lbs, set_nth ubs i k), (set_nth lbs i k, ubs))
@@ -45,7 +45,8 @@ Definition update_bounds_from_split (lbs: list R) (ubs : list R) (split : split)
 (*    | ReluSplit (b,f,aux) -> List.mem (Relu (b,f,aux)) constraints*)
 (*    | _ -> true*)
 
-Definition check_split (split : split) (constraints : list Constraint.constraint) : bool :=
+
+Definition check_split (split : t) (constraints : list Constraint.t) : bool :=
   match split with
   | relu b f aux  => existsb (Constraint.constraint_eqb (Constraint.relu b f aux)) constraints
   | _ => false

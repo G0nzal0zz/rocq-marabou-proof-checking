@@ -6,4 +6,5 @@
            mathcomp.algebra
            elpi
            elpi_elpi
-           HB))
+           HB)
+ (flags -w -all))

@@ -1,11 +1,10 @@
 From Stdlib Require Import Reals.
 From mathcomp Require Import all_ssreflect all_algebra.
 
-Require Import Certificate.
-Require Import Farkas.
-Require Import Split.
-
-Inductive Constraint.
+Require Import certificate.
+Require Import constraint.
+Require Import farkas.
+Require Import split.
 
 Section Checker.
 
@@ -13,16 +12,14 @@ Variable (R' : numDomainType).
 Variable (n : nat).
 Variable (m : nat).
 
-Print Farkas.expr.
+Definition poly : Type := farkas.poly R' n.
 
-Definition poly : Type := Farkas.poly R' n.
-
-Definition expr : Type := Farkas.expr R' n.
+Definition expr : Type := farkas.expr R' n.
 
 Definition example_poly : 'rV[R']_n.+1 := \row_(i < n.+1) (0: R').  (* all zeros *)
-Definition example_eq : Farkas.expr R' n := Farkas.Eq example_poly.
+Definition example_eq : farkas.expr R' n := farkas.Eq example_poly.
 
-Definition system : Type := Farkas.system R' n m.
+Definition system : Type := farkas.system R' n m.
 
 Definition s : system :=
   [tuple of nseq m.+2 example_eq].
@@ -67,16 +64,14 @@ Definition check_contradiction
   : bool :=
   let sys : system := mk_system_contradcition tableau upper_bounds lower_bounds in
   let certificate := mk_contradiction_certificate contradiction tableau upper_bounds lower_bounds in 
-  Farkas.check_cert sys certificate.
-
-Print Certificate.
+  farkas.check_cert sys certificate.
 
 (* WARN: Should I be using mathcomp's reals or Rocq's Stdlib reals? *)
 Fixpoint check_tree
   (tableau : list expr)
   (upper_bounds : list R)
   (lower_bounds : list R)
-  (constraints : list constraint)
+  (constraints : list Constraint.t)
   (proof_node : proof_tree)
   : bool :=
   match proof_node with
@@ -86,8 +81,8 @@ Fixpoint check_tree
                           upper_bounds
                           lower_bounds
   | node split tleft tright =>
-      let valid_split := check_split split constraints in
-      let bounds := update_bounds_from_split
+      let valid_split := Split.check_split split constraints in
+      let bounds := Split.update_bounds_from_split
                       lower_bounds
                       upper_bounds
                       split in
