@@ -15,15 +15,12 @@ Module FarkasSoundness.
 
 Section Farkas.
 (* Variable (R : realFieldType). *)
-(* WARN:  What is the purpose of all the `Variable` statements below?*) 
-(* WARN:  Which concrete type should I use when working with `numDomainType` interface (i.e., rat, int ...) ?*) 
 Variable (R : numDomainType).
 Variable (n : nat).
 Implicit Type x : 'cV[R]_n.
 Implicit Type p : 'rV[R]_n.+1.
 Variable (m : nat).
 
-(* WARN: Why isn't `poly` a list of Stdlib Reals like in the Imandra code? (i.e., list R) *)
 (* NOTE:'rV[R]_n.+1 is the MathComp type of row vectors over R of length n + 1. *)
 Definition poly (n : nat) : Type := 'rV[R]_n.+1.
 
@@ -31,8 +28,8 @@ Definition poly (n : nat) : Type := 'rV[R]_n.+1.
 Open Scope ring_scope.
 
 Inductive expr :=
-| Eq of poly n
-| Geq of poly n.
+  | Eq of poly n
+  | Geq of poly n.
 
 
 Definition expr_eq e1 e2 :=
@@ -42,6 +39,7 @@ Definition expr_eq e1 e2 :=
   | _, _ => false
   end.
 
+(* NOTE: Proof that denotes that expr is decidable (IMPORTANT FOR MATHCOMP) *)
 Lemma expr_eqP : Equality.axiom expr_eq.
 Proof.
   move=> e1 e2.
@@ -54,7 +52,7 @@ Proof.
   by apply/eqP.
 Qed.
 
-HB.instance Definition _ := hasDecEq.Build expr expr_eqP.
+HB.instance Definition _ := hasDecEq.Build expr expr_eq.
 
 Definition extract_poly e : poly n :=
   match e with
@@ -62,15 +60,14 @@ Definition extract_poly e : poly n :=
   | Geq p => p
   end.
 
-(* WARN: What is the purpose of the statement below? *)
+(* NOTE: The following coercion tells Rocq that a expr can be converted into a polynomial *)
 Coercion extract_poly : expr >-> poly.
 
 (*
   NOTE:
    - `m.+2`: Is equal to S (S n), equivalently `m.+1` is equal to S n. In simple terms `m.+2` is m + 2.
-   - `-tuple expr`: A tuple (list) of type `expr` and length `m.+2`.
+   - `-tuple expr`: A tuple of type `expr` and length `m.+2`, meaning that there are at least 2 items in the tuple.
 *)
-(* WARN: What is the purpose of the '.+2'? Is it truly necessary to specify that the system has a length of m + 2? *)
 Definition system := m.+2.-tuple expr.
 
 Let cv_addn1_succ: 'cV[R]_(n+1) -> 'cV[R]_n.+1 :=
@@ -219,7 +216,7 @@ Qed.
 
 End Farkas.
 
-(* WARN: What is the purpose of the following section, and how does it differ from the Farkas section? *)
+(* NOTE: This section aim is to demonstrate that the inductive definition `system` is the same as a matrix *)
 Section Mat.
 
 Open Scope ring_scope.
@@ -251,6 +248,7 @@ Definition system_to_mat (es : system R n m) : ('M[R]_(m,n) * 'cV[R]_n * 'cV[R]_
     (poly_to_rv (extract_poly (tnth es ord_max)))^T
   ).
 
+(* NOTE: Specifying the order of mathcomp matrices. *)
 Definition lermx (mx1 mx2 : 'M[R]_(m,n)) :=
     [forall i : 'I_m * 'I_n, mx1 i.1 i.2 <= mx2 i.1 i.2].
 
