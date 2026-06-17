@@ -5,8 +5,15 @@
 *)
 From mathcomp Require Import all_ssreflect all_fingroup all_algebra zmodp ssrnum ssrnat matrix eqtype.
 (* Require Import utils algebra_ext matrix_ext. *)
-Import GroupScope Order.TTheory GRing.Theory Num.Theory.
 From HB Require Import structures.
+
+Require Import farkas.
+Require Import certificate.
+
+Import GroupScope Order.TTheory GRing.Theory Num.Theory.
+Import CertificateSpecs.
+(* NOTE: Open the Farkas namespace to access its definitions directly without using qualified paths (e.g., Farkas.foo). *)
+Import Farkas. 
 
 Set Implicit Arguments.
 Unset Strict Implicit.
@@ -14,25 +21,13 @@ Unset Strict Implicit.
 Module FarkasSoundness.
 
 Section Farkas.
-(* Variable (R : realFieldType). *)
-Variable (R : numDomainType).
-Variable (n : nat).
+
 Implicit Type x : 'cV[R]_n.
 Implicit Type p : 'rV[R]_n.+1.
-Variable (m : nat).
 
 (* NOTE:'rV[R]_n.+1 is the MathComp type of row vectors over R of length n + 1. *)
-Definition poly (n : nat) : Type := 'rV[R]_n.+1.
 
-
-Open Scope ring_scope.
-
-Inductive expr :=
-  | Eq of poly n
-  | Geq of poly n.
-
-
-Definition expr_eq e1 e2 :=
+Definition expr_eq (e1 e2 : expr n) :=
   match e1, e2 with
   | Eq p1, Eq p2 => p1 == p2
   | Geq p1, Geq p2 => p1 == p2
@@ -52,23 +47,7 @@ Proof.
   by apply/eqP.
 Qed.
 
-HB.instance Definition _ := hasDecEq.Build expr expr_eq.
-
-Definition extract_poly e : poly n :=
-  match e with
-  | Eq p => p
-  | Geq p => p
-  end.
-
-(* NOTE: The following coercion tells Rocq that a expr can be converted into a polynomial *)
-Coercion extract_poly : expr >-> poly.
-
-(*
-  NOTE:
-   - `m.+2`: Is equal to S (S n), equivalently `m.+1` is equal to S n. In simple terms `m.+2` is m + 2.
-   - `-tuple expr`: A tuple of type `expr` and length `m.+2`, meaning that there are at least 2 items in the tuple.
-*)
-Definition system := m.+2.-tuple expr.
+HB.instance Definition _ := hasDecEq.Build (expr n) expr_eqP.
 
 Let cv_addn1_succ: 'cV[R]_(n+1) -> 'cV[R]_n.+1 :=
   (castmx (addn1 n, erefl)).
@@ -90,30 +69,7 @@ Definition eval_expr e x : bool :=
   | Geq p => 0%R <= eval_poly p x
   end.
 
-Definition eval_system (es : system) x : bool := all (eval_expr ^~ x) es.
-
-Definition is_neg_const p : bool :=
-  [forall i : 'I_n.+1, if i == ord_max then p 0 i < 0 else p 0 i == 0].
-
-(** This is not a nice solution, should look into it **)
-Definition scale_expr (c : R) (e : expr) : expr :=
-  match e with
-  | Eq p => Eq (c *: p)
-  | Geq p => if c >= 0 then Geq (c *: p) else Geq p
-  end.
-
-Definition scale_exprs (cs : m.+2.-tuple R) (es : system) : system :=
-  map (fun '(c, e) => scale_expr c e) (zip_tuple cs es).
-
-Definition sum_polys (es : system) : poly n :=
-  \sum_(e <- es) extract_poly e.
-
-Definition mk_cert_poly (cs : m.+2.-tuple R) (es : system) : poly n :=
-  sum_polys (scale_exprs cs es).
-
-Definition check_cert (es : system) (cs : m.+2.-tuple R) : bool :=
-  is_neg_const (mk_cert_poly cs es).
-
+Definition eval_system (es : system m) x : bool := all (eval_expr ^~ x) es.
 Lemma col_mx_max1 x : cv_addn1_succ (col_mx x 1%:M) ord_max ord0 = 1.
 Proof.
   rewrite /cv_addn1_succ castmxE (_ : ord_max = cast_ord (addn1 n) (rshift n ord0)) //=.
@@ -205,7 +161,7 @@ Proof.
   by have := H e He.
 Qed.
 
-Theorem farkas_unsat (es:system) (cs : m.+2.-tuple R) x :
+Theorem farkas_unsat (es : system m) (cs : m.+2.-tuple R) x :
   check_cert es cs -> eval_system es x = false.
 Proof.
   move=> /(cert_is_neg x).
@@ -221,20 +177,14 @@ Section Mat.
 
 Open Scope ring_scope.
 
-Variable (R : numDomainType).
-Variable (m n : nat).
-Variable (A : 'M[R]_(m,n)).
-Variable (l x u : 'cV[R]_n).
-
-Definition mat_to_system A l u x : system R n m :=
+Definition mat_to_system A l u x : system m :=
   tcast (addn2 m) (
   cat_tuple
-  [tuple (Eq (rv_addn1_succ (row_mx (row i A) 0%:M))) | i < m]
-  [tuple (Geq (rv_addn1_succ (row_mx (u-x)^T 0%:M))); (Geq (rv_addn1_succ (row_mx (x-l)^T 0%:M)))]).
+  [tuple (Eq n (rv_addn1_succ (row_mx (row i A) 0%:M))) | i < m]
+  [tuple (Geq n (rv_addn1_succ (row_mx (u-x)^T 0%:M))); (Geq n (rv_addn1_succ (row_mx (x-l)^T 0%:M)))]).
 
-Definition poly_to_rv (p : poly R n) : 'rV[R]_n :=
+Definition poly_to_rv (p : poly n) : 'rV[R]_n :=
   lsubmx (castmx (erefl, esym (addn1 n)) p).
-
 
 Lemma leqW2 (a : nat) : (a <= a.+2)%N.
 Proof.
@@ -242,27 +192,29 @@ Proof.
   by apply leqnSn.
 Qed.
 
-Definition system_to_mat (es : system R n m) : ('M[R]_(m,n) * 'cV[R]_n * 'cV[R]_n) :=
+Definition system_to_mat (es : system m) : ('M[R]_(m,n) * 'cV[R]_n * 'cV[R]_n) :=
   (\matrix_(i < m) poly_to_rv (extract_poly (tnth es (widen_ord (leqW2 m) i))),
     (poly_to_rv (extract_poly (tnth es (ord_max - 1))))^T,
     (poly_to_rv (extract_poly (tnth es ord_max)))^T
   ).
 
 (* NOTE: Specifying the order of mathcomp matrices. *)
-Definition lermx (mx1 mx2 : 'M[R]_(m,n)) :=
+Definition lermx {m n} (mx1 mx2 : 'M[R]_(m,n)) :=
     [forall i : 'I_m * 'I_n, mx1 i.1 i.2 <= mx2 i.1 i.2].
+
+Check lermx.
 
 End Mat.
 Open Scope ring_scope.
 
 Notation "A <=m B" := (lermx A B) (at level 70, no associativity) : ring_scope.
 
-Definition eval_mat {R : numDomainType} {m n} (A : 'M[R]_(m,n)) (l x u : 'cV[R]_n) : bool :=
+Definition eval_mat (A: 'M[R]_(m,n)) (l x u : 'cV[R]_n) : bool :=
   (A *m x == 0) && (l <=m x) && (x <=m u).
 
 (* WARN: The following lemma is unfinished, is there any reason for it? *)
-Lemma mat_system_inv {R : numDomainType} {m n} (A : 'M[R]_(m,n)) (l u x : 'cV[R]_n)
-(es : system R n m) : system_to_mat (mat_to_system A l x u) = (A, l, u).
+Lemma mat_system_inv  (A : 'M[R]_(m,n)) (l u x : 'cV[R]_n)
+(es : system m) : system_to_mat (mat_to_system A l x u) = (A, l, u).
 Proof.
   rewrite /system_to_mat.
   apply congr2.
@@ -274,7 +226,7 @@ Proof.
 Admitted.
 
 (* WARN: The following lemma is unfinished, is there any reason for it? *)
-Lemma poly_equiv {R : numDomainType} {m n} (A : 'M[R]_(m,n)) (l x u : 'cV[R]_n) (es : system R n m) :
+Lemma poly_equiv  (A : 'M[R]_(m,n)) (l x u : 'cV[R]_n) (es : system m) :
   eval_mat A l x u <-> eval_system es x.
 Proof.
   split.

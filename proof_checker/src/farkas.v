@@ -4,79 +4,66 @@
   https://github.com/lstrsrmn/proof-certs-translation/tree/main
 *)
 From mathcomp Require Import all_ssreflect all_fingroup all_algebra zmodp ssrnum ssrnat matrix eqtype.
+
+Require Import certificate.
+
 Import GRing.Theory.
-Require Import farkas_soundness.
+Import CertificateSpecs.
 
-
-Set Implicit Arguments.
-
-Section Farkas.
-
-Definition poly := seq rat.
+Module Farkas.
 
 Open Scope ring_scope.
 
-Inductive expr :=
-| Eq of poly
-| Geq of poly.
+Implicit Type x : 'cV[R]_n.
+Implicit Type p : 'rV[R]_n.+1.
 
-Print FarkasSoundness.poly.
+(* NOTE:'rV[R]_n.+1 is the MathComp type of row vectors over R of length n + 1. *)
+Definition poly (n : nat) : Type := 'rV[R]_n.+1.
 
-Definition convert_poly (n : nat) (p : poly) : FarkasSoundness.poly rat n :=
-  \row_(i < n.+1) nth 0 p i.
 
-Print FarkasSoundness.expr.
+Inductive expr (n : nat) :=
+  | Eq of poly n
+  | Geq of poly n.
 
-Fixpoint convert_expr (n : nat) (e : expr) : FarkasSoundness.expr rat n :=
+
+Definition extract_poly e : poly n :=
   match e with
-  | Eq p  => FarkasSoundness.Eq (convert_poly n p)
-  | Geq p => FarkasSoundness.Geq (convert_poly n p)
+  | Eq p => p
+  | Geq p => p
   end.
 
-Definition system (n : nat) := seq expr.
+(* NOTE: The following coercion tells Rocq that a expr can be converted into a polynomial *)
+Coercion extract_poly : expr >-> poly.
 
-Print FarkasSoundness.system.
+(*
+  NOTE:
+   - `m.+2`: Is equal to S (S n), equivalently `m.+1` is equal to S n. In simple terms `m.+2` is m + 2.
+   - `-tuple expr`: A tuple of type `expr` and length `m.+2`, meaning that there are at least 2 items in the tuple.
+*)
+Definition system (m : nat) : Type := (m.+2).-tuple (expr n).
 
-Definition convert_system' (n m : nat) (s : system n) (H : size s = m.+2) 
-  : FarkasSoundness.system rat n m.
-Proof.
-  (* 1. We still must convert the elements to the target type *)
-  pose s_converted := [seq convert_expr n i | i <- s].
-  
-  (* 2. We prove the NEW sequence has the correct size *)
-  have Hsize : size s_converted == m.+2.
-  { (* size_map proves that size s_converted is exactly size s *)
-    rewrite size_map. 
-    (* Now the goal is size s == m.+2, which we can solve with our hypothesis *)
-    apply/eqP. 
-    exact: H.
-  }
-    
-  (* 3. We build the tuple exactly as before *)
-  exact: (Tuple Hsize).
-Defined.
+Definition is_neg_const p : bool :=
+  [forall i : 'I_n.+1, if i == ord_max then p 0 i < 0 else p 0 i == 0].
 
+Check Eq.
 
-(* n = 1 (meaning row vectors will have size n.+1 = 2) *)
-Definition n := 1%nat.
+(** This is not a nice solution, should look into it **)
+Definition scale_expr (c : R) (e : expr n) : (expr  n) :=
+  match e with
+  | Eq p => Eq n (c *: p)
+  | Geq p => if c >= 0 then Geq n (c *: p) else Geq n p
+  end.
 
-(* m = 0 (meaning system will have size m.+2 = 2) *)
-Definition m := 0%nat. 
+Definition scale_exprs (cs : m.+2.-tuple R) (es :  system m) : system m :=
+  map (fun '(c, e) => scale_expr c e) (zip_tuple cs es).
 
-Definition dummy_poly1 : poly := [:: 0; 0].
-Definition dummy_poly2 : poly := [:: 0; 0].
+Definition sum_polys (es : system m) : poly n :=
+  \sum_(e <- es) extract_poly e.
 
+Definition mk_cert_poly (cs : m.+2.-tuple R) (es : system m) : poly n :=
+  sum_polys (scale_exprs cs es).
 
-Definition dummy_sys : system n := [:: Eq dummy_poly1; Geq dummy_poly2].
-
-Lemma dummy_sys_has_correct_size : size dummy_sys = m.+2.
-Proof. simpl. reflexivity. Qed.
-
-
-Definition converted_dummy_system := 
-  convert_system' dummy_sys dummy_sys_has_correct_size.
-
-Print converted_dummy_system.
+Definition check_cert (es : system m) (cs : m.+2.-tuple R) : bool :=
+  is_neg_const (mk_cert_poly cs es).
 
 End Farkas.
-
