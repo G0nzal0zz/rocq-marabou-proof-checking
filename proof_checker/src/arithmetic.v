@@ -11,20 +11,6 @@ Import Farkas.
 Module Arithmetic.
 
 
-(* NOTE: Temporary function to avoid compiling error when multiplying a Stdlib Real and a Mathcomp real. *)
-
-(*Definition mul' (x : R) (y : R') : R :=*)
-(*  0.*)
-(*Definition poly : Type := farkas.poly R' n.*)
-(**)
-(*Definition expr : Type := farkas.expr R' n.*)
-(**)
-(*Definition example_poly : 'rV[R']_n.+1 := \row_(i < n.+1) (0: R').  (* all zeros *)*)
-(*Definition example_eq : farkas.expr R' n := farkas.Eq example_poly.*)
-(**)
-(**)
-(*Definition extract_poly' := extract_poly example_eq.*)
-
 (** Helper function for {!compute_combination} *)
 (*let rec update_combination (lc: Real.t list) (expl: Real.t list) (tableau: expr list): Real.t list = *)
 (*    match expl, tableau with*)
