@@ -1,10 +1,11 @@
-From Stdlib Require Import Reals.
-From Stdlib Require Import List.
+From mathcomp Require Import all_algebra seq.
 
+Require Import certificate_specs.
 Require Import constraint.
 Require Import util.
+Require Import tightening.
 
-Import ListNotations.
+Import CertificateSpecs.
 
 Module Split.
 
@@ -26,17 +27,20 @@ Inductive t :=
 (*        let ubs_r = set_nth ubs aux 0. in*)
 (*        (lbs_l, ubs_l), (lbs_r, ubs_r)*)
 
-Definition update_bounds_from_split (lbs: list R) (ubs : list R) (split : t)
-  : ((list R * list R)  * (list R * list R)) :=
+Definition update_bounds_from_split
+  (lbs: Tightening.t_bounds)
+  (ubs : Tightening.t_bounds)
+  (split : t)
+  : ((Tightening.t_bounds * Tightening.t_bounds)  * (Tightening.t_bounds  * Tightening.t_bounds)) :=
   match split with
-  | single i k => ((lbs, set_nth ubs i k), (set_nth lbs i k, ubs))
+  | single i k => ((lbs, set_nth_vector ubs i k), (set_nth_vector lbs i k, ubs))
   | relu b f aux => 
     (* left: inactive phase *)
-    let lbs_l := set_nth lbs f 0%R in
-    let ubs_l := set_nth (set_nth ubs b 0%R) f 0%R in
+    let lbs_l := set_nth_vector lbs f 0%R in
+    let ubs_l := set_nth_vector (set_nth_vector ubs b 0%R) f 0%R in
     (* right: active phase *)
-    let lbs_r := set_nth (set_nth lbs b 0%R) aux 0%R in
-    let ubs_r := set_nth ubs aux 0%R in
+    let lbs_r := set_nth_vector (set_nth_vector lbs b 0%R) aux 0%R in
+    let ubs_r := set_nth_vector ubs aux 0%R in
     ((lbs_l, ubs_l), (lbs_r, ubs_r))
   end.
 
@@ -45,10 +49,9 @@ Definition update_bounds_from_split (lbs: list R) (ubs : list R) (split : t)
 (*    | ReluSplit (b,f,aux) -> List.mem (Relu (b,f,aux)) constraints*)
 (*    | _ -> true*)
 
-
-Definition check_split (split : t) (constraints : list Constraint.t) : bool :=
+Definition check_split (split : t) (constraints : seq Constraint.t) : bool :=
   match split with
-  | relu b f aux  => existsb (Constraint.constraint_eqb (Constraint.relu b f aux)) constraints
+  | relu b f aux => has (Constraint.constraint_eqb (Constraint.relu b f aux)) constraints
   | _ => false
   end.
 

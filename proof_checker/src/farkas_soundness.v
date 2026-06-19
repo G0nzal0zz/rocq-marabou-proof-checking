@@ -7,8 +7,8 @@ From mathcomp Require Import all_ssreflect all_fingroup all_algebra zmodp ssrnum
 (* Require Import utils algebra_ext matrix_ext. *)
 From HB Require Import structures.
 
+Require Import certificate_specs.
 Require Import farkas.
-Require Import certificate.
 
 Import GroupScope Order.TTheory GRing.Theory Num.Theory.
 Import CertificateSpecs.
@@ -69,7 +69,7 @@ Definition eval_expr e x : bool :=
   | Geq p => 0%R <= eval_poly p x
   end.
 
-Definition eval_system (es : system m) x : bool := all (eval_expr ^~ x) es.
+Definition eval_system (es : system m n) x : bool := all (eval_expr ^~ x) es.
 Lemma col_mx_max1 x : cv_addn1_succ (col_mx x 1%:M) ord_max ord0 = 1.
 Proof.
   rewrite /cv_addn1_succ castmxE (_ : ord_max = cast_ord (addn1 n) (rshift n ord0)) //=.
@@ -161,7 +161,7 @@ Proof.
   by have := H e He.
 Qed.
 
-Theorem farkas_unsat (es : system m) (cs : m.+2.-tuple R) x :
+Theorem farkas_unsat (es : system m n) (cs : m.+2.-tuple R) x :
   check_cert es cs -> eval_system es x = false.
 Proof.
   move=> /(cert_is_neg x).
@@ -177,7 +177,7 @@ Section Mat.
 
 Open Scope ring_scope.
 
-Definition mat_to_system A l u x : system m :=
+Definition mat_to_system A l u x : system m n :=
   tcast (addn2 m) (
   cat_tuple
   [tuple (Eq n (rv_addn1_succ (row_mx (row i A) 0%:M))) | i < m]
@@ -192,7 +192,7 @@ Proof.
   by apply leqnSn.
 Qed.
 
-Definition system_to_mat (es : system m) : ('M[R]_(m,n) * 'cV[R]_n * 'cV[R]_n) :=
+Definition system_to_mat (es : system m n) : ('M[R]_(m,n) * 'cV[R]_n * 'cV[R]_n) :=
   (\matrix_(i < m) poly_to_rv (extract_poly (tnth es (widen_ord (leqW2 m) i))),
     (poly_to_rv (extract_poly (tnth es (ord_max - 1))))^T,
     (poly_to_rv (extract_poly (tnth es ord_max)))^T
@@ -214,7 +214,7 @@ Definition eval_mat (A: 'M[R]_(m,n)) (l x u : 'cV[R]_n) : bool :=
 
 (* WARN: The following lemma is unfinished, is there any reason for it? *)
 Lemma mat_system_inv  (A : 'M[R]_(m,n)) (l u x : 'cV[R]_n)
-(es : system m) : system_to_mat (mat_to_system A l x u) = (A, l, u).
+(es : system m n) : system_to_mat (mat_to_system A l x u) = (A, l, u).
 Proof.
   rewrite /system_to_mat.
   apply congr2.
@@ -226,7 +226,7 @@ Proof.
 Admitted.
 
 (* WARN: The following lemma is unfinished, is there any reason for it? *)
-Lemma poly_equiv  (A : 'M[R]_(m,n)) (l x u : 'cV[R]_n) (es : system m) :
+Lemma poly_equiv  (A : 'M[R]_(m,n)) (l x u : 'cV[R]_n) (es : system m n) :
   eval_mat A l x u <-> eval_system es x.
 Proof.
   split.

@@ -1,7 +1,7 @@
 From mathcomp Require Import all_ssreflect all_fingroup all_algebra zmodp ssrnum ssrnat matrix eqtype.
 
 Require Import farkas.
-Require Import certificate.
+Require Import certificate_specs.
 
 Import CertificateSpecs.
 

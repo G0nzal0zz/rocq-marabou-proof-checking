@@ -1,4 +1,11 @@
+From mathcomp Require Import all_ssreflect all_algebra.
 From Stdlib Require Import Reals.
+
+Require Import certificate_specs.
+
+Import CertificateSpecs.
+
+Module Tightening.
 
 Inductive bound_type :=
 | UPPER
@@ -6,6 +13,8 @@ Inductive bound_type :=
 
 (* index of value to tighten, new value, bound type (UPPER or LOWER) *)
 Definition t : Type := nat * R * bound_type.
+
+Definition t_bounds : Type := 'rV[R]_n.+1.
 
 (* update the bounds according to a list of tightenings *)
 (*let update_bounds (tightenings: t list) (upper_bounds: Real.t list) (lower_bounds: Real.t list): (Real.t list * Real.t list) =*)
@@ -21,3 +30,6 @@ Definition update_bounds
   (lower_bounds : list R)
   : list R * list R :=
   (nil, nil).
+
+End Tightening.
+

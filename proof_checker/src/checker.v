@@ -1,53 +1,31 @@
-From Stdlib Require Import Reals.
 From mathcomp Require Import all_ssreflect all_algebra.
 
+Require Import certificate_specs.
 Require Import certificate.
+Require Import proof_tree.
 Require Import constraint.
 Require Import farkas.
 Require Import split.
+Require Import tightening.
+Require Import arithmetic.
 
-Section Checker.
-
-Variable (R' : numDomainType).
-Variable (n : nat).
-Variable (m : nat).
-
-Definition poly : Type := farkas.poly R' n.
-
-Definition expr : Type := farkas.expr R' n.
-
-Definition example_poly : 'rV[R']_n.+1 := \row_(i < n.+1) (0: R').  (* all zeros *)
-Definition example_eq : farkas.expr R' n := farkas.Eq example_poly.
-
-Definition system : Type := farkas.system R' n m.
-
-Definition s : system :=
-  [tuple of nseq m.+2 example_eq].
-
-(*let mk_system_contradiction (tableau: expr list) (upper_bounds: Real.t list) (lower_bounds: Real.t list): expr list =*)
-(*  tableau @ (mk_geq_constraints upper_bounds lower_bounds)*)
-
-(* TODO: Implement function *)
-Definition mk_system_contradcition
-  (tableau : list expr)
-  (upper_bounds : list R)
-  (lower_bounds : list R)
-  : system :=
-  s.
+Import CertificateSpecs.
+Import Farkas.
 
 
 (*let mk_contradiction_certificate (contradiction: Real.t list) (tableau: expr list) (upper_bounds: Real.t list) (lower_bounds: Real.t list) =*)
 (*    let lc = compute_combination contradiction tableau in*)
 (*    contradiction @ ((mk_upper_bound_certificate lc) @ (mk_lower_bound_certificate lc))*)
-
-(* TODO: Implement function *)
 Definition mk_contradiction_certificate
-  (contradiction : list R)
-  (tableau : list expr)
-  (upper_bounds : list R)
-  (lower_bounds : list R)
-  : m.+2.-tuple R' :=
-  [tuple of nseq m.+2 0].
+  (contradiction : seq R)
+  (tableau : system m n)
+  (upper_bounds : Tightening.t_bounds)
+  (lower_bounds : Tightening.t_bounds)
+  : seq R :=
+  let lc := Arithmetic.compute_combination contradiction tableau in
+  let upper_bound_cert := Certificate.mk_upper_bound_certificate lc in
+  let lower_bound_cert := Certificate.mk_lower_bound_certificate lc in
+  contradiction ++ (upper_bound_cert ++ lower_bound_cert).
 
 (* check contradiction with polynomials representation *)
 (*let check_contradiction (contradiction: Real.t list) (tableau: expr list) (upper_bounds: Real.t list) (lower_bounds: Real.t list): bool =*)
@@ -55,32 +33,30 @@ Definition mk_contradiction_certificate
 (*    let certificate = mk_contradiction_certificate contradiction tableau upper_bounds lower_bounds in*)
 (*    let res = (check_cert sys certificate) in*)
 (*    res*)
-
 Definition check_contradiction
-  (contradiction : list R)
-  (tableau : list expr)
-  (upper_bounds : list R)
-  (lower_bounds : list R)
+  (contradiction : seq R)
+  (tableau : system m n)
+  (upper_bounds : Tightening.t_bounds)
+  (lower_bounds : Tightening.t_bounds)
   : bool :=
-  let sys : system := mk_system_contradcition tableau upper_bounds lower_bounds in
+  let sys  := Certificate.mk_system_contradiction tableau upper_bounds lower_bounds in
   let certificate := mk_contradiction_certificate contradiction tableau upper_bounds lower_bounds in 
-  farkas.check_cert sys certificate.
+  check_cert sys certificate.
 
-(* WARN: Should I be using mathcomp's reals or Rocq's Stdlib reals? *)
 Fixpoint check_tree
-  (tableau : list expr)
-  (upper_bounds : list R)
-  (lower_bounds : list R)
-  (constraints : list Constraint.t)
-  (proof_node : proof_tree)
+  (tableau : system m n)
+  (upper_bounds : Tightening.t_bounds)
+  (lower_bounds : Tightening.t_bounds)
+  (constraints : seq Constraint.t)
+  (proof_node : ProofTree.t)
   : bool :=
   match proof_node with
-  | leaf contradiction => 
+  | ProofTree.leaf contradiction => 
       check_contradiction contradiction
                           tableau
                           upper_bounds
                           lower_bounds
-  | node split tleft tright =>
+  | ProofTree.node split tleft tright =>
       let valid_split := Split.check_split split constraints in
       let bounds := Split.update_bounds_from_split
                       lower_bounds
@@ -97,4 +73,3 @@ Fixpoint check_tree
       andb valid_children valid_split
   end.
 
-End Checker.
