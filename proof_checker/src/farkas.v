@@ -17,6 +17,7 @@ Open Scope ring_scope.
 Implicit Type x : 'cV[R]_n.
 Implicit Type p : 'rV[R]_n.+1.
 
+Definition m' := (m + n.+1.*2).
 (* NOTE:'rV[R]_n.+1 is the MathComp type of row vectors over R of length n + 1. *)
 Definition poly (n : nat) : Type := 'rV[R]_n.+1.
 
@@ -52,16 +53,16 @@ Definition scale_expr (c : R) (e : expr n) : (expr  n) :=
   | Geq p => if c >= 0 then Geq n (c *: p) else Geq n p
   end.
 
-Definition scale_exprs (cs : m.+2.-tuple R) (es :  system m n) : system m n :=
+Definition scale_exprs (cs : m'.+2.-tuple R) (es :  system m' n) : system m' n :=
   map (fun '(c, e) => scale_expr c e) (zip_tuple cs es).
 
-Definition sum_polys (es : system m n) : poly n :=
+Definition sum_polys (es : system m' n) : poly n :=
   \sum_(e <- es) extract_poly e.
 
-Definition mk_cert_poly (cs : m.+2.-tuple R) (es : system m n) : poly n :=
+Definition mk_cert_poly (cs : m'.+2.-tuple R) (es : system m' n) : poly n :=
   sum_polys (scale_exprs cs es).
 
-Definition check_cert (es : system m n) (cs : m.+2.-tuple R) : bool :=
+Definition check_cert (es : system m' n) (cs : m'.+2.-tuple R) : bool :=
   is_neg_const (mk_cert_poly cs es).
 
 End Farkas.

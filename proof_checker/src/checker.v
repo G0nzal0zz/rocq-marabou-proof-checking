@@ -39,7 +39,7 @@ Definition check_contradiction
   (upper_bounds : Tightening.t_bounds)
   (lower_bounds : Tightening.t_bounds)
   : bool :=
-  let sys  := Certificate.mk_system_contradiction tableau upper_bounds lower_bounds in
+  let sys := Certificate.mk_system_contradiction tableau upper_bounds lower_bounds in
   let certificate := mk_contradiction_certificate contradiction tableau upper_bounds lower_bounds in 
   check_cert sys certificate.
 

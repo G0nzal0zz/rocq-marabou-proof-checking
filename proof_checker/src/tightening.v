@@ -54,13 +54,10 @@ Definition update_bounds
   (upper_bounds : t_bounds)
   (lower_bounds : t_bounds)
   : t_bounds * t_bounds :=
-
   let upper_tightenings := filter (fun '(_, _, btype) => is_upper btype) tightenings in
   let lower_tightenings := filter (fun '(_, _, btype) => is_lower btype) tightenings in
-
   let updated_upper := update_bounds_by_tightenings upper_tightenings upper_bounds in
   let updated_lower := update_bounds_by_tightenings lower_tightenings lower_bounds in
-
   (updated_upper, updated_lower).
 
 End Tightening.
