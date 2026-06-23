@@ -8,27 +8,30 @@ Import CertificateSpecs.
 
 Module Certificate.
 
-Open Scope rat_scope.
+Open Scope ring_scope.
 
 (* create certificate for Geq constraints corresponding to upper bounds *)
 (*let rec mk_upper_bound_certificate (lc: Real.t list) = *)
 (*  match lc with *)
 (*  | [] -> []*)
 (*  | hd :: tl -> (if hd >=. 0. then hd else 0. ) :: mk_upper_bound_certificate tl*)
-Definition mk_upper_bound_certificate (lc : seq R) : seq R :=
-  [seq if Num.ge hd 0%R then hd else 0%R | hd <- lc].
+Definition mk_upper_bound_certificate (lc : n.-tuple R) : n.-tuple R :=
+  [tuple
+    let val := tnth lc j in
+    if val >= 0%R then val else 0%R
+  | j < n].
 
 (* create certificate for Geq constraints corresponding to lower bounds *)
 (*let rec mk_lower_bound_certificate (lc: Real.t list) = *)
 (*  match lc with *)
 (*  | [] -> []*)
 (*  | hd :: tl -> (if hd <. 0. then (-. hd) else 0. ) :: mk_lower_bound_certificate tl*)
-Definition mk_lower_bound_certificate (lc : seq R) : seq R :=
-  (* FIXED: Num.lt hd 0%R checks if hd is strictly negative *)
-  [seq if Num.lt hd 0%R then - hd else 0%R | hd <- lc].
+Definition mk_lower_bound_certificate (lc : n.-tuple R) : n.-tuple R :=
+  [tuple
+    let val := tnth lc j in
+    if val < 0%R then - val else 0%R
+  | j < n].
 
-Locate "\row_".
-Locate "tuple".
 (*
   Create a polynomial of size (size + 1) that represents the bound of variable i:
   all coefficients are 0, except at index i where it is  `coeff` (should be 1 for a lower bound

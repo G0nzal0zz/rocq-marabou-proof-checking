@@ -39,6 +39,8 @@ Definition map2_vector {R : numFieldType} {n : nat} (f : R -> R -> R) (u v : 'rV
   (* Element-wise transformation across all columns *)
   \row_(j < n.+1) f (u 0%R j) (v 0%R j).
 
-
 Definition vector_to_seq {n : nat} (v : 'rV[R]_n) : seq R :=
   [seq v 0%R i | i <- enum 'I_n].
+
+Definition drop_last_vector (v : 'rV[R]_n.+1) : 'rV[R]_n :=
+  \matrix_(i < 1, j < n) v 0%R (cast_ord (addn1 n) (lshift 1 j)).

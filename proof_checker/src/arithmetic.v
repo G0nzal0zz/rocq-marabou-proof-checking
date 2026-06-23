@@ -1,4 +1,5 @@
 From mathcomp Require Import all_ssreflect all_algebra.
+From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq path choice matrix.
 
 Require Import certificate_specs.
 Require Import farkas.
@@ -10,30 +11,15 @@ Import Farkas.
 
 Module Arithmetic.
 
-
 (** Helper function for {!compute_combination} *)
 (*let rec update_combination (lc: Real.t list) (expl: Real.t list) (tableau: expr list): Real.t list = *)
 (*    match expl, tableau with*)
 (*    | _, [] | [], _ -> lc*)
 (*    | coeff :: expl', row :: tableau' -> update_combination (list_add lc (list_scale (extract_poly row) coeff)) expl' tableau'*)
 
-Fixpoint update_combination_list  (lc expl : seq R) (tableau_list : seq (expr n)) : seq R :=
-  match expl, tableau_list with
-  | [::], _ => lc
-  | _, [::] => lc
-  | coeff :: expl', row :: tableau' => 
-      let scaled_row := map_vector (fun x => mulq coeff x) (extract_poly row) in
-      let next_lc := map2 addq lc (vector_to_seq scaled_row) in
-      
-      update_combination_list next_lc expl' tableau'
-  end.
-
-Definition update_combination (lc expl : seq R) (tableau : system m n) : seq R :=
-  update_combination_list lc expl (val tableau).
-
-(** Compute a linear combination of tableau rows with coefficients from the explanation vector `expl` 
+(** Compute a linear combination of tableau rows with coefficients from the explanation vector `expl`
     (i.e. a bound-tightening lemma vector or a contradiction in a Leaf node)
-    The initial zero vector accumulator has length (len p - 1) because the polynomials have a constant factor, 
+    The initial zero vector accumulator has length (len p - 1) because the polynomials have a constant factor,
     and we want it to be the size of the variable vector
 *)
 (*let compute_combination (expl: Real.t list) (tableau: expr list): Real.t list =*)
@@ -41,13 +27,10 @@ Definition update_combination (lc expl : seq R) (tableau : system m n) : seq R :
 (*    | [] -> []*)
 (*    | (hd::tl as tableau) -> update_combination (repeat 0. (List.length (extract_poly hd) - 1)) expl tableau*)
 
-Definition compute_combination (expl : seq R) (tableau : system m n) : seq R :=
-  match val tableau with
-  | [::] => [::]
-  | hd :: tl => 
-      let initial_size := n.-1 in
-      update_combination (nseq initial_size 0%R) expl tableau
-  end.
+Definition compute_combination (expl : (m.+2).-tuple R) (tableau : system m n) : n.-tuple R :=
+  let raw_vector_sum : 'rV[R]_n :=
+    \sum_(i < m.+2) (tnth expl i *: drop_last_vector (extract_poly (tnth tableau i))) in
+  [tuple raw_vector_sum 0 j | j < n].
 
 End Arithmetic.
 

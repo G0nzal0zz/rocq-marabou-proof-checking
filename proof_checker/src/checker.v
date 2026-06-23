@@ -16,16 +16,17 @@ Import Farkas.
 (*let mk_contradiction_certificate (contradiction: Real.t list) (tableau: expr list) (upper_bounds: Real.t list) (lower_bounds: Real.t list) =*)
 (*    let lc = compute_combination contradiction tableau in*)
 (*    contradiction @ ((mk_upper_bound_certificate lc) @ (mk_lower_bound_certificate lc))*)
+(* WARN: Should I move this function to certificate.v?*)
 Definition mk_contradiction_certificate
-  (contradiction : seq R)
+  (contradiction : (m.+2).-tuple R)
   (tableau : system m n)
   (upper_bounds : Tightening.t_bounds)
   (lower_bounds : Tightening.t_bounds)
-  : seq R :=
+  : (m.+2 + (n + n)).-tuple R :=
   let lc := Arithmetic.compute_combination contradiction tableau in
   let upper_bound_cert := Certificate.mk_upper_bound_certificate lc in
   let lower_bound_cert := Certificate.mk_lower_bound_certificate lc in
-  contradiction ++ (upper_bound_cert ++ lower_bound_cert).
+  cat_tuple contradiction (cat_tuple upper_bound_cert lower_bound_cert).
 
 (* check contradiction with polynomials representation *)
 (*let check_contradiction (contradiction: Real.t list) (tableau: expr list) (upper_bounds: Real.t list) (lower_bounds: Real.t list): bool =*)
@@ -34,13 +35,19 @@ Definition mk_contradiction_certificate
 (*    let res = (check_cert sys certificate) in*)
 (*    res*)
 Definition check_contradiction
-  (contradiction : seq R)
+  (contradiction : (m.+2).-tuple R)
   (tableau : system m n)
   (upper_bounds : Tightening.t_bounds)
   (lower_bounds : Tightening.t_bounds)
   : bool :=
   let sys := Certificate.mk_system_contradiction tableau upper_bounds lower_bounds in
-  let certificate := mk_contradiction_certificate contradiction tableau upper_bounds lower_bounds in 
+  let certificate := mk_contradiction_certificate contradiction tableau upper_bounds lower_bounds in
+  (* WARN:
+     `check_cert` expects `sys` and `certificate` to have the same size.
+     But `sys` and `certificate` both have different sizes.
+     It should be investigated if this fact is an error in my implementation or
+     if the function `check_cert` should expect both arguments to have different sizes.
+  *)
   check_cert sys certificate.
 
 Fixpoint check_tree
