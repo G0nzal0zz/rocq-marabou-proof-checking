@@ -59,8 +59,8 @@ Definition mk_bound_poly (n : nat) (i : nat) (coeff : R) (bound : R) : Farkas.po
 (*  | u::bounds -> let i = size - (List.length upper_bounds) in*)
 (*      Geq (mk_bound_poly size i (-1.) u) :: mk_upper_bounds_constraints size bounds*)
 
-Definition mk_upper_bounds_constraints (upper_bounds : Tightening.t_bounds) : (n.+1).-tuple (Farkas.expr n) :=
-  [tuple (Farkas.Geq n (mk_bound_poly n (j : nat) (-1)%R (upper_bounds 0%R j))) | j < n.+1].
+Definition mk_upper_bounds_constraints (upper_bounds : Tightening.t_bounds) : n.-tuple (Farkas.expr n) :=
+  [tuple (Farkas.Geq n (mk_bound_poly n (j : nat) (-1)%R (upper_bounds 0%R j))) | j < n].
 
 (* remove iterator to make it easier to prove *)
 (*let rec mk_lower_bounds_constraints size lower_bounds = *)
@@ -68,8 +68,8 @@ Definition mk_upper_bounds_constraints (upper_bounds : Tightening.t_bounds) : (n
 (*  | [] -> []*)
 (*  | l::bounds -> let i = size - (List.length lower_bounds) in*)
 (*    Geq (mk_bound_poly size i 1. (-. l)) :: mk_lower_bounds_constraints size bounds*)
-Definition mk_lower_bounds_constraints (lower_bounds : Tightening.t_bounds) : (n.+1).-tuple (Farkas.expr n) :=
-  [tuple (Farkas.Geq n (mk_bound_poly n (j : nat) 1%R (lower_bounds 0%R j))) | j < n.+1].
+Definition mk_lower_bounds_constraints (lower_bounds : Tightening.t_bounds) : n.-tuple (Farkas.expr n) :=
+  [tuple (Farkas.Geq n (mk_bound_poly n (j : nat) 1%R (lower_bounds 0%R j))) | j < n].
 
 (** Create Geq constraints corresponding to the variable bounds.
 *)
@@ -77,7 +77,7 @@ Definition mk_lower_bounds_constraints (lower_bounds : Tightening.t_bounds) : (n
 (*  let size = List.length upper_bounds in*)
 (*  (mk_upper_bounds_constraints size upper_bounds) @ (mk_lower_bounds_constraints size lower_bounds)*)
 
-Definition mk_geq_constraints (upper_bounds lower_bounds : Tightening.t_bounds) : (n.+1 + n.+1).-tuple (Farkas.expr n) :=
+Definition mk_geq_constraints (upper_bounds lower_bounds : Tightening.t_bounds) : (n + n).-tuple (Farkas.expr n) :=
   cat_tuple (mk_upper_bounds_constraints upper_bounds) (mk_lower_bounds_constraints lower_bounds).
 
 (* Create the polynomial representation of the linear constraints from the matrix representation *)
@@ -86,11 +86,7 @@ Definition mk_geq_constraints (upper_bounds lower_bounds : Tightening.t_bounds) 
 Definition mk_system_contradiction
   (tableau : Farkas.system m n)
   (upper_bounds lower_bounds : Tightening.t_bounds)
-  : (m.+2 + n.+1.*2).-tuple (Farkas.expr n).
-Proof.
-  apply: (tcast _ (cat_tuple tableau (mk_geq_constraints upper_bounds lower_bounds))).
-  
-  by rewrite addnn.
-Defined.
+  : (m.+2 + (n + n)).-tuple (Farkas.expr n) :=
+  cat_tuple tableau (mk_geq_constraints upper_bounds lower_bounds).
 
 End Certificate.

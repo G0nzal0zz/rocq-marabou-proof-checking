@@ -12,7 +12,6 @@ Require Import arithmetic.
 Import CertificateSpecs.
 Import Farkas.
 
-
 (*let mk_contradiction_certificate (contradiction: Real.t list) (tableau: expr list) (upper_bounds: Real.t list) (lower_bounds: Real.t list) =*)
 (*    let lc = compute_combination contradiction tableau in*)
 (*    contradiction @ ((mk_upper_bound_certificate lc) @ (mk_lower_bound_certificate lc))*)
@@ -27,6 +26,7 @@ Definition mk_contradiction_certificate
   let upper_bound_cert := Certificate.mk_upper_bound_certificate lc in
   let lower_bound_cert := Certificate.mk_lower_bound_certificate lc in
   cat_tuple contradiction (cat_tuple upper_bound_cert lower_bound_cert).
+
 
 (* check contradiction with polynomials representation *)
 (*let check_contradiction (contradiction: Real.t list) (tableau: expr list) (upper_bounds: Real.t list) (lower_bounds: Real.t list): bool =*)

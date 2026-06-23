@@ -15,7 +15,7 @@ Inductive bound_type :=
 (* index of value to tighten, new value, bound type (UPPER or LOWER) *)
 Definition t : Type := nat * R * bound_type.
 
-Definition t_bounds : Type := 'rV[R]_n.+1.
+Definition t_bounds : Type := 'rV[R]_n.
 
 Definition is_upper (type : bound_type) : bool :=
   match type with

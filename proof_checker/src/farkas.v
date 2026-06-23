@@ -17,7 +17,7 @@ Open Scope ring_scope.
 Implicit Type x : 'cV[R]_n.
 Implicit Type p : 'rV[R]_n.+1.
 
-Definition m' := (m + n.+1.*2).
+Definition m' := (m + (n + n)).
 (* NOTE:'rV[R]_n.+1 is the MathComp type of row vectors over R of length n + 1. *)
 Definition poly (n : nat) : Type := 'rV[R]_n.+1.
 
