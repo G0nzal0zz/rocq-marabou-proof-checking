@@ -12,6 +12,8 @@ Require Import arithmetic.
 Import CertificateSpecs.
 Import Farkas.
 
+Module Checker.
+
 (*let mk_contradiction_certificate (contradiction: Real.t list) (tableau: expr list) (upper_bounds: Real.t list) (lower_bounds: Real.t list) =*)
 (*    let lc = compute_combination contradiction tableau in*)
 (*    contradiction @ ((mk_upper_bound_certificate lc) @ (mk_lower_bound_certificate lc))*)
@@ -80,3 +82,4 @@ Fixpoint check_tree
       andb valid_children valid_split
   end.
 
+End Checker.

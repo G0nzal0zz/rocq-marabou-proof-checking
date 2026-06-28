@@ -69,7 +69,7 @@ Definition eval_expr e x : bool :=
   | Geq p => 0%R <= eval_poly p x
   end.
 
-Definition eval_system (es : system m n) x : bool := all (eval_expr ^~ x) es.
+Definition eval_system (es : system m' n) x : bool := all (eval_expr ^~ x) es.
 Lemma col_mx_max1 x : cv_addn1_succ (col_mx x 1%:M) ord_max ord0 = 1.
 Proof.
   rewrite /cv_addn1_succ castmxE (_ : ord_max = cast_ord (addn1 n) (rshift n ord0)) //=.
@@ -161,7 +161,7 @@ Proof.
   by have := H e He.
 Qed.
 
-Theorem farkas_unsat (es : system m n) (cs : m.+2.-tuple R) x :
+Theorem farkas_unsat (es : system m' n) (cs : m'.+2.-tuple R) x :
   check_cert es cs -> eval_system es x = false.
 Proof.
   move=> /(cert_is_neg x).
@@ -174,6 +174,8 @@ End Farkas.
 
 (* NOTE: This section aim is to demonstrate that the inductive definition `system` is the same as a matrix *)
 Section Mat.
+
+(* TODO: Change `m` for `m'`*)
 
 Open Scope ring_scope.
 
