@@ -15,7 +15,7 @@ Module Sat.
 (*    check_relu_constraints relu_constraints x) = false*)
 
 (* NOTE: The function `bounded` can be omitted since the sizes of the vectors are enconded in the types*)
-Definition unsat (tableau : system m n) (constraints : seq Constraint.t) (x : 'rV[R]_n.+1) : bool :=
+Definition unsat (tableau : (m.+2).-tuple ('rV[R]_n)) (constraints : seq Constraint.t) (x : 'rV[R]_n) : bool :=
   (Arithmetic.is_in_kernel tableau x && Constraint.check_relu_constraints constraints x) == false.
   
 End Sat.

@@ -21,6 +21,8 @@ Definition m' := (m + (n + n)).
 (* NOTE:'rV[R]_n.+1 is the MathComp type of row vectors over R of length n + 1. *)
 Definition poly (n : nat) : Type := 'rV[R]_n.+1.
 
+(*Coercion vector_poly 'rV[R]>-> *)
+
 Inductive expr (n : nat) :=
   | Eq of poly n
   | Geq of poly n.

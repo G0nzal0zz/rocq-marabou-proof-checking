@@ -41,9 +41,9 @@ Definition compute_combination (expl : (m.+2).-tuple R) (tableau : system m n) :
 (*    | [] -> true*)
 (*    | row :: rows -> dot_product row x = 0. && is_in_kernel rows x*)
 
-Definition is_in_kernel (tableau : system m n) (x : 'rV[R]_n.+1) : bool :=
+Definition is_in_kernel (tableau : (m.+2).-tuple ('rV[R]_n)) (x : 'rV[R]_n) : bool :=
   (* 1. Build the matrix out of the tuple of rows *)
-  let tab_mx := \matrix_(i, j) (extract_poly (tnth tableau i)) 0 j in
+  let tab_mx := \matrix_(i, j) (tnth tableau i) 0 j in
 
   (* 2. Transpose x to make it a column vector, multiply, and check for zero *)
   (tab_mx *m (trmx x)) == 0.

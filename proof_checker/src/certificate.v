@@ -71,6 +71,22 @@ Definition mk_upper_bounds_constraints (upper_bounds : Tightening.t_bounds) : n.
 Definition mk_lower_bounds_constraints (lower_bounds : Tightening.t_bounds) : n.-tuple (Farkas.expr n) :=
   [tuple (Farkas.Geq n (mk_bound_poly n (j : nat) 1%R (lower_bounds 0%R j))) | j < n].
 
+(*
+  transform the tableau into a list of Eq expressions, with
+  an added 0. for the constant at the end
+*)
+(*let rec mk_eq_constraints (tableau: Real.t list list): expr list =*)
+(*  match tableau with *)
+(*  | hd :: tl -> Eq (hd @ [0.]) :: mk_eq_constraints tl*)
+(*  | [] -> []*)
+Definition mk_eq_constraints (tableau : (m.+2).-tuple ('rV[R]_n)) : (m.+2).-tuple (Farkas.expr n) :=
+  map_tuple (fun hd =>
+  let extended_vector := row_mx hd 0 in (* Adding the constant at the end of each vector.*)
+    let typed_vector := castmx (erefl 1, addn1 n) extended_vector in
+    Farkas.Eq n typed_vector
+  ) tableau.
+
+
 (** Create Geq constraints corresponding to the variable bounds.
 *)
 (*let mk_geq_constraints (upper_bounds: Real.t list) (lower_bounds: Real.t list): expr list =*)

@@ -1,17 +1,18 @@
-From mathcomp Require Import all_algebra seq.
+From mathcomp Require Import all_ssreflect all_algebra seq.
 
 Require Import certificate_specs.
 Require Import constraint.
 Require Import util.
 Require Import tightening.
+Require Import relu.
 
 Import CertificateSpecs.
 
 Module Split.
 
 Inductive t :=
-| single : nat -> R -> t
-| relu : nat -> nat -> nat -> t.
+  | single : 'I_n -> R -> t
+  | relu : 'I_n -> 'I_n -> 'I_n -> t.
 
 (*let update_bounds_from_split (lbs: real list) (ubs: real list) (split: t): *)
 (*        ((real list * real list) * (real list * real list)) =*)
@@ -51,7 +52,7 @@ Definition update_bounds_from_split
 
 Definition check_split (split : t) (constraints : seq Constraint.t) : bool :=
   match split with
-  | relu b f aux => has (Constraint.constraint_eqb (Constraint.relu b f aux)) constraints
+  | relu b f aux => has (Constraint.constraint_eqb (b, f, aux)) constraints
   | _ => false
   end.
 

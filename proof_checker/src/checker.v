@@ -82,4 +82,28 @@ Fixpoint check_tree
       andb valid_children valid_split
   end.
 
+
+(* Main entry point to verify the proof tree.
+   - perform sanity checks on the tableau and upper and lower bound vector dimensions.
+   - check the tree recursively starting from the root. We use pattern matching to check
+   that the root node contains no dynamic bound tightenings.
+   The function `check_tree` will traverse the tree recursively; so if it returns true,
+   it means that the proof is valid, i.e.all the bound tightenings are correct and
+   all the contradiction vectors correpond to a contradiction.
+*)
+(*let check_proof_tree (tableau: Real.t list list) (upper_bounds: Real.t list) (lower_bounds: Real.t list) (constraints: Constraint.t list) (tree: Proof_tree.t) =*)
+(*    well_formed_tableau_bounds tableau upper_bounds lower_bounds*)
+(*    (* && check_all_splits tree constraints *)*)
+(*    && check_tree (mk_eq_constraints tableau) upper_bounds lower_bounds constraints tree*)
+
+Definition check_proof_tree
+  (tableau : (m.+2).-tuple ('rV[R]_n))
+  (upper_bounds : Tightening.t_bounds)
+  (lower_bounds : Tightening.t_bounds)
+  (constraints : seq Constraint.t)
+  (proof_node : ProofTree.t)
+  : bool :=
+  check_tree (Certificate.mk_eq_constraints tableau) upper_bounds lower_bounds constraints proof_node.
+
 End Checker.
+
