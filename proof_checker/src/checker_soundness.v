@@ -8,6 +8,8 @@ Require Import proof_tree.
 Require Import checker.
 Require Import sat.
 Require Import certificate.
+Require Import split.
+
 
 Import Farkas.
 Import CertificateSpecs.
@@ -34,14 +36,21 @@ Import CertificateSpecs.
 (*   @> [%use check_tree_soundness_node tableau upper_bounds lower_bounds constraints tree x]*)
 (*   @> unroll 50]*)
 
-Lemma check_tree_soundness_full
-  (tableau : (m.+2).-tuple ('rV[R]_n))
+Lemma check_tree_soundness_full (tableau : (m.+2).-tuple ('rV[R]_n))
   (upper_bounds : Tightening.t_bounds)
   (lower_bounds : Tightening.t_bounds)
   (constraints : seq Constraint.t)
   (proof_tree : ProofTree.t)
-  (x : 'rV[R]_n.+1) :
-  Checker.check_tree (Certificate.mk_eq_constraints tableau) upper_bounds lower_bounds constraints proof_tree -> true.
+  (x : 'rV[R]_n) :
+  Checker.check_tree (Certificate.mk_eq_constraints tableau) upper_bounds lower_bounds constraints proof_tree ->
+  match proof_tree with
+  | ProofTree.leaf _ => Sat.unsat tableau upper_bounds lower_bounds constraints x
+  | ProofTree.node split tleft tright => 
+    let '((lb_left, ub_left), (lb_right, ub_right)) := Split.update_bounds_from_split lower_bounds upper_bounds split in
+    Sat.unsat tableau ub_left lb_left constraints x
+    && Sat.unsat tableau ub_right lb_right constraints x ->
+    Sat.unsat tableau upper_bounds lower_bounds constraints x
+  end.
 Proof.
 Admitted.
 
@@ -73,12 +82,8 @@ Theorem check_tree_soundness
   (proof_tree : ProofTree.t)
   (x : 'rV[R]_n) :
   Checker.check_proof_tree tableau upper_bounds lower_bounds constraints proof_tree
-  -> Sat.unsat tableau constraints x.
+  -> Sat.unsat tableau upper_bounds lower_bounds constraints x.
 Proof.
-  destruct Checker.check_tree.
-  - admit.
-  -
-
 Admitted.
 
 

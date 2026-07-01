@@ -9,6 +9,15 @@ Import Farkas.
 
 Module Arithmetic.
 
+
+(*let rec bounded xs us ls = *)
+(*    match xs, us, ls with*)
+(*    | [], [], [] -> true*)
+(*    | x::xs, u::us, l::ls -> l <=. x && x <=. u && bounded xs us ls*)
+(*    | _, _, _ -> true*)
+Definition bounded (v ub lb: 'rV[R]_n) :=
+  [forall i : 'I_n, (lb 0 i <= v 0 i) && (v 0 i <= ub 0 i)].
+
 (** Helper function for {!compute_combination} *)
 (*let rec update_combination (lc: Real.t list) (expl: Real.t list) (tableau: expr list): Real.t list = *)
 (*    match expl, tableau with*)
