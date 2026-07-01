@@ -5,6 +5,8 @@ Require Import proof_tree.
 Require Import tightening.
 Require Import constraint.
 Require Import certificate.
+Require Import checker.
+Require Import farkas.
 
 Import CertificateSpecs.
 
@@ -24,7 +26,7 @@ Module LeafSoundness.
 (*[@@fc]*)
 (* WARN: Is it possible to use ProofTree.leaf as an argument type? *)
 Lemma check_tree_implies_check_cert
-  (tableau : (m.+2).-tuple ('rV[R]_n))
+  (tableau : Farkas.system m n)
   (upper_bounds : Tightening.t_bounds)
   (lower_bounds : Tightening.t_bounds)
   (constraints : seq Constraint.t)
@@ -32,9 +34,9 @@ Lemma check_tree_implies_check_cert
   (x : 'rV[R]_n) :
   let sys := Certificate.mk_system_contradiction tableau upper_bounds lower_bounds in
   let certificate := Certificate.mk_contradiction_certificate contradiction tableau upper_bounds lower_bounds in
-  check_tree tableau upper_bounds lower_bounds relu_constraints proof_tree
+  Checker.check_tree tableau upper_bounds lower_bounds constraints (ProofTree.leaf contradiction)
   ->
-  check_cert sys certificate
+  Farkas.check_cert sys certificate.
   Proof.
   Admitted.
 
