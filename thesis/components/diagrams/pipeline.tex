@@ -1,0 +1,54 @@
+\begin{figure}[h]
+\centering
+
+\begin{tikzpicture}[
+    box/.style={draw, rounded corners, align=center, minimum width=2cm, minimum height=1.0cm},l
+    arrow/.style={-Latex, thick}
+]
+
+\tikzset{
+    verifier/.style={box, fill=blue!10},
+    input/.style={box, fill=gray!10},
+    sat/.style={box, fill=red!15},
+    unsat/.style={box, fill=green!15},
+    check/.style={box, fill=gray!15},
+    finalsafe/.style={box, fill=green!25},
+    finalunsafe/.style={box, fill=red!25}
+}
+
+% Center
+\node[verifier] (b3) {DNN Verifier};
+
+% Inputs (closer)
+\node[input, left=1cm of b3, yshift=0.6cm] (b1) {DNN};
+\node[input, left=1cm of b3, yshift=-0.6cm] (b2) {Property\\Spec.};
+
+% Branch nodes (closer)
+\node[sat, right=1cm of b3, yshift=1cm] (sat) {SAT\\(Unsafe)};
+\node[unsat, right=1cm of b3, yshift=-1cm] (unsat) {UNSAT\\(Safe)};
+
+% SAT path (compressed)
+\node[check, right=1cm of sat] (sat_check) {Counterexample\\validation};
+
+% UNSAT path (compressed)
+\node[check, right=1cm of unsat] (proof) {Proof\\Checker};
+
+% Arrows into verifier
+\draw[arrow] (b1.east) -- (b3.west);
+\draw[arrow] (b2.east) -- (b3.west);
+
+% Branching
+\draw[arrow] (b3.east) -- (sat.west);
+\draw[arrow] (b3.east) -- (unsat.west);
+
+% SAT flow
+\draw[arrow] (sat.east) -- (sat_check.west);
+
+% UNSAT flow
+\draw[arrow] (unsat.east) -- (proof.west);
+
+\end{tikzpicture}
+
+\caption{The DNN verification pipeline. When the verifier finds no unsafe behaviour (UNSAT), it emits a certificate which the proof checker independently validates. When unsafe behaviour is found (SAT), a counterexample is tested directly against the DNN.}
+\label{fig:dnn_verification_pipeline}
+\end{figure}

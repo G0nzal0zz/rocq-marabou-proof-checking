@@ -1,0 +1,23 @@
+\section{Evaluation}
+This section presents the evaluation of the Rocq-based proof checker and compares it with the Imandra proof checker described in \cite{certified_proof_checker}. The evaluation is structured along three complementary dimensions: capability, maintainability, and performance.
+
+\subsection{Capability Evaluation}
+The capability evaluation compares the functional capabilities of both implementations against the functional requirements defined in \autoref{sec:fun-requirements}. The purpose of this evaluation is to ensure there are no outstanding functional differences between the two implementations.
+
+
+\subsection{Maintainability Evaluation}
+The maintainability evaluation analyses the codebases of both implementations to assess their relative maintainability. The following metrics will be used to ensure a fair comparison:
+
+\begin{itemize}
+    \item \textbf{Lines of code.} The total number of lines of code in each implementation, broken down by file, to assess the overall size and complexity of the codebase.
+    \item \textbf{Number of auxiliary lemmas.} The number of helper lemmas required to support the main proof is used as a proxy for proof complexity.
+    \item \textbf{External library dependencies.} The number and nature of external libraries relied upon by each implementation.
+\end{itemize}
+
+\subsection{Performance Evaluation}
+The performance evaluation measures the proof checker's runtime performance. Experiments will be conducted on proof certificates of varying sizes to analyse execution time and scalability. The following metrics will be used:
+
+\begin{itemize}
+    \item \textbf{Verification time.} The time taken to check a certificate, measured across certificates of varying sizes.
+    \item \textbf{Scalability.} How verification time grows as the size of the proof tree increases, used to assess the practical viability of the implementation on larger benchmarks.
+\end{itemize}

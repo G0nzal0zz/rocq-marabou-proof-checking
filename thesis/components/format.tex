@@ -1,0 +1,223 @@
+% formatting and package settings
+
+
+% document details
+\def\docDate{\nth{\the\day}~\ifcase\the\month\or
+  January\or February\or March\or April\or May\or June\or
+  July\or August\or September\or October\or November\or
+  December\fi~\the\year}
+\def\docInstitution{Heriot-Watt University}
+\def\docSchool{School of Mathematical and Computer Sciences}
+\author{\docAuthor}
+\title{\docTitle}
+\date{\docDate}
+
+% change geometry of ACM template
+\geometry{twoside=true, head=13pt, foot=2pc,
+     paperwidth=21cm, paperheight=29.7cm,
+     includeheadfoot,
+     top=78pt, bottom=114pt, inner=81pt, outer=81pt,
+     marginparwidth=4pc,heightrounded
+ }%
+
+% to make sections start on new pages
+% \AddToHook{cmd/section/before}{\newpage}
+
+% colors
+% main text
+\def\textColor{\color[HTML]{212121}}
+\def\secTextColor{\color[HTML]{424242}}
+% footer and header
+\def\headerColor{\color[HTML]{565656}}
+% title, chapters, sections
+\def\titleColor{\color[HTML]{212121}}
+
+% set line spacing
+% \onehalfspacing
+% \singlespacing
+
+% set table cells padding
+\def\arraystretch{1.5}
+
+% set headings format
+% unset to follow ACM format
+% \titleformat{\chapter}{\singlespacing\normalfont\huge\bfseries\titleColor}{\chaptertitlename\ \thechapter}{1em}{}
+% \titleformat{\chapter}{\singlespacing\normalfont\huge\bfseries\titleColor}{\thechapter}{1em}{}
+% \titleformat{\section}{\singlespacing\normalfont\large\bfseries\titleColor}{\thesection}{1em}{}
+% \titleformat{\subsection}{\singlespacing\normalfont\large\bfseries}{\thesubsection}{1em}{}
+% \titleformat{\subsubsection}{\singlespacing\normalfont\normalsize\bfseries}{\thesubsubsection}{1em}{}
+% \titlespacing*{\chapter}{0pt}{0pt}{10pt}
+
+% set paragraph indent
+% unset to follow ACM format
+% \setlength{\parindent}{18pt}
+
+% set the text colour
+% \textColor
+
+% set hyperlinks + pdf metadata
+\hypersetup{
+    pdftitle={\docTitle},
+    pdfauthor={\docAuthor},
+    pdfkeywords={computer science dissertation},
+    colorlinks=true,%
+    citecolor=[HTML]{152845},%
+    linkcolor=[HTML]{152845},%
+    urlcolor=[HTML]{1976D2}
+}
+
+\newcommand\code[1]{{\tt\small #1}}
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{ltblue}{rgb}{0,0.4,0.4}
+\definecolor{dkviolet}{rgb}{0.3,0,0.5}
+
+% lstlisting coq style (inspired from a file of Assia Mahboubi)
+\lstdefinelanguage{Coq}{
+    % Anything betweeen $ becomes LaTeX math mode
+    mathescape=true,
+    % Comments may or not include Latex commands
+    texcl=false,
+    % Vernacular commands
+    morekeywords=[1]{Section, Module, End, Require, Import, Export,
+        Variable, Variables, Parameter, Parameters, Axiom, Hypothesis,
+        Hypotheses, Notation, Local, Tactic, Reserved, Scope, Open, Close,
+        Bind, Delimit, Definition, Let, Ltac, Fixpoint, CoFixpoint, Add,
+        Morphism, Relation, Implicit, Arguments, Unset, Contextual,
+        Strict, Prenex, Implicits, Inductive, CoInductive, Record,
+        Structure, Canonical, Coercion, Context, Class, Global, Instance,
+        Program, Infix, Theorem, Lemma, Corollary, Proposition, Fact,
+        Remark, Example, Proof, Goal, Save, Qed, Defined, Hint, Resolve,
+        Rewrite, View, Search, Show, Print, Printing, All, Eval, Check,
+        Projections, inside, outside, Def},
+    % Gallina
+    morekeywords=[2]{forall, exists, exists2, fun, fix, cofix, struct,
+        match, with, end, as, in, return, let, if, is, then, else, for, of,
+        nosimpl, when},
+    % Sorts
+    morekeywords=[3]{Type, Prop, Set, true, false, option},
+    % Various tactics, some are std Coq subsumed by ssr, for the manual purpose
+    morekeywords=[4]{pose, set, move, case, elim, apply, clear, hnf,
+        intro, intros, generalize, rename, pattern, after, destruct,
+        induction, using, refine, inversion, injection, rewrite, congr,
+        unlock, compute, ring, field, fourier, replace, fold, unfold,
+        change, cutrewrite, simpl, have, suff, wlog, suffices, without,
+        loss, nat_norm, assert, cut, trivial, revert, bool_congr, nat_congr,
+        symmetry, transitivity, auto, split, left, right, autorewrite},
+    % Terminators
+    morekeywords=[5]{by, done, exact, reflexivity, tauto, romega, omega,
+        assumption, solve, contradiction, discriminate},
+    % Control
+    morekeywords=[6]{do, last, first, try, idtac, repeat},
+    % Comments delimiters, we do turn this off for the manual
+    morecomment=[s]{(*}{*)},
+    % Spaces are not displayed as a special character
+    showstringspaces=false,
+    % String delimiters
+    morestring=[b]",
+    morestring=[d]’,
+    % Size of tabulations
+    tabsize=3,
+    % Enables ASCII chars 128 to 255
+    extendedchars=false,
+    % Case sensitivity
+    sensitive=true,
+    % Automatic breaking of long lines
+    breaklines=false,
+    % Default style fors listings
+    basicstyle=\small,
+    % Position of captions is bottom
+    captionpos=b,
+    % flexible columns
+    columns=[l]flexible,
+    % Style for (listings') identifiers
+    identifierstyle={\ttfamily\color{black}},
+    % Style for declaration keywords
+    keywordstyle=[1]{\ttfamily\color{dkviolet}},
+    % Style for gallina keywords
+    keywordstyle=[2]{\ttfamily\color{dkgreen}},
+    % Style for sorts keywords
+    keywordstyle=[3]{\ttfamily\color{ltblue}},
+    % Style for tactics keywords
+    keywordstyle=[4]{\ttfamily\color{dkblue}},
+    % Style for terminators keywords
+    keywordstyle=[5]{\ttfamily\color{dkred}},
+    %Style for iterators
+    %keywordstyle=[6]{\ttfamily\color{dkpink}},
+    % Style for strings
+    stringstyle=\ttfamily,
+    % Style for comments
+    commentstyle={\ttfamily\color{dkgreen}},
+    %moredelim=**[is][\ttfamily\color{red}]{/&}{&/},
+    literate=
+    {\\forall}{{\color{dkgreen}{$\forall\;$}}}1
+    {\\exists}{{$\exists\;$}}1
+    {<-}{{$\leftarrow\;$}}1
+    {=>}{{$\Rightarrow\;$}}1
+    {==}{{\code{==}\;}}1
+    {==>}{{\code{==>}\;}}1
+    %    {:>}{{\code{:>}\;}}1
+    {->}{{$\rightarrow\;$}}1
+    {<->}{{$\leftrightarrow\;$}}1
+    {<==}{{$\leq\;$}}1
+    {\#}{{$^\star$}}1
+    {\\o}{{$\circ\;$}}1
+    {\@}{{$\cdot$}}1
+    {\/\\}{{$\wedge\;$}}1
+    {\\\/}{{$\vee\;$}}1
+    {++}{{\code{++}}}1
+    {~}{{$\sim$}}1
+    {\@\@}{{$@$}}1
+    {\\mapsto}{{$\mapsto\;$}}1
+    {\\hline}{{\rule{\linewidth}{0.5pt}}}1
+    %
+}[keywords,comments,strings]
+
+\crefname{lstlisting}{\lstlistingname}{\lstlistingname s}
+\Crefname{lstlisting}{\lstlistingname}{\lstlistingname s}
+
+% set cross-references labels with cleveref
+\crefname{appendixchapter}{Appendix}{Appendices}
+\Crefname{appendixchapter}{Appendix}{Appendices}
+
+
+% set custom headers/footers
+% unset to follow ACM template
+% \pagestyle{fancy}
+% \fancyhf{}
+% \renewcommand{\headrulewidth}{0pt}
+% \renewcommand{\footrulewidth}{0pt}
+% \fancyhead[R]{\headerColor \docType}
+% \fancyhead[L]{\headerColor \docAuthor}
+% \fancyfoot[C]{\headerColor \thepage}
+% % Redefine the plain page style for chapter pages
+% \fancypagestyle{plain}{%
+%     \fancyhf{}%
+%     \fancyfoot[C]{\headerColor \thepage}
+% }
+
+% custom section heading for front-matter content with addition to the ToC
+\newcommand{\frontmattersection}[2]{
+    \thispagestyle{plain} % remove the header on page
+    % \vspace*{1cm} % to align vertically
+    \phantomsection
+    \begin{center}
+        \textsc{#1}
+        \addcontentsline{toc}{section}{#1}
+    \end{center}
+    #2 % Main Text
+    \clearpage % leave blank space underneath
+}
+
+\renewcommand{\abstract}[1]{
+    \frontmattersection{Abstract}{#1}
+}
+
+\newcommand{\acknowledgements}[1]{
+    \frontmattersection{Acknowledgements}{#1}
+}
+
+% formatting the table of content
+\dottedcontents{section}[1em]{\bfseries}{1.2em}{0pc}
+\dottedcontents{subsection}[3em]{}{2.2em}{1pc}
+
+\renewcommand{\contentsname}{Table of Contents}
