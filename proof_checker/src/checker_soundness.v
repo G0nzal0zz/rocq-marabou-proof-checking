@@ -36,7 +36,8 @@ Import CertificateSpecs.
 (*   @> [%use check_tree_soundness_node tableau upper_bounds lower_bounds constraints tree x]*)
 (*   @> unroll 50]*)
 
-Lemma check_tree_soundness_full (tableau : (m.+2).-tuple ('rV[R]_n))
+Lemma check_tree_soundness_full
+  (tableau : (m.+2).-tuple ('rV[R]_n))
   (upper_bounds : Tightening.t_bounds)
   (lower_bounds : Tightening.t_bounds)
   (constraints : seq Constraint.t)

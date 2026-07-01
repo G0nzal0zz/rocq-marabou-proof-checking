@@ -3,6 +3,7 @@ From mathcomp Require Import all_ssreflect all_algebra matrix.
 Require Import certificate_specs.
 Require Import farkas.
 Require Import tightening.
+Require Import arithmetic.
 
 Import CertificateSpecs.
 
@@ -95,6 +96,20 @@ Definition mk_eq_constraints (tableau : (m.+2).-tuple ('rV[R]_n)) : (m.+2).-tupl
 
 Definition mk_geq_constraints (upper_bounds lower_bounds : Tightening.t_bounds) : (n + n).-tuple (Farkas.expr n) :=
   cat_tuple (mk_upper_bounds_constraints upper_bounds) (mk_lower_bounds_constraints lower_bounds).
+
+(*let mk_contradiction_certificate (contradiction: Real.t list) (tableau: expr list) (upper_bounds: Real.t list) (lower_bounds: Real.t list) =*)
+(*    let lc = compute_combination contradiction tableau in*)
+(*    contradiction @ ((mk_upper_bound_certificate lc) @ (mk_lower_bound_certificate lc))*)
+Definition mk_contradiction_certificate
+  (contradiction : (m.+2).-tuple R)
+  (tableau : Farkas.system m n)
+  (upper_bounds : Tightening.t_bounds)
+  (lower_bounds : Tightening.t_bounds)
+  : (m.+2 + (n + n)).-tuple R :=
+  let lc := Arithmetic.compute_combination contradiction tableau in
+  let upper_bound_cert := Certificate.mk_upper_bound_certificate lc in
+  let lower_bound_cert := Certificate.mk_lower_bound_certificate lc in
+  cat_tuple contradiction (cat_tuple upper_bound_cert lower_bound_cert).
 
 (* Create the polynomial representation of the linear constraints from the matrix representation *)
 (*let mk_system_contradiction (tableau: expr list) (upper_bounds: Real.t list) (lower_bounds: Real.t list): expr list =*)
