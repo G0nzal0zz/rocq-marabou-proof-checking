@@ -179,10 +179,10 @@ Section Mat.
 
 Open Scope ring_scope.
 
-Definition mat_to_system A l u x : system m n :=
-  tcast (addn2 m) (
+Definition mat_to_system A l u x : system m' n :=
+  tcast (addn2 m') (
   cat_tuple
-  [tuple (Eq n (rv_addn1_succ (row_mx (row i A) 0%:M))) | i < m]
+  [tuple (Eq n (rv_addn1_succ (row_mx (row i A) 0%:M))) | i < m']
   [tuple (Geq n (rv_addn1_succ (row_mx (u-x)^T 0%:M))); (Geq n (rv_addn1_succ (row_mx (x-l)^T 0%:M)))]).
 
 Definition poly_to_rv (p : poly n) : 'rV[R]_n :=
@@ -194,15 +194,15 @@ Proof.
   by apply leqnSn.
 Qed.
 
-Definition system_to_mat (es : system m n) : ('M[R]_(m,n) * 'cV[R]_n * 'cV[R]_n) :=
-  (\matrix_(i < m) poly_to_rv (extract_poly (tnth es (widen_ord (leqW2 m) i))),
+Definition system_to_mat (es : system m' n) : ('M[R]_(m',n) * 'cV[R]_n * 'cV[R]_n) :=
+  (\matrix_(i < m') poly_to_rv (extract_poly (tnth es (widen_ord (leqW2 m') i))),
     (poly_to_rv (extract_poly (tnth es (ord_max - 1))))^T,
     (poly_to_rv (extract_poly (tnth es ord_max)))^T
   ).
 
 (* NOTE: Specifying the order of mathcomp matrices. *)
-Definition lermx {m n} (mx1 mx2 : 'M[R]_(m,n)) :=
-    [forall i : 'I_m * 'I_n, mx1 i.1 i.2 <= mx2 i.1 i.2].
+Definition lermx {m' n} (mx1 mx2 : 'M[R]_(m',n)) :=
+    [forall i : 'I_m' * 'I_n, mx1 i.1 i.2 <= mx2 i.1 i.2].
 
 Check lermx.
 
@@ -211,12 +211,12 @@ Open Scope ring_scope.
 
 Notation "A <=m B" := (lermx A B) (at level 70, no associativity) : ring_scope.
 
-Definition eval_mat (A: 'M[R]_(m,n)) (l x u : 'cV[R]_n) : bool :=
+Definition eval_mat (A: 'M[R]_(m',n)) (l x u : 'cV[R]_n) : bool :=
   (A *m x == 0) && (l <=m x) && (x <=m u).
 
 (* WARN: The following lemma is unfinished, is there any reason for it? *)
-Lemma mat_system_inv  (A : 'M[R]_(m,n)) (l u x : 'cV[R]_n)
-(es : system m n) : system_to_mat (mat_to_system A l x u) = (A, l, u).
+Lemma mat_system_inv  (A : 'M[R]_(m',n)) (l u x : 'cV[R]_n)
+(es : system m' n) : system_to_mat (mat_to_system A l x u) = (A, l, u).
 Proof.
   rewrite /system_to_mat.
   apply congr2.
@@ -228,7 +228,7 @@ Proof.
 Admitted.
 
 (* WARN: The following lemma is unfinished, is there any reason for it? *)
-Lemma poly_equiv  (A : 'M[R]_(m,n)) (l x u : 'cV[R]_n) (es : system m n) :
+Lemma poly_equiv  (A : 'M[R]_(m',n)) (l x u : 'cV[R]_n) (es : system m' n) :
   eval_mat A l x u <-> eval_system es x.
 Proof.
   split.
