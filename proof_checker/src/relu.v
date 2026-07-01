@@ -34,6 +34,7 @@ Definition eval_relu (b_var f_var aux_var : 'I_n) (x : 'rV[R]_n) : bool :=
 Lemma eval_relu_different_var (xs : 'rV[R]_n) (f_var b_var a_var : 'I_n) :
   eval_relu f_var b_var a_var xs ->
   [&& b_var != f_var, b_var != a_var & f_var != a_var].
+Proof.
   rewrite /eval_relu.
   move=> /andP [] H1 /andP [] H2 /andP [] H3 _.
   rewrite /andb.
