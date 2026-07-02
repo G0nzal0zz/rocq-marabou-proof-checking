@@ -55,6 +55,12 @@ Let cv_addn1_succ: 'cV[R]_(n+1) -> 'cV[R]_n.+1 :=
 Definition rv_addn1_succ: 'rV[R]_(n+1) -> 'rV[R]_n.+1 :=
   (castmx (erefl, addn1 n)).
 
+(* NOTE:
+   In order to compute the value of the polynomial, we need to compute the matrix multiplication (`*m`) between `p` and `x`.
+   For matrix multiplication, the number of columns of the first matrix must match the number of rows of the second. 
+   Since `p` has `n.+1` columns and `x` only has `n` rows, we stack a scalar `1` to the bottom of `x` (using `col_mx`) to make its row count match.
+   Because the result of a matrix multiplication is always a matrix, even if it only contains a single element (a 1x1 matrix in our case), we extract the final scalar value using `ord0 ord0`.
+*)
 Definition eval_poly_def p x := (p *m (cv_addn1_succ (col_mx x 1%:M))) ord0 ord0.
 
 Fact eval_poly_key : unit. Proof. by []. Qed.
