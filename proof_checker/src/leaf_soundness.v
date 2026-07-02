@@ -140,10 +140,22 @@ Lemma soundness_check_cert_composition
   ->
   ((Arithmetic.is_in_kernel tableau x) && (Arithmetic.bounded x ub lb)) = false.
 Proof.
-  intros.
-  move : (soundness_eval_sys_composition tableau ub lb x) => H_comp.
-  move : (eval_system_unsat_contra tableau ub lb x) => H_unsat.
-  simpl in *.
+  move=> Heval.
+  (* Remember that a boolean is either true or false. We destruct it. *)
+  case H_prop: ((Arithmetic.is_in_kernel tableau x) && (Arithmetic.bounded x ub lb)).
+  - (* Case 1: The proposition is true. *)
+    (* We feed this truth (H_prop) directly into your lemma *)
+    have H_sys := eval_system_unsat_contra tableau ub lb x H_prop.
+
+    (* H_sys is now: FarkasSoundness.eval_system sys (trmx x) = true *)
+    (* But Heval says it equals false! We rewrite H_sys with Heval to get a contradiction *)
+    (*rewrite Heval in H_sys.*)
+    (*discriminate H_sys. (* or inversion H_sys, or done *)*)
+    admit.
+
+  - (* Case 2: The proposition is false. *)
+    (* This is exactly what the goal wants, so it's trivial *)
+    by [].
 Admitted.
 
 (* lemma not_eval_system_implies_unsat tableau upper_bounds lower_bounds relu_constraints x =
@@ -193,7 +205,7 @@ Qed.
            Certificate.mk_system_contradiction]
 [@@fc]
    [@@timeout 120] *)
-Lemma soundness_leaf
+Lemma leaf_soundness
   (tableau : (m.+2).-tuple ('rV[R]_n))
   (ub lb : Tightening.t_bounds)
   (constraints : seq Constraint.t)
