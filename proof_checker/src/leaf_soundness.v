@@ -10,6 +10,7 @@ Require Import farkas.
 Require Import farkas_soundness.
 Require Import sat.
 Require Import arithmetic.
+Require Import tableau_soundness.
 
 Import CertificateSpecs.
 
@@ -27,17 +28,15 @@ Module LeafSoundness.
 [@@by auto]
 [@@disable Farkas.check_cert, Checker.check_tree, Checker.mk_contradiction_certificate, Certificate.mk_system_contradiction]
 [@@fc] *)
-(* WARN: Is it possible to use ProofTree.leaf as an argument type? *)
 Lemma check_tree_implies_check_cert
   (tableau : Farkas.system m n)
-  (upper_bounds : Tightening.t_bounds)
-  (lower_bounds : Tightening.t_bounds)
+  (ub lb : Tightening.t_bounds)
   (constraints : seq Constraint.t)
   (contradiction : (m.+2).-tuple R)
   (x : 'rV[R]_n) :
-  let sys := Certificate.mk_system_contradiction tableau upper_bounds lower_bounds in
-  let certificate := Certificate.mk_contradiction_certificate contradiction tableau upper_bounds lower_bounds in
-  Checker.check_tree tableau upper_bounds lower_bounds constraints (ProofTree.leaf contradiction) ->
+  let sys := Cert.mk_system_contradiction tableau ub lb in
+  let certificate := Cert.mk_contradiction_certificate contradiction tableau ub lb in
+  Checker.check_tree tableau ub lb constraints (ProofTree.leaf contradiction) ->
   Farkas.check_cert sys certificate.
 Proof.
   auto.
@@ -59,16 +58,45 @@ Qed.
 [@@fc]*)
 Lemma check_cert_implies_not_eval_system
   (tableau : Farkas.system m n)
-  (upper_bounds lower_bounds : Tightening.t_bounds)
+  (ub lb : Tightening.t_bounds)
   (constraints : seq Constraint.t)
   (contradiction : (m.+2).-tuple R)
   (x : 'rV[R]_n) :
-  let sys := Certificate.mk_system_contradiction tableau upper_bounds lower_bounds in
-  let certificate := Certificate.mk_contradiction_certificate contradiction tableau upper_bounds lower_bounds in
-  Checker.check_tree tableau upper_bounds lower_bounds constraints (ProofTree.leaf contradiction) ->
+  let sys := Cert.mk_system_contradiction tableau ub lb in
+  let certificate := Cert.mk_contradiction_certificate contradiction tableau ub lb in
+  Checker.check_tree tableau ub lb constraints (ProofTree.leaf contradiction) ->
   FarkasSoundness.eval_system sys (trmx x) = false.
 Proof.
 Admitted.
+
+(*lemma eval_system_unsat_conjn tableau upper_bounds lower_bounds x =
+    well_formed_tableau_bounds tableau upper_bounds lower_bounds &&
+    List.length x = List.length (List.hd tableau) &&
+    not ((eval_system (mk_eq_constraints tableau) x) && (eval_system (mk_geq_constraints upper_bounds lower_bounds) x))
+    ==>
+    not ((is_in_kernel tableau x) && (bounded x upper_bounds lower_bounds))
+[@@by [%use eval_system_unsat tableau upper_bounds lower_bounds x]
+   @> auto]
+[@@disable Checker.well_formed_tableau_bounds, Arithmetic.bounded]
+[@@fc]
+[@@timeout 60]*)
+Lemma eval_system_unsat
+  (tableau : (m.+2).-tuple ('rV[R]_n))
+  (ub lb : Tightening.t_bounds)
+  (x : 'rV[R]_n) :
+    let sys := Cert.mk_system_contradiction (Cert.mk_eq_constraints tableau) ub lb in
+    FarkasSoundness.eval_system sys (trmx x) = false
+    ->
+    ((Arithmetic.is_in_kernel tableau x) && (Arithmetic.bounded x ub lb)) = false.
+Proof.
+  intros.
+  move: (TableauSoundness.tableau_reduction_soundness tableau ub lb x) => H_tab.
+  simpl in *.
+  case H_prop: ((Arithmetic.is_in_kernel tableau x) && (Arithmetic.bounded x ub lb)).
+  - apply H_tab in H_prop.
+    by rewrite H in H_prop.
+  - reflexivity.
+Qed.
 
 (*lemma eval_system_unsat_contra tableau upper_bounds lower_bounds x =
     well_formed_tableau_bounds tableau upper_bounds lower_bounds &&
@@ -85,10 +113,18 @@ Lemma eval_system_unsat_contra
   (x : 'rV[R]_n) :
   (Arithmetic.is_in_kernel tableau x) && (Arithmetic.bounded x ub lb)
   ->
-  let sys := cat_tuple (Certificate.mk_eq_constraints tableau)  (Certificate.mk_geq_constraints ub lb) in
+  (*let sys := cat_tuple (Cert.mk_eq_constraints tableau)  (Cert.mk_geq_constraints ub lb) in*)
+  let sys := Cert.mk_system_contradiction (Cert.mk_eq_constraints tableau) ub lb in
   FarkasSoundness.eval_system sys (trmx x).
 Proof.
-Admitted.
+  intros.
+  move : (eval_system_unsat tableau ub lb x) => H_conjn.
+  simpl in *.
+  induction FarkasSoundness.eval_system.
+  - reflexivity.
+  - have H_false := H_conjn (erefl false).
+    by rewrite H_false in H.
+Qed.
 
 (* lemma soundness_eval_sys_composition tableau upper_bounds lower_bounds x =
     let sys = mk_system_contradiction (mk_eq_constraints tableau) upper_bounds lower_bounds in
@@ -102,15 +138,16 @@ Admitted.
 [@@disable Farkas.eval_system, Certificate.mk_system_contradiction, Checker.well_formed_tableau_bounds]
 [@@fc]
 [@@timeout 90] *)
+(* NOTE: This lemma is not being used *)
 Lemma soundness_eval_sys_composition
   (tableau : (m.+2).-tuple ('rV[R]_n))
   (ub lb : Tightening.t_bounds)
   (x : 'rV[R]_n) :
-    let sys := Certificate.mk_system_contradiction (Certificate.mk_eq_constraints tableau) ub lb in
-    ~ (FarkasSoundness.eval_system sys (trmx x))
-    ->
-    let sys' := cat_tuple (Certificate.mk_eq_constraints tableau)  (Certificate.mk_geq_constraints ub lb) in
-    ~ (FarkasSoundness.eval_system sys' (trmx x)).
+    let sys := Cert.mk_system_contradiction (Cert.mk_eq_constraints tableau) ub lb in
+    FarkasSoundness.eval_system sys (trmx x)
+    ==
+    let sys' := cat_tuple (Cert.mk_eq_constraints tableau)  (Cert.mk_geq_constraints ub lb) in
+    FarkasSoundness.eval_system sys' (trmx x).
 Proof.
   auto.
 Qed.
@@ -135,28 +172,19 @@ Lemma soundness_check_cert_composition
   (tableau : (m.+2).-tuple ('rV[R]_n))
   (ub lb : Tightening.t_bounds)
   (x : 'rV[R]_n) :
-  let sys := Certificate.mk_system_contradiction (Certificate.mk_eq_constraints tableau) ub lb in
+  let sys := Cert.mk_system_contradiction (Cert.mk_eq_constraints tableau) ub lb in
   (FarkasSoundness.eval_system sys (trmx x)) = false
   ->
   ((Arithmetic.is_in_kernel tableau x) && (Arithmetic.bounded x ub lb)) = false.
 Proof.
-  move=> Heval.
-  (* Remember that a boolean is either true or false. We destruct it. *)
+  intros.
   case H_prop: ((Arithmetic.is_in_kernel tableau x) && (Arithmetic.bounded x ub lb)).
-  - (* Case 1: The proposition is true. *)
-    (* We feed this truth (H_prop) directly into your lemma *)
-    have H_sys := eval_system_unsat_contra tableau ub lb x H_prop.
-
-    (* H_sys is now: FarkasSoundness.eval_system sys (trmx x) = true *)
-    (* But Heval says it equals false! We rewrite H_sys with Heval to get a contradiction *)
-    (*rewrite Heval in H_sys.*)
-    (*discriminate H_sys. (* or inversion H_sys, or done *)*)
-    admit.
-
-  - (* Case 2: The proposition is false. *)
-    (* This is exactly what the goal wants, so it's trivial *)
-    by [].
-Admitted.
+  - move : (eval_system_unsat_contra tableau ub lb x H_prop) => H_unsat.
+    rewrite  <- H.
+    simpl in *.
+    by rewrite H_unsat.
+  - reflexivity.
+Qed.
 
 (* lemma not_eval_system_implies_unsat tableau upper_bounds lower_bounds relu_constraints x =
     let sys = mk_system_contradiction (mk_eq_constraints tableau) upper_bounds lower_bounds in
@@ -176,7 +204,7 @@ Lemma not_eval_system_implies_unsat
   (constraints : seq Constraint.t)
   (contradiction : (m.+2).-tuple R)
   (x : 'rV[R]_n) :
-  let sys := Certificate.mk_system_contradiction (Certificate.mk_eq_constraints tableau) ub lb in
+  let sys := Cert.mk_system_contradiction (Cert.mk_eq_constraints tableau) ub lb in
   (FarkasSoundness.eval_system sys (trmx x)) = false
   ->
   Sat.unsat tableau ub lb constraints x.
@@ -211,7 +239,7 @@ Lemma leaf_soundness
   (constraints : seq Constraint.t)
   (contradiction : (m.+2).-tuple R)
   (x : 'rV[R]_n) :
-  let system' := Certificate.mk_eq_constraints tableau in
+  let system' := Cert.mk_eq_constraints tableau in
   Checker.check_tree system' ub lb constraints (ProofTree.leaf contradiction) ->
   Sat.unsat tableau ub lb constraints x.
 Proof.

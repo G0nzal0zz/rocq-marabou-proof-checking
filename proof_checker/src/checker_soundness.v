@@ -36,7 +36,7 @@ Lemma check_tree_soundness_leaf
   (constraints : seq Constraint.t)
   (contradiction : (m.+2).-tuple R)
   (x : 'rV[R]_n) :
-  Checker.check_tree (Certificate.mk_eq_constraints tableau) ub lb constraints (ProofTree.leaf contradiction) ->
+  Checker.check_tree (Cert.mk_eq_constraints tableau) ub lb constraints (ProofTree.leaf contradiction) ->
   Sat.unsat tableau ub lb constraints x.
 Proof.
   intros.
@@ -72,7 +72,7 @@ Lemma check_tree_soundness_full
   (constraints : seq Constraint.t)
   (proof_tree : ProofTree.t)
   (x : 'rV[R]_n) :
-  Checker.check_tree (Certificate.mk_eq_constraints tableau) ub lb constraints proof_tree ->
+  Checker.check_tree (Cert.mk_eq_constraints tableau) ub lb constraints proof_tree ->
   match proof_tree with
   | ProofTree.leaf _ => Sat.unsat tableau ub lb constraints x
   | ProofTree.node split tleft tright =>

@@ -7,7 +7,7 @@ Require Import arithmetic.
 
 Import CertificateSpecs.
 
-Module Certificate.
+Module Cert.
 
 Open Scope ring_scope.
 
@@ -45,7 +45,7 @@ Definition mk_lower_bound_certificate (lc : n.-tuple R) : n.-tuple R :=
 (*  else 0. :: mk_bound_poly (size - 1) (i - 1) coeff bound*)
 (*
   WARN: For some reason I couldn't use the row notation for the following function.
-  I should try to make it work as it improves readibilit.
+  I should try to make it work as it improves readibility.
 *)
 Definition mk_bound_poly (n : nat) (i : nat) (coeff : R) (bound : R) : Farkas.poly n :=
   matrix_of_fun matrix_key (fun _ (j : 'I_n.+1) =>
@@ -82,11 +82,9 @@ Definition mk_lower_bounds_constraints (lower_bounds : Tightening.t_bounds) : n.
 (*  | [] -> []*)
 Definition mk_eq_constraints (tableau : (m.+2).-tuple ('rV[R]_n)) : (m.+2).-tuple (Farkas.expr n) :=
   map_tuple (fun hd =>
-  let extended_vector := row_mx hd 0 in (* Adding the constant at the end of each vector.*)
-    let typed_vector := castmx (erefl 1, addn1 n) extended_vector in
-    Farkas.Eq n typed_vector
-  ) tableau.
-
+    let extended_vector := row_mx hd 0 in (* Adding the constant at the end of each vector.*)
+    Farkas.Eq n (Arithmetic.rv_addn1_succ extended_vector))
+  tableau.
 
 (** Create Geq constraints corresponding to the variable bounds.
 *)
@@ -107,8 +105,8 @@ Definition mk_contradiction_certificate
   (lower_bounds : Tightening.t_bounds)
   : (m.+2 + (n + n)).-tuple R :=
   let lc := Arithmetic.compute_combination contradiction tableau in
-  let upper_bound_cert := Certificate.mk_upper_bound_certificate lc in
-  let lower_bound_cert := Certificate.mk_lower_bound_certificate lc in
+  let upper_bound_cert := mk_upper_bound_certificate lc in
+  let lower_bound_cert := mk_lower_bound_certificate lc in
   cat_tuple contradiction (cat_tuple upper_bound_cert lower_bound_cert).
 
 (* Create the polynomial representation of the linear constraints from the matrix representation *)
@@ -120,4 +118,4 @@ Definition mk_system_contradiction
   : (m.+2 + (n + n)).-tuple (Farkas.expr n) :=
   cat_tuple tableau (mk_geq_constraints upper_bounds lower_bounds).
 
-End Certificate.
+End Cert.

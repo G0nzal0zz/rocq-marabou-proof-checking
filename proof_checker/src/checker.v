@@ -26,8 +26,8 @@ Definition check_contradiction
   (upper_bounds : Tightening.t_bounds)
   (lower_bounds : Tightening.t_bounds)
   : bool :=
-  let sys := Certificate.mk_system_contradiction tableau upper_bounds lower_bounds in
-  let certificate := Certificate.mk_contradiction_certificate contradiction tableau upper_bounds lower_bounds in
+  let sys := Cert.mk_system_contradiction tableau upper_bounds lower_bounds in
+  let certificate := Cert.mk_contradiction_certificate contradiction tableau upper_bounds lower_bounds in
   (* WARN:
      `check_cert` expects `sys` and `certificate` to have the same size.
      But `sys` and `certificate` both have different sizes.
@@ -87,7 +87,7 @@ Definition check_proof_tree
   (constraints : seq Constraint.t)
   (proof_node : ProofTree.t)
   : bool :=
-  check_tree (Certificate.mk_eq_constraints tableau) upper_bounds lower_bounds constraints proof_node.
+  check_tree (Cert.mk_eq_constraints tableau) upper_bounds lower_bounds constraints proof_node.
 
 End Checker.
 

@@ -9,6 +9,7 @@ From HB Require Import structures.
 
 Require Import certificate_specs.
 Require Import farkas.
+Require Import arithmetic.
 
 Import GroupScope Order.TTheory GRing.Theory Num.Theory.
 Import CertificateSpecs.
@@ -24,8 +25,6 @@ Section Farkas.
 
 Implicit Type x : 'cV[R]_n.
 Implicit Type p : 'rV[R]_n.+1.
-
-(* NOTE:'rV[R]_n.+1 is the MathComp type of row vectors over R of length n + 1. *)
 
 Definition expr_eq (e1 e2 : expr n) :=
   match e1, e2 with
@@ -49,63 +48,58 @@ Qed.
 
 HB.instance Definition _ := hasDecEq.Build (expr n) expr_eqP.
 
-Let cv_addn1_succ: 'cV[R]_(n+1) -> 'cV[R]_n.+1 :=
-  (castmx (addn1 n, erefl)).
-
-Definition rv_addn1_succ: 'rV[R]_(n+1) -> 'rV[R]_n.+1 :=
-  (castmx (erefl, addn1 n)).
-
 (* NOTE:
    In order to compute the value of the polynomial, we need to compute the matrix multiplication (`*m`) between `p` and `x`.
    For matrix multiplication, the number of columns of the first matrix must match the number of rows of the second. 
    Since `p` has `n.+1` columns and `x` only has `n` rows, we stack a scalar `1` to the bottom of `x` (using `col_mx`) to make its row count match.
    Because the result of a matrix multiplication is always a matrix, even if it only contains a single element (a 1x1 matrix in our case), we extract the final scalar value using `ord0 ord0`.
 *)
-Definition eval_poly_def p x := (p *m (cv_addn1_succ (col_mx x 1%:M))) ord0 ord0.
 
-Fact eval_poly_key : unit. Proof. by []. Qed.
-
-Definition eval_poly := locked_with eval_poly_key eval_poly_def.
-
-Canonical eval_poly_unlockable := [unlockable fun eval_poly].
+(*Fact eval_poly_key : unit. Proof. by []. Qed.*)
+(**)
+(*Definition eval_poly := locked_with eval_poly_key eval_poly_def.*)
+(**)
+(*Canonical eval_poly_unlockable := [unlockable fun eval_poly].*)
 
 Definition eval_expr e x : bool :=
   match e with
-  | Eq p => eval_poly p x == 0%R
-  | Geq p => 0%R <= eval_poly p x
+  | Eq p => Arithmetic.dot_product p x == 0%R
+  | Geq p => 0%R <= Arithmetic.dot_product p x
   end.
 
 Definition eval_system (es : system m' n) x : bool := all (eval_expr ^~ x) es.
-Lemma col_mx_max1 x : cv_addn1_succ (col_mx x 1%:M) ord_max ord0 = 1.
+Check eval_system.
+
+Lemma col_mx_max1 x : Arithmetic.cv_addn1_succ (col_mx x 1%:M) ord_max ord0 = 1.
 Proof.
-  rewrite /cv_addn1_succ castmxE (_ : ord_max = cast_ord (addn1 n) (rshift n ord0)) //=.
+  rewrite /Arithmetic.cv_addn1_succ castmxE (_ : ord_max = cast_ord (addn1 n) (rshift n ord0)) //=.
   by rewrite cast_ordK col_mxEd cast_ord_id mxE.
   apply/val_inj.
   by rewrite //= addn0.
 Qed.
 
-Lemma eval_scale_pull p (r : R) x : eval_poly (r *: p) x = r * eval_poly p x.
+Lemma eval_scale_pull p (r : R) x : Arithmetic.dot_product (r *: p) x = r * Arithmetic.dot_product p x.
 Proof.
-  rewrite unlock /eval_poly !mxE big_distrr /= (eq_bigr (fun j => r * (p ord0 j * cv_addn1_succ (col_mx x 1%:M) j ord0))) // => i _.
+  rewrite /Arithmetic.dot_product !mxE big_distrr /= (eq_bigr (fun j => r * (p ord0 j * Arithmetic.cv_addn1_succ (col_mx x 1%:M) j ord0))) // => i _.
   by rewrite mulrA !mxE.
 Qed.
 
-Lemma eval_zero_scale p (c : R) x : eval_poly p x = 0 -> eval_poly (c *: p) x = 0.
+Lemma eval_zero_scale p (c : R) x : Arithmetic.dot_product p x = 0 -> Arithmetic.dot_product (c *: p) x = 0.
 Proof.
   move=> H.
   by rewrite eval_scale_pull H mulr0.
 Qed.
 
-Lemma eval_non_neg_scale p (c : R) x :eval_poly p x >= 0 -> c >= 0 -> eval_poly (c *: p) x >= 0.
+Lemma eval_non_neg_scale p (c : R) x :Arithmetic.dot_product p x >= 0 -> c >= 0 -> Arithmetic.dot_product (c *: p) x >= 0.
 Proof.
   move=> Hp Hc.
   rewrite eval_scale_pull mulr_ge0 //=.
 Qed.
 
 Lemma cert_is_neg cs es x :
-  check_cert es cs -> eval_poly (mk_cert_poly cs es) x < 0.
+  check_cert es cs -> Arithmetic.dot_product (mk_cert_poly cs es) x < 0.
 Proof.
-  rewrite /check_cert /is_neg_const unlock /eval_poly !mxE big_ord_recr /= col_mx_max1 mulr1 => /forallP H.
+  rewrite /check_cert /is_neg_const /Arithmetic.dot_product !mxE big_ord_recr /= col_mx_max1 mulr1 => /forallP H.
   rewrite big1.
   rewrite add0r.
   move: (H ord_max).
@@ -120,16 +114,16 @@ Proof.
   by rewrite ltnn.
 Qed.
 
-Lemma eval_poly0 x : eval_poly 0 x = 0.
+Lemma eval_poly0 x : Arithmetic.dot_product 0 x = 0.
 Proof.
-  by rewrite unlock /eval_poly mul0mx !mxE.
+  by rewrite /Arithmetic.dot_product mul0mx !mxE.
 Qed.
 
 Lemma eval_poly_morph x :
-  {morph eval_poly^~ x : p q / p + q >-> p + q}.
+  {morph Arithmetic.dot_product^~ x : p q / p + q >-> p + q}.
 Proof.
   move=> p q.
-  rewrite unlock /eval_poly !mxE -big_split /=.
+  rewrite /Arithmetic.dot_product !mxE -big_split /=.
   apply eq_bigr => i _.
   by rewrite -mulrDl !mxE.
 Qed.
@@ -151,10 +145,10 @@ Proof.
   by rewrite !orbT.
 Qed.
 
-Lemma solution_is_not_neg cs es x : eval_system es x -> eval_poly (mk_cert_poly cs es) x >= 0.
+Lemma solution_is_not_neg cs es x : eval_system es x -> Arithmetic.dot_product (mk_cert_poly cs es) x >= 0.
 Proof.
   (* rewrite /eval_system => /allP H. *)
-  rewrite /eval_system /mk_cert_poly /sum_polys (big_morph (eval_poly^~ x) (eval_poly_morph x) (eval_poly0 x)) /scale_exprs big_seq /= => /allP H.
+  rewrite /eval_system /mk_cert_poly /sum_polys (big_morph (Arithmetic.dot_product^~ x) (eval_poly_morph x) (eval_poly0 x)) /scale_exprs big_seq /= => /allP H.
   apply sumr_ge0 => k /mapP [ce Hce] ->.
   case: ce Hce => c e.
   move=> /zip_mem_in /andP [Hc He].
@@ -172,7 +166,7 @@ Theorem farkas_unsat (es : system m' n) (cs : m'.+2.-tuple R) x :
 Proof.
   move=> /(cert_is_neg x).
   case E: (eval_system es x) => //=.
-  move: E => /(solution_is_not_neg cs) E /lt_le_trans => /(_ (eval_poly (mk_cert_poly cs es ) x)) => /(_ E).
+  move: E => /(solution_is_not_neg cs) E /lt_le_trans => /(_ (Arithmetic.dot_product (mk_cert_poly cs es ) x)) => /(_ E).
   by rewrite lt_irreflexive.
 Qed.
 
@@ -181,15 +175,13 @@ End Farkas.
 (* NOTE: This section aim is to demonstrate that the inductive definition `system` is the same as a matrix *)
 Section Mat.
 
-(* TODO: Change `m` for `m'`*)
-
 Open Scope ring_scope.
 
 Definition mat_to_system A l u x : system m' n :=
   tcast (addn2 m') (
   cat_tuple
-  [tuple (Eq n (rv_addn1_succ (row_mx (row i A) 0%:M))) | i < m']
-  [tuple (Geq n (rv_addn1_succ (row_mx (u-x)^T 0%:M))); (Geq n (rv_addn1_succ (row_mx (x-l)^T 0%:M)))]).
+  [tuple (Eq n (Arithmetic.rv_addn1_succ (row_mx (row i A) 0%:M))) | i < m']
+  [tuple (Geq n (Arithmetic.rv_addn1_succ (row_mx (u-x)^T 0%:M))); (Geq n (Arithmetic.rv_addn1_succ (row_mx (x-l)^T 0%:M)))]).
 
 Definition poly_to_rv (p : poly n) : 'rV[R]_n :=
   lsubmx (castmx (erefl, esym (addn1 n)) p).
