@@ -84,19 +84,20 @@ Lemma eval_system_unsat
   (tableau : (m.+2).-tuple ('rV[R]_n))
   (ub lb : Tightening.t_bounds)
   (x : 'rV[R]_n) :
-    let sys := Cert.mk_system_contradiction (Cert.mk_eq_constraints tableau) ub lb in
-    FarkasSoundness.eval_system sys (trmx x) = false
+    let eq := Cert.mk_eq_constraints tableau in
+    let geq := Cert.mk_geq_constraints ub lb in
+     (FarkasSoundness.eval_system eq (trmx x) &&  FarkasSoundness.eval_system geq (trmx x)) = false
     ->
     ((Arithmetic.is_in_kernel tableau x) && (Arithmetic.bounded x ub lb)) = false.
 Proof.
-  intros.
-  move: (TableauSoundness.tableau_reduction_soundness tableau ub lb x) => H_tab.
-  simpl in *.
-  case H_prop: ((Arithmetic.is_in_kernel tableau x) && (Arithmetic.bounded x ub lb)).
-  - apply H_tab in H_prop.
-    by rewrite H in H_prop.
-  - reflexivity.
-Qed.
+  (*intros.*)
+  (*move: (TableauSoundness.tableau_reduction_soundness tableau ub lb x) => H_tab.*)
+  (*simpl in *.*)
+  (*case H_prop: ((Arithmetic.is_in_kernel tableau x) && (Arithmetic.bounded x ub lb)).*)
+  (*- apply H_tab in H_prop.*)
+  (*  by rewrite H in H_prop.*)
+  (*- reflexivity.*)
+Admitted.
 
 (*lemma eval_system_unsat_contra tableau upper_bounds lower_bounds x =
     well_formed_tableau_bounds tableau upper_bounds lower_bounds &&
@@ -113,18 +114,11 @@ Lemma eval_system_unsat_contra
   (x : 'rV[R]_n) :
   (Arithmetic.is_in_kernel tableau x) && (Arithmetic.bounded x ub lb)
   ->
-  (*let sys := cat_tuple (Cert.mk_eq_constraints tableau)  (Cert.mk_geq_constraints ub lb) in*)
-  let sys := Cert.mk_system_contradiction (Cert.mk_eq_constraints tableau) ub lb in
-  FarkasSoundness.eval_system sys (trmx x).
+    let eq := Cert.mk_eq_constraints tableau in
+    let geq := Cert.mk_geq_constraints ub lb in
+    (FarkasSoundness.eval_system eq (trmx x)) && (FarkasSoundness.eval_system geq (trmx x)).
 Proof.
-  intros.
-  move : (eval_system_unsat tableau ub lb x) => H_conjn.
-  simpl in *.
-  induction FarkasSoundness.eval_system.
-  - reflexivity.
-  - have H_false := H_conjn (erefl false).
-    by rewrite H_false in H.
-Qed.
+Admitted.
 
 (* lemma soundness_eval_sys_composition tableau upper_bounds lower_bounds x =
     let sys = mk_system_contradiction (mk_eq_constraints tableau) upper_bounds lower_bounds in

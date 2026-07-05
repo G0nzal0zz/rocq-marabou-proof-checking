@@ -38,10 +38,10 @@ Definition compute_combination (expl : (m.+2).-tuple R) (tableau : system m n) :
     \sum_(i < m.+2) (tnth expl i *: drop_last_vector (extract_poly (tnth tableau i))) in
   [tuple raw_vector_sum 0 j | j < n].
 
-Definition cv_addn1_succ: 'cV[R]_(n+1) -> 'cV[R]_n.+1 :=
+Definition cv_addn1_succ {n : nat} :  'cV[R]_(n+1) -> 'cV[R]_n.+1 :=
   (castmx (addn1 n, erefl)).
 
-Definition rv_addn1_succ: 'rV[R]_(n+1) -> 'rV[R]_n.+1 :=
+Definition rv_addn1_succ {n : nat} :  'rV[R]_(n+1) -> 'rV[R]_n.+1 :=
   (castmx (erefl, addn1 n)).
 
 (*let rec dot_product x y =
@@ -49,10 +49,10 @@ match x, y with
     | [], [] -> 0.
     | x_hd :: x_tl, y_hd :: y_tl -> x_hd *. y_hd +. (dot_product x_tl y_tl)
     | _ -> 0.*)
-Definition dot_product (p : 'rV[R]_n.+1) (x : 'cV[R]_n) : R :=
-  (p *m (cv_addn1_succ (col_mx x 1%:M))) ord0 ord0.
+Definition dot_product {n : nat} (p : 'rV[R]_n) (x : 'cV[R]_n) : R :=
+  (p *m x) ord0 ord0.
 
-Definition check_dot_product_zero (p : 'rV[R]_n.+1) (x : 'cV[R]_n) : bool :=
+Definition check_dot_product_zero {n : nat} (p : 'rV[R]_n) (x : 'cV[R]_n) : bool :=
   dot_product p x == 0.
 
 (*let rec is_in_kernel tableau x =*)
@@ -60,8 +60,7 @@ Definition check_dot_product_zero (p : 'rV[R]_n.+1) (x : 'cV[R]_n) : bool :=
 (*    | [] -> true*)
 (*    | row :: rows -> dot_product row x = 0. && is_in_kernel rows x*)
 Definition is_in_kernel (tableau : (m.+2).-tuple ('rV[R]_n)) (x : 'rV[R]_n) : bool :=
-  let padded_tableau := map_tuple (fun hd => Arithmetic.rv_addn1_succ(row_mx hd 0)) tableau in
-  all (check_dot_product_zero ^~ (trmx x)) (val padded_tableau).
+  all (check_dot_product_zero ^~ (trmx x)) (val tableau).
 
 
 End Arithmetic.

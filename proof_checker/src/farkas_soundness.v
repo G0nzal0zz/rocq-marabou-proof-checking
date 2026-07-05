@@ -14,7 +14,7 @@ Require Import arithmetic.
 Import GroupScope Order.TTheory GRing.Theory Num.Theory.
 Import CertificateSpecs.
 (* NOTE: Open the Farkas namespace to access its definitions directly without using qualified paths (e.g., Farkas.foo). *)
-Import Farkas. 
+Import Farkas.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
@@ -50,7 +50,7 @@ HB.instance Definition _ := hasDecEq.Build (expr n) expr_eqP.
 
 (* NOTE:
    In order to compute the value of the polynomial, we need to compute the matrix multiplication (`*m`) between `p` and `x`.
-   For matrix multiplication, the number of columns of the first matrix must match the number of rows of the second. 
+   For matrix multiplication, the number of columns of the first matrix must match the number of rows of the second.
    Since `p` has `n.+1` columns and `x` only has `n` rows, we stack a scalar `1` to the bottom of `x` (using `col_mx`) to make its row count match.
    Because the result of a matrix multiplication is always a matrix, even if it only contains a single element (a 1x1 matrix in our case), we extract the final scalar value using `ord0 ord0`.
 *)
@@ -61,14 +61,14 @@ HB.instance Definition _ := hasDecEq.Build (expr n) expr_eqP.
 (**)
 (*Canonical eval_poly_unlockable := [unlockable fun eval_poly].*)
 
-Definition eval_expr e x : bool :=
+Definition eval_expr {n : nat} (e : expr n) (x : 'cV[R]_n) : bool :=
   match e with
-  | Eq p => Arithmetic.dot_product p x == 0%R
-  | Geq p => 0%R <= Arithmetic.dot_product p x
+  | Eq p => Arithmetic.dot_product p (Arithmetic.cv_addn1_succ (col_mx x 1%:M)) == 0%R
+  | Geq p => 0%R <= Arithmetic.dot_product p (Arithmetic.cv_addn1_succ (col_mx x 1%:M))
   end.
 
-Definition eval_system (es : system m' n) x : bool := all (eval_expr ^~ x) es.
-Check eval_system.
+(* NOTE: Using `m` as an explicit argument to facilitate generating proofs around eval_system (e.g., tableau_reduction_soundness). *)
+Definition eval_system {m n : nat} (es : (m).-tuple (expr n)) (x : 'cV[R]_n) : bool := all (eval_expr ^~ x) es.
 
 Lemma col_mx_max1 x : Arithmetic.cv_addn1_succ (col_mx x 1%:M) ord_max ord0 = 1.
 Proof.
@@ -78,26 +78,26 @@ Proof.
   by rewrite //= addn0.
 Qed.
 
-Lemma eval_scale_pull p (r : R) x : Arithmetic.dot_product (r *: p) x = r * Arithmetic.dot_product p x.
+Lemma eval_scale_pull p (r : R) x : Arithmetic.dot_product (r *: p) (Arithmetic.cv_addn1_succ (col_mx x 1%:M))  = r * Arithmetic.dot_product p (Arithmetic.cv_addn1_succ (col_mx x 1%:M)).
 Proof.
   rewrite /Arithmetic.dot_product !mxE big_distrr /= (eq_bigr (fun j => r * (p ord0 j * Arithmetic.cv_addn1_succ (col_mx x 1%:M) j ord0))) // => i _.
   by rewrite mulrA !mxE.
 Qed.
 
-Lemma eval_zero_scale p (c : R) x : Arithmetic.dot_product p x = 0 -> Arithmetic.dot_product (c *: p) x = 0.
+Lemma eval_zero_scale p (c : R) x : Arithmetic.dot_product p (Arithmetic.cv_addn1_succ (col_mx x 1%:M))  = 0 -> Arithmetic.dot_product (c *: p) (Arithmetic.cv_addn1_succ (col_mx x 1%:M)) = 0.
 Proof.
   move=> H.
   by rewrite eval_scale_pull H mulr0.
 Qed.
 
-Lemma eval_non_neg_scale p (c : R) x :Arithmetic.dot_product p x >= 0 -> c >= 0 -> Arithmetic.dot_product (c *: p) x >= 0.
+Lemma eval_non_neg_scale p (c : R) x :Arithmetic.dot_product p (Arithmetic.cv_addn1_succ (col_mx x 1%:M)) >= 0 -> c >= 0 -> Arithmetic.dot_product (c *: p) (Arithmetic.cv_addn1_succ (col_mx x 1%:M)) >= 0.
 Proof.
   move=> Hp Hc.
   rewrite eval_scale_pull mulr_ge0 //=.
 Qed.
 
 Lemma cert_is_neg cs es x :
-  check_cert es cs -> Arithmetic.dot_product (mk_cert_poly cs es) x < 0.
+  check_cert es cs -> Arithmetic.dot_product (mk_cert_poly cs es) (Arithmetic.cv_addn1_succ (col_mx x 1%:M)) < 0.
 Proof.
   rewrite /check_cert /is_neg_const /Arithmetic.dot_product !mxE big_ord_recr /= col_mx_max1 mulr1 => /forallP H.
   rewrite big1.
@@ -114,19 +114,20 @@ Proof.
   by rewrite ltnn.
 Qed.
 
-Lemma eval_poly0 x : Arithmetic.dot_product 0 x = 0.
+Lemma eval_poly0 x : Arithmetic.dot_product 0 (Arithmetic.cv_addn1_succ (col_mx x 1%:M)) = 0.
 Proof.
   by rewrite /Arithmetic.dot_product mul0mx !mxE.
 Qed.
 
 Lemma eval_poly_morph x :
-  {morph Arithmetic.dot_product^~ x : p q / p + q >-> p + q}.
+  {morph Arithmetic.dot_product^~ (Arithmetic.cv_addn1_succ (col_mx x 1%:M)) : p q / p + q >-> p + q}.
 Proof.
   move=> p q.
   rewrite /Arithmetic.dot_product !mxE -big_split /=.
   apply eq_bigr => i _.
   by rewrite -mulrDl !mxE.
 Qed.
+
 
 Lemma zip_mem_in (a : nat) (A B : eqType) (cs : a.-tuple A) (es : a.-tuple B) (c : A) (e : B) :
   (c, e) \in zip cs es -> (c \in cs) && (e \in es).
@@ -145,10 +146,10 @@ Proof.
   by rewrite !orbT.
 Qed.
 
-Lemma solution_is_not_neg cs es x : eval_system es x -> Arithmetic.dot_product (mk_cert_poly cs es) x >= 0.
+Lemma solution_is_not_neg cs es x : eval_system es x -> Arithmetic.dot_product (mk_cert_poly cs es) (Arithmetic.cv_addn1_succ (col_mx x 1%:M)) >= 0.
 Proof.
   (* rewrite /eval_system => /allP H. *)
-  rewrite /eval_system /mk_cert_poly /sum_polys (big_morph (Arithmetic.dot_product^~ x) (eval_poly_morph x) (eval_poly0 x)) /scale_exprs big_seq /= => /allP H.
+  rewrite /eval_system /mk_cert_poly /sum_polys (big_morph (Arithmetic.dot_product^~ (Arithmetic.cv_addn1_succ (col_mx x 1%:M))) (eval_poly_morph x) (eval_poly0 x)) /scale_exprs big_seq /= => /allP H.
   apply sumr_ge0 => k /mapP [ce Hce] ->.
   case: ce Hce => c e.
   move=> /zip_mem_in /andP [Hc He].
@@ -166,7 +167,7 @@ Theorem farkas_unsat (es : system m' n) (cs : m'.+2.-tuple R) x :
 Proof.
   move=> /(cert_is_neg x).
   case E: (eval_system es x) => //=.
-  move: E => /(solution_is_not_neg cs) E /lt_le_trans => /(_ (Arithmetic.dot_product (mk_cert_poly cs es ) x)) => /(_ E).
+  move: E => /(solution_is_not_neg cs) E /lt_le_trans => /(_ (Arithmetic.dot_product (mk_cert_poly cs es ) (Arithmetic.cv_addn1_succ (col_mx x 1%:M)))) => /(_ E).
   by rewrite lt_irreflexive.
 Qed.
 

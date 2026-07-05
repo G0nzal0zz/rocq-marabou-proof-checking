@@ -7,4 +7,6 @@ Module CertificateSpecs.
   (* NOTE:  Number of rows in tableau *)
   Parameter (m : nat).
 
+  Definition m' := (m + (n + n)).
+
 End CertificateSpecs.
