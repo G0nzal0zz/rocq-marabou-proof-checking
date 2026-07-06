@@ -12,7 +12,7 @@ Import CertificateSpecs GRing.Theory Num.Theory.
 
 Open Scope ring_scope.
 
-Module TableauSoundness.
+Module SystemSoundness.
 
 Lemma dot_product_eq_kernel (hd : 'rV[R]_n) (x : 'rV[R]_n) :
   Arithmetic.dot_product (Arithmetic.rv_addn1_succ (row_mx hd 0))
@@ -45,7 +45,7 @@ Proof.
   by [].
 Qed.
 
-Lemma tableau_reduction_soundness_eq
+Lemma system_soundness_eq
   (tableau : (m.+2).-tuple ('rV[R]_n))
   (x : 'rV[R]_n) :
   Arithmetic.is_in_kernel tableau x ->
@@ -101,7 +101,7 @@ Proof.
   reflexivity.
 Qed.
 
-Lemma tableau_reduction_soundness_geq
+Lemma system_soundness_geq
   (ub lb : Tightening.t_bounds)
   (x : 'rV[R]_n) :
   Arithmetic.bounded x ub lb ->
@@ -135,7 +135,7 @@ Proof.
     eval_system (mk_eq_constraints tableau) x
     [@@by induct ~on_vars:["tableau"] ()]
     [@@fc]*)
-Theorem tableau_reduction_soundness
+Theorem system_soundness
   (tableau : (m.+2).-tuple ('rV[R]_n))
   (ub lb : Tightening.t_bounds)
   (x : 'rV[R]_n) :
@@ -143,9 +143,9 @@ Theorem tableau_reduction_soundness
   let sys := Cert.mk_system_contradiction (Cert.mk_eq_constraints tableau) ub lb in
   FarkasSoundness.eval_system sys (trmx x).
 Proof.
-  move/andP=> [/tableau_reduction_soundness_eq H_ker /tableau_reduction_soundness_geq H_bound].
+  move/andP=> [/system_soundness_eq H_ker /system_soundness_geq H_bound].
   rewrite /Cert.mk_system_contradiction in H_ker *.
   by rewrite FarkasSoundness.eval_system_composition H_ker H_bound.
 Qed.
 
-End TableauSoundness.
+End SystemSoundness.

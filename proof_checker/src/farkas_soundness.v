@@ -82,8 +82,6 @@ Proof.
   by rewrite all_cat.
 Qed.
 
-
-
 Lemma col_mx_max1 x : Arithmetic.cv_addn1_succ (col_mx x 1%:M) ord_max ord0 = 1.
 Proof.
   rewrite /Arithmetic.cv_addn1_succ castmxE (_ : ord_max = cast_ord (addn1 n) (rshift n ord0)) //=.

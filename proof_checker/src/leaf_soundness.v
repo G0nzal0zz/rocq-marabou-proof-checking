@@ -10,7 +10,7 @@ Require Import farkas.
 Require Import farkas_soundness.
 Require Import sat.
 Require Import arithmetic.
-Require Import tableau_soundness.
+Require Import system_soundness.
 
 Import CertificateSpecs.
 
@@ -67,58 +67,10 @@ Lemma check_cert_implies_not_eval_system
   Checker.check_tree tableau ub lb constraints (ProofTree.leaf contradiction) ->
   FarkasSoundness.eval_system sys (trmx x) = false.
 Proof.
-Admitted.
-
-(*lemma eval_system_unsat_conjn tableau upper_bounds lower_bounds x =
-    well_formed_tableau_bounds tableau upper_bounds lower_bounds &&
-    List.length x = List.length (List.hd tableau) &&
-    not ((eval_system (mk_eq_constraints tableau) x) && (eval_system (mk_geq_constraints upper_bounds lower_bounds) x))
-    ==>
-    not ((is_in_kernel tableau x) && (bounded x upper_bounds lower_bounds))
-[@@by [%use eval_system_unsat tableau upper_bounds lower_bounds x]
-   @> auto]
-[@@disable Checker.well_formed_tableau_bounds, Arithmetic.bounded]
-[@@fc]
-[@@timeout 60]*)
-Lemma eval_system_unsat
-  (tableau : (m.+2).-tuple ('rV[R]_n))
-  (ub lb : Tightening.t_bounds)
-  (x : 'rV[R]_n) :
-    let eq := Cert.mk_eq_constraints tableau in
-    let geq := Cert.mk_geq_constraints ub lb in
-     (FarkasSoundness.eval_system eq (trmx x) &&  FarkasSoundness.eval_system geq (trmx x)) = false
-    ->
-    ((Arithmetic.is_in_kernel tableau x) && (Arithmetic.bounded x ub lb)) = false.
-Proof.
-  (*intros.*)
-  (*move: (TableauSoundness.tableau_reduction_soundness tableau ub lb x) => H_tab.*)
-  (*simpl in *.*)
-  (*case H_prop: ((Arithmetic.is_in_kernel tableau x) && (Arithmetic.bounded x ub lb)).*)
-  (*- apply H_tab in H_prop.*)
-  (*  by rewrite H in H_prop.*)
-  (*- reflexivity.*)
-Admitted.
-
-(*lemma eval_system_unsat_contra tableau upper_bounds lower_bounds x =
-    well_formed_tableau_bounds tableau upper_bounds lower_bounds &&
-    List.length x = List.length (List.hd tableau) &&
-    (is_in_kernel tableau x) && (bounded x upper_bounds lower_bounds)
-    ==>
-    (eval_system (mk_eq_constraints tableau) x) && (eval_system (mk_geq_constraints upper_bounds lower_bounds) x)
-[@@by [%use eval_system_unsat_conjn tableau upper_bounds lower_bounds x]
-   @> auto]
- [@@fc]*)
-Lemma eval_system_unsat_contra
-  (tableau : (m.+2).-tuple ('rV[R]_n))
-  (ub lb : Tightening.t_bounds)
-  (x : 'rV[R]_n) :
-  (Arithmetic.is_in_kernel tableau x) && (Arithmetic.bounded x ub lb)
-  ->
-    let eq := Cert.mk_eq_constraints tableau in
-    let geq := Cert.mk_geq_constraints ub lb in
-    (FarkasSoundness.eval_system eq (trmx x)) && (FarkasSoundness.eval_system geq (trmx x)).
-Proof.
-Admitted.
+  move: (check_tree_implies_check_cert tableau ub lb constraints contradiction x) => H_cert.
+  move: (@FarkasSoundness.farkas_unsat (Cert.mk_system_contradiction tableau ub lb) ((Cert.mk_contradiction_certificate contradiction tableau ub lb)) (trmx x)) => H_farkas.
+  by [].
+Qed.
 
 (* lemma soundness_eval_sys_composition tableau upper_bounds lower_bounds x =
     let sys = mk_system_contradiction (mk_eq_constraints tableau) upper_bounds lower_bounds in
@@ -132,8 +84,8 @@ Admitted.
 [@@disable Farkas.eval_system, Certificate.mk_system_contradiction, Checker.well_formed_tableau_bounds]
 [@@fc]
 [@@timeout 90] *)
-(* NOTE: This lemma is not being used *)
-Lemma soundness_eval_sys_composition
+(* WARN: This lemma is not being used *)
+Lemma soundness_eval_sys_composition_unused
   (tableau : (m.+2).-tuple ('rV[R]_n))
   (ub lb : Tightening.t_bounds)
   (x : 'rV[R]_n) :
@@ -173,7 +125,7 @@ Lemma soundness_check_cert_composition
 Proof.
   intros.
   case H_prop: ((Arithmetic.is_in_kernel tableau x) && (Arithmetic.bounded x ub lb)).
-  - move : (eval_system_unsat_contra tableau ub lb x H_prop) => H_unsat.
+  - move : (SystemSoundness.system_soundness tableau ub lb x H_prop) => H_unsat.
     rewrite  <- H.
     simpl in *.
     by rewrite H_unsat.
@@ -205,7 +157,7 @@ Lemma not_eval_system_implies_unsat
 Proof.
   intros.
   rewrite /Sat.unsat.
-  move : (soundness_check_cert_composition tableau ub lb x) => H_comp.
+  move: (soundness_check_cert_composition tableau ub lb x) => H_comp.
   have H_final := H_comp H.
   by rewrite H_final.
 Qed.
@@ -238,8 +190,8 @@ Lemma leaf_soundness
   Sat.unsat tableau ub lb constraints x.
 Proof.
   intros system' H.
-  move : (not_eval_system_implies_unsat tableau ub lb constraints contradiction x) => H_eval.
-  move : (check_cert_implies_not_eval_system system' ub lb constraints contradiction x) => H_test.
+  move: (not_eval_system_implies_unsat tableau ub lb constraints contradiction x) => H_eval.
+  move: (check_cert_implies_not_eval_system system' ub lb constraints contradiction x) => H_test.
   auto.
 Qed.
 

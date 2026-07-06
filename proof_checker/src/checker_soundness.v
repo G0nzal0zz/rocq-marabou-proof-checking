@@ -82,11 +82,6 @@ Lemma check_tree_soundness_full
     Sat.unsat tableau ub lb constraints x
   end.
 Proof.
-  move=> Hcheck.
-  elim: proof_tree Hcheck.
-  - admit. (*TODO: ProofTree.node case*)
-  - intros. (*NOTE: ProofTree.leaf branch *)
-    by apply (check_tree_soundness_leaf tableau ub lb constraints t x).
 Admitted.
 
 (*theorem check_tree_soundness (tableau: real list list) (upper_bounds: real list) (lower_bounds: real list)
@@ -116,6 +111,11 @@ Theorem check_tree_soundness
   Checker.check_proof_tree tableau ub lb constraints proof_tree
   -> Sat.unsat tableau ub lb constraints x.
 Proof.
+  move=> Hcheck.
+  elim: proof_tree Hcheck.
+  - admit. (*TODO: ProofTree.node case*)
+  - intros. (*NOTE: ProofTree.leaf branch *)
+    by apply (check_tree_soundness_leaf tableau ub lb constraints t x).
 Admitted.
 
 
