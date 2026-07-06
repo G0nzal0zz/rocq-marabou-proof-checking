@@ -70,6 +70,20 @@ Definition eval_expr {n : nat} (e : expr n) (x : 'cV[R]_n) : bool :=
 (* NOTE: Using `m` as an explicit argument to facilitate generating proofs around eval_system (e.g., tableau_reduction_soundness). *)
 Definition eval_system {m n : nat} (es : (m).-tuple (expr n)) (x : 'cV[R]_n) : bool := all (eval_expr ^~ x) es.
 
+Lemma eval_system_composition
+  {m m' n : nat}
+  (es : (m).-tuple (expr n))
+  (es' : (m').-tuple (expr n))
+  (x : 'cV[R]_n) :
+  eval_system (cat_tuple es es') x <->
+  eval_system es x && eval_system es' x.
+Proof.
+  rewrite /eval_system.
+  by rewrite all_cat.
+Qed.
+
+
+
 Lemma col_mx_max1 x : Arithmetic.cv_addn1_succ (col_mx x 1%:M) ord_max ord0 = 1.
 Proof.
   rewrite /Arithmetic.cv_addn1_succ castmxE (_ : ord_max = cast_ord (addn1 n) (rshift n ord0)) //=.

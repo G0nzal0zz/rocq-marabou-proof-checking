@@ -143,11 +143,9 @@ Theorem tableau_reduction_soundness
   let sys := Cert.mk_system_contradiction (Cert.mk_eq_constraints tableau) ub lb in
   FarkasSoundness.eval_system sys (trmx x).
 Proof.
-  (* TODO *)
-  (*intros.*)
-  (*simpl in *.*)
-  (*unfold FarkasSoundness.eval_system.*)
-
-Admitted.
+  move/andP=> [/tableau_reduction_soundness_eq H_ker /tableau_reduction_soundness_geq H_bound].
+  rewrite /Cert.mk_system_contradiction in H_ker *.
+  by rewrite FarkasSoundness.eval_system_composition H_ker H_bound.
+Qed.
 
 End TableauSoundness.
