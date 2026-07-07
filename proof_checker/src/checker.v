@@ -38,32 +38,20 @@ Definition check_contradiction
 
 Fixpoint check_tree
   (tableau : system m n)
-  (upper_bounds : Tightening.t_bounds)
-  (lower_bounds : Tightening.t_bounds)
+  (ub lb : Tightening.t_bounds)
   (constraints : seq Constraint.t)
   (proof_node : ProofTree.t)
   : bool :=
   match proof_node with
-  | ProofTree.leaf contradiction => 
-      check_contradiction contradiction
-                          tableau
-                          upper_bounds
-                          lower_bounds
+  | ProofTree.leaf contradiction =>
+    check_contradiction contradiction tableau ub lb
   | ProofTree.node split tleft tright =>
-      let valid_split := Split.check_split split constraints in
-      let bounds := Split.update_bounds_from_split
-                      lower_bounds
-                      upper_bounds
-                      split in
-      let '((lb_left, ub_left), (lb_right, ub_right)) := bounds in
+    let bounds := Split.update_bounds_from_split ub lb split in
 
-      let valid_children :=
-        andb
-          (check_tree tableau ub_left lb_left constraints tleft)
-          (check_tree tableau ub_right lb_right constraints tright)
-      in
-
-      andb valid_children valid_split
+    let valid_split := Split.check_split split constraints in
+    let valid_left  := check_tree tableau bounds.1.2 bounds.1.1 constraints tleft in
+    let valid_right := check_tree tableau bounds.2.2 bounds.2.1 constraints tright in
+    valid_split && valid_left && valid_right
   end.
 
 
