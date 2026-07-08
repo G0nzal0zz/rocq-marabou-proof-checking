@@ -29,17 +29,17 @@ Definition is_lower (type : bound_type) : bool :=
   | _ => false
   end.
 
-(*let rec update_bounds_by_tightenings (tightenings: t list) (bounds: Real.t list): Real.t list =*)
-(*   match tightenings with*)
-(*   | []                    -> bounds*)
-(*   | (var, value, _) :: tl -> let updated_bounds = set_nth bounds var value in*)
-(*                              update_bounds_by_tightenings tl updated_bounds*)
-Fixpoint update_bounds_by_tightenings (tightenings : seq t) (bounds : t_bounds) : Tightening.t_bounds :=
+(*let rec update_bounds_by_tightenings (tightenings: t list) (bounds: Real.t list): Real.t list =
+   match tightenings with
+   | []                    -> bounds
+   | (var, value, _) :: tl -> let updated_bounds = set_nth bounds var value in
+     update_bounds_by_tightenings tl updated_bounds*)
+(*Fixpoint update_bounds_by_tightenings (tightenings : seq t) (bounds : t_bounds) : Tightening.t_bounds :=
   match tightenings with
   | [::] => bounds
   | (var, value, _) :: tl => let updated_bounds := set_nth_vector bounds var value in
       update_bounds_by_tightenings tl updated_bounds
-  end.
+  end.*)
 
 
 (* update the bounds according to a list of tightenings *)
@@ -49,16 +49,16 @@ Fixpoint update_bounds_by_tightenings (tightenings : seq t) (bounds : t_bounds) 
 (*   let updated_upper = update_bounds_by_tightenings upper_tightenings upper_bounds in*)
 (*   let updated_lower = update_bounds_by_tightenings lower_tightenings lower_bounds in*)
 (*   (updated_upper, updated_lower)*)
-Definition update_bounds
-  (tightenings : seq t)
-  (upper_bounds : t_bounds)
-  (lower_bounds : t_bounds)
-  : t_bounds * t_bounds :=
-  let upper_tightenings := filter (fun '(_, _, btype) => is_upper btype) tightenings in
-  let lower_tightenings := filter (fun '(_, _, btype) => is_lower btype) tightenings in
-  let updated_upper := update_bounds_by_tightenings upper_tightenings upper_bounds in
-  let updated_lower := update_bounds_by_tightenings lower_tightenings lower_bounds in
-  (updated_upper, updated_lower).
+(*Definition update_bounds*)
+(*  (tightenings : seq t)*)
+(*  (upper_bounds : t_bounds)*)
+(*  (lower_bounds : t_bounds)*)
+(*  : t_bounds * t_bounds :=*)
+(*  let upper_tightenings := filter (fun '(_, _, btype) => is_upper btype) tightenings in*)
+(*  let lower_tightenings := filter (fun '(_, _, btype) => is_lower btype) tightenings in*)
+(*  let updated_upper := update_bounds_by_tightenings upper_tightenings upper_bounds in*)
+(*  let updated_lower := update_bounds_by_tightenings lower_tightenings lower_bounds in*)
+(*  (updated_upper, updated_lower).*)
 
 End Tightening.
 

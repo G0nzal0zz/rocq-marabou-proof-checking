@@ -17,10 +17,8 @@ Fixpoint set_nth {A : Type} (l : list A) (idx : nat) (elem : A) :=
   | S n, x :: xs => [x] ++ set_nth xs n elem
   end.
 
-Definition set_nth_vector {A : Type} {n : nat} (v : 'rV[A]_n) (idx : nat) (elem : A) : 'rV[A]_n :=
-  if insub idx is Some col then
-    \matrix_(i, j) if j == col then elem else v i j
-  else v.
+Definition set_nth_vector {A : Type} {n : nat} (v : 'rV[A]_n) (idx : 'I_n) (elem : A) : 'rV[A]_n :=
+    \matrix_(i, j) if j == idx then elem else v i j.
 
 (* NOTE: Like OCaml List.map2, but it does not fail if the lists have unequal lengths *)
 Fixpoint map2 {A B C: Type } (f : A -> B -> C) (a : list A) (b : list B) : list C :=

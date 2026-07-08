@@ -107,8 +107,8 @@ Proof.
   { move/eqP: H_unsat_l => H; exact H. }
   have H_sat_r : Sat.sat tableau (Split.update_bounds_from_split ub lb split).2.2 (Split.update_bounds_from_split ub lb split).2.1 constraints x = false.
   { move/eqP: H_unsat_r => H; exact H. }
-  rewrite /Sat.unsat.
-  apply/eqP.
+  rewrite Sat.unsat_not_sat.
+  rewrite eqbF_neg.
   apply: (NodeSoundness.soundness_split_contra tableau ub lb constraints split x).
   by rewrite H_split H_sat_l H_sat_r.
 Qed.

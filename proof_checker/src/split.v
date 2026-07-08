@@ -29,13 +29,13 @@ Inductive t :=
 (*        (lbs_l, ubs_l), (lbs_r, ubs_r)*)
 
 Definition update_bounds_from_split
-  (lbs: Tightening.t_bounds)
   (ubs : Tightening.t_bounds)
+  (lbs: Tightening.t_bounds)
   (split : t)
   : ((Tightening.t_bounds * Tightening.t_bounds)  * (Tightening.t_bounds  * Tightening.t_bounds)) :=
   match split with
   | single i k => ((lbs, set_nth_vector ubs i k), (set_nth_vector lbs i k, ubs))
-  | relu b f aux => 
+  | relu b f aux =>
     (* left: inactive phase *)
     let lbs_l := set_nth_vector lbs f 0%R in
     let ubs_l := set_nth_vector (set_nth_vector ubs b 0%R) f 0%R in
@@ -53,7 +53,7 @@ Definition update_bounds_from_split
 Definition check_split (split : t) (constraints : seq Constraint.t) : bool :=
   match split with
   | relu b f aux => has (Constraint.constraint_eqb (b, f, aux)) constraints
-  | _ => false
+  | _ => true
   end.
 
 End Split.
