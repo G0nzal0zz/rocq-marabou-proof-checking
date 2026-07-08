@@ -8,66 +8,16 @@ Require Import split.
 Require Import sat.
 Require Import arithmetic.
 Require Import util.
+Require Import single_var_split_soundness.
+Require Import relu.
+
+From Coq Require Import PeanoNat.
 
 Open Scope ring_scope.
 
 Import CertificateSpecs GRing.Theory Num.Theory Order.POrderTheory.
 
 Module SplitSoundness.
-
-Lemma bounded_set_lb (x ub lb: 'rV[R]_n) (i : 'I_n) (k : R)
-  : Arithmetic.bounded x ub lb ->
-    k <= x 0 i ->
-    Arithmetic.bounded x ub (set_nth_vector lb i k).
-Proof.
-  move=> /forallP Hb Hk.
-  apply/forallP => j.
-  rewrite /set_nth_vector mxE.
-  case: eqP => [-> | Hij].
-  - move: (Hb i) => /andP [H_lb H_ub]. by rewrite Hk H_ub.
-  - by move: (Hb j) => /andP [H_lb H_ub].
-Qed.
-
-Lemma bounded_set_ub (x ub lb: 'rV[R]_n) (i : 'I_n) (k : R)
-  : Arithmetic.bounded x ub lb ->
-     x 0 i < k  ->
-    Arithmetic.bounded x (set_nth_vector ub i k) lb.
-Proof.
-  move=> /forallP Hb Hk.
-  apply/forallP => j.
-  rewrite /set_nth_vector mxE.
-  case: eqP => [-> | Hij].
-  - move: (Hb i) => /andP [H_lb H_ub].
-    rewrite H_lb. exact: (ltW Hk).
-  - by move: (Hb j) => /andP [H_lb H_ub].
-Qed.
-
-(*lemma bounded_set_nth xs us ls k i =
-    bounded xs us ls
-    ==>
-    bounded xs us (set_nth ls i k) ||
-    bounded xs (set_nth us i k) ls
-    [@@by auto]*)
-Lemma bounded_set_nth
-  (ub lb: Tightening.t_bounds)
-  (i : 'I_n)
-  (k : R)
-  (x : 'rV[R]_n) :
-  Arithmetic.bounded x ub lb
-  ->
-  Arithmetic.bounded x (set_nth_vector ub i k) lb ||
-  Arithmetic.bounded x ub (set_nth_vector lb i k).
-Proof.
-  move=> Hb.
-  have Hcmp := lerP k (x 0 i).
-  case: Hcmp.
-  - move=> Hk.
-    apply/orP; right.
-    exact: bounded_set_lb Hb Hk.
-  - move=> Hk.
-    apply/orP; left.
-    exact: bounded_set_ub Hb Hk.
-Qed.
 
 (*lemma soundness_single_var_split_matching tableau ubs lbs constraints x split =
     let (lbs_l, ubs_l), (lbs_r, ubs_r) = update_bounds_from_split lbs ubs split in
@@ -79,7 +29,7 @@ Qed.
         sat tableau ubs_r lbs_r constraints x
     | _ -> true
    [@@by auto]*)
-Lemma soundness_single_var_split
+Theorem soundness_single_var_split
   (tableau : (m.+2).-tuple ('rV[R]_n))
   (ub lb: Tightening.t_bounds)
   (constraints : seq Constraint.t)
@@ -97,10 +47,76 @@ Proof.
   move/andP: H_sat => [/andP[H_kernel H_bounded] H_relu].
   rewrite H_kernel H_relu !andbT /=.
   clear H_kernel H_relu.
-  move: (bounded_set_nth ub lb i k x) => H_set_nth.
+  move: (SingleSplitSoundness.bounded_set_nth ub lb i k x) => H_set_nth.
   by apply H_set_nth in H_bounded.
 Qed.
 
+Lemma eval_relu_phase (b f aux : 'I_n) (x : 'rV[R]_n) :
+  Relu.eval_relu b f aux x -> (x 0 b <= 0) || (0 <= x 0 b).
+Proof.
+Admitted.
+
+Lemma bounded_inactive_phase
+  (ub lb : Tightening.t_bounds) (b f aux : 'I_n) (x : 'rV[R]_n) :
+  let lbs_l := set_nth_vector lb f 0%R in
+  let ubs_l := set_nth_vector (set_nth_vector ub b 0%R) f 0%R in
+  x 0 b <= 0 ->
+  Arithmetic.bounded x ub lb ->
+  Relu.eval_relu b f aux x ->
+  Arithmetic.bounded x ubs_l lbs_l.
+Proof.
+Admitted.
+
+Lemma bounded_active_phase
+  (ub lb : Tightening.t_bounds) (b f aux : 'I_n) (x : 'rV[R]_n) :
+  let lbs_r := set_nth_vector (set_nth_vector lb b 0%R) aux 0%R in
+  let ubs_r := set_nth_vector ub aux 0%R in
+  0 <= x 0 b ->
+  Arithmetic.bounded x ub lb ->
+  Relu.eval_relu b f aux x ->
+  Arithmetic.bounded x ubs_r lbs_r.
+Proof.
+Admitted.
+
+Lemma eval_relu_inequalities (b f aux : 'I_n) (x : 'rV[R]_n) :
+  Relu.eval_relu b f aux x ->
+  [/\ 0 <= x 0 f, x 0 aux = 0 & x 0 b = x 0 f] \/ [/\ x 0 b <= 0, x 0 f = 0 & x 0 aux <= 0].
+Proof.
+Admitted.
+
+Lemma soundness_relu_split_bounded
+  (ub lb: Tightening.t_bounds)
+  (constraints : seq Constraint.t)
+  (b f aux : 'I_n)
+  (x : 'rV[R]_n) :
+  let relu := Split.relu b f aux in
+  let bounds := Split.update_bounds_from_split ub lb (Split.relu b f aux) in
+  Split.check_split relu constraints ->
+  Arithmetic.bounded x ub lb ->
+  Constraint.check_relu_constraints constraints x ->
+  Arithmetic.bounded x bounds.1.2 bounds.1.1 ||
+  Arithmetic.bounded x bounds.2.2 bounds.2.1.
+Proof.
+  move=> relu bounds H_split H_bound H_constraints.
+  have /hasP [c Hc_in Hc_eq] := H_split.
+  have /eqP Heq_c' := Hc_eq.
+  clear H_split.
+  have Heval : Relu.eval_relu b f aux x.
+  - {have Hc_eval : Relu.eval_relu c.1.1 c.1.2 c.2 x.
+    + {move: Hc_in H_constraints.
+      elim: constraints => [|c' cs IH] Hc_in H_all.
+      * by case: Hc_in.
+      * move: Hc_in => /predU1P [->|Hc_in_cs].
+        -- have /andP [Heval_c' _] : Constraint.check_relu_constraints (c' :: cs) x := H_all.
+           exact Heval_c'.
+        -- have /andP [_ H_cs] : Constraint.check_relu_constraints (c' :: cs) x := H_all.
+           exact: IH Hc_in_cs H_cs. }
+    + by rewrite -Heq_c' in Hc_eval. }
+  - have Hphase := eval_relu_phase b f aux x Heval.
+    case/orP: Hphase => Hx.
+    + apply/orP; left; exact: bounded_inactive_phase Hx H_bound Heval.
+    + apply/orP; right; exact: bounded_active_phase Hx H_bound Heval.
+Qed.
 
 (*theorem soundness_relu_split tableau us ls constraints xs b f aux split =
     let (lb_left, ub_left), (lb_right, ub_right) = update_bounds_from_split ls us split in
@@ -119,7 +135,7 @@ Qed.
     ]
 [@@disable sat, update_bounds_from_split, List.length, List.mem]
 [@@fc] *)
-Lemma soundness_relu_split
+Theorem soundness_relu_split
   (tableau : (m.+2).-tuple ('rV[R]_n))
   (ub lb: Tightening.t_bounds)
   (constraints : seq Constraint.t)
@@ -133,6 +149,13 @@ Lemma soundness_relu_split
   (Sat.sat tableau bounds.1.2 bounds.1.1 constraints x
   || Sat.sat tableau bounds.2.2 bounds.2.1 constraints x).
 Proof.
-Admitted.
+  move => relu bounds /andP[H_split H_sat].
+  unfold Sat.sat.
+  unfold Sat.sat in H_sat.
+  move: H_sat => /andP[/andP[H_kernel H_bounded] H_relu].
+  rewrite H_kernel H_relu !andbT /=.
+  clear H_kernel.
+  by move: (soundness_relu_split_bounded ub lb constraints b f aux x H_split H_bounded H_relu). 
+Qed.
 
 End SplitSoundness.
