@@ -51,10 +51,14 @@ Proof.
   by apply H_set_nth in H_bounded.
 Qed.
 
+Lemma maxr_idPr (x y : R) : reflect (Num.max x y = y) (x <= y).
+Proof. by rewrite -eq_maxr; exact: eqP. Qed.
+
 Lemma eval_relu_phase (b f aux : 'I_n) (x : 'rV[R]_n) :
   Relu.eval_relu b f aux x -> (x 0 b <= 0) || (0 <= x 0 b).
 Proof.
-Admitted.
+  by move=> _; exact: Order.TotalTheory.le_total.
+Qed.
 
 Lemma bounded_inactive_phase
   (ub lb : Tightening.t_bounds) (b f aux : 'I_n) (x : 'rV[R]_n) :
@@ -65,7 +69,24 @@ Lemma bounded_inactive_phase
   Relu.eval_relu b f aux x ->
   Arithmetic.bounded x ubs_l lbs_l.
 Proof.
-Admitted.
+  move=> lbs_l ubs_l Hxb /forallP Hbound /andP [_ /andP [_ /andP [_ /andP [Hmax _]]]].
+  apply/forallP => i.
+  rewrite /ubs_l /lbs_l /set_nth_vector !mxE.
+  rewrite /ubs_l /lbs_l /set_nth_vector /=.
+  have [Hif | Hif] := boolP (i == f).
+    move/eqP: Hif => Hif; subst i.
+    have Hxf : x 0 f = 0%R.
+      move: Hmax; rewrite /Relu.compute_relu => /eqP ->.
+      by move: (maxr_idPr (x 0 b) 0 Hxb) => H_maxr. 
+      (*rewrite maxC; exact: max_l _ _ Hxb.*)
+    by rewrite Hxf; apply/andP; split => //; exact/lexx.
+  have [Hib | Hib] := boolP (i == b).
+    move/eqP: Hib => Hib; subst i.
+    move: (Hbound b) => /andP [Hlb Hub].
+    by rewrite Hlb Hxb.
+    (*apply/andP; split => //; exact: le_trans Hub Hxb.*)
+  by move: (Hbound i) => /andP [Hlb Hub].
+Qed.
 
 Lemma bounded_active_phase
   (ub lb : Tightening.t_bounds) (b f aux : 'I_n) (x : 'rV[R]_n) :
@@ -76,12 +97,86 @@ Lemma bounded_active_phase
   Relu.eval_relu b f aux x ->
   Arithmetic.bounded x ubs_r lbs_r.
 Proof.
-Admitted.
+  move=> lbs_r ubs_r Hxb /forallP Hbound /andP [_ /andP [_ /andP [_ /andP [Hmax Haux]]]].
+  have Hxf_b : x 0 f = x 0 b.
+    have Hmax_eq : x 0 f = Num.max (x 0 b) 0%R := eqP Hmax.
+    have Hmax_b : Num.max (x 0 b) 0%R = x 0 b.
+   move: (max_idPr Hxb) => H_maxid.
+   by rewrite  Order.TotalTheory.maxC.
+    by rewrite Hmax_eq Hmax_b.
+  have Hxaux0 : x 0 aux = 0%R.
+    rewrite Hxf_b /= in Haux. 
+    rewrite addrK in Haux.
+    by move/eqP: Haux => Haux_eq.
+  apply/forallP => i.
+  rewrite /ubs_r /lbs_r /set_nth_vector !mxE.
+  have [Hiaux | Hiaux] := boolP (i == aux).
+      move/eqP: Hiaux => Hiaux.
+      rewrite Hiaux Hxaux0. auto.
+  have [Hib | Hib] := boolP (i == b).
+    move/eqP: Hib => Hib.
+    rewrite Hib Hxb /=. 
+    move: (Hbound b) => H_test.
+    by move/andP: H_test => [H_lb H_ub].
+  move: (Hbound i) => /andP [Hlb Hub].
+  by move: (Hbound i) => H_test.
+Qed.
+
+Print le_anti.
 
 Lemma eval_relu_inequalities (b f aux : 'I_n) (x : 'rV[R]_n) :
   Relu.eval_relu b f aux x ->
-  [/\ 0 <= x 0 f, x 0 aux = 0 & x 0 b = x 0 f] \/ [/\ x 0 b <= 0, x 0 f = 0 & x 0 aux <= 0].
+  [/\ 0 <= x 0 f, x 0 aux = 0 & x 0 b = x 0 f] \/ [/\ x 0 b <= 0, x 0 f = 0 & 0 <= x 0 aux].
 Proof.
+  rewrite /Relu.eval_relu => /andP [Hneq_bf /andP [Hneq_baux /andP [Hneq_faux /andP [Hf Haux]]]].
+  have Hphase: (x 0 b <= 0) || (0 <= x 0 b) := Order.TotalTheory.le_total (x 0 b) 0.
+  case/orP: Hphase => Hx.
+  - have Hf0 : x 0 f = 0.
+      have Hmax : Relu.compute_relu (x 0 b) = 0.
+        rewrite /Relu.compute_relu /Num.max.
+        case/boolP: (x 0 b < 0) => Hlt.
+        - by [].
+        - have Hge : 0 <= x 0 b.
+             rewrite Order.TotalTheory.ltNge /= in Hlt. 
+             by apply negbNE in Hlt.
+        apply: le_anti.
+        - by rewrite Hx Hge. 
+        - move: (maxr_idPr (x 0 b) 0 Hx) => H_maxr. 
+      unfold Relu.compute_relu in Hf, Hmax.
+      rewrite  Order.TotalTheory.maxC in H_maxr.
+      move/eqP: Hf => Hf.
+      by rewrite Hmax in Hf.
+  - right.
+    split.
+  - exact Hx.
+      - by [].
+      - admit.
+  - left.
+      split.
+      - (* 0 <= x 0 f *)
+        move/eqP: Hf => Hf.
+        rewrite /Relu.compute_relu  in Hf.
+        move: (maxr_idPr 0 (x 0 b) Hx) => H_maxr. 
+        rewrite  Order.TotalTheory.maxC in H_maxr.
+        rewrite H_maxr in Hf.
+        by rewrite Hf.
+      - (* x 0 aux = 0 *)
+        move/eqP: Haux => Haux.
+        move/eqP: Hf => Hf.
+        rewrite /Relu.compute_relu in Hf.
+        move: (maxr_idPr 0 (x 0 b) Hx) => H_maxr. 
+        rewrite  Order.TotalTheory.maxC in H_maxr.
+        rewrite H_maxr in Hf.
+        rewrite Hf in Haux.
+      rewrite -addrA in Haux.
+      by rewrite subrr addr0 in Haux.
+
+      - (* x 0 b = x 0 f *)
+        move/eqP: Hf => Hf.
+        rewrite /Relu.compute_relu  in Hf.
+        move: (maxr_idPr 0 (x 0 b) Hx) => H_maxr. 
+        rewrite  Order.TotalTheory.maxC in H_maxr.
+        by rewrite H_maxr in Hf.
 Admitted.
 
 Lemma soundness_relu_split_bounded
