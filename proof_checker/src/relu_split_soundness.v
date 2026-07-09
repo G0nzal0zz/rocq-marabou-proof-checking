@@ -63,27 +63,22 @@ Lemma bounded_active_phase
 Proof.
   move=> lbs_r ubs_r Hxb /forallP Hbound /andP [_ /andP [_ /andP [_ /andP [Hmax Haux]]]].
   have Hxf_b : x 0 f = x 0 b.
-    have Hmax_eq : x 0 f = Num.max (x 0 b) 0%R := eqP Hmax.
-    have Hmax_b : Num.max (x 0 b) 0%R = x 0 b.
-   move: (max_idPr Hxb) => H_maxid.
-   by rewrite  Order.TotalTheory.maxC.
-    by rewrite Hmax_eq Hmax_b.
-  have Hxaux0 : x 0 aux = 0%R.
-    rewrite Hxf_b /= in Haux. 
-    rewrite addrK in Haux.
-    by move/eqP: Haux => Haux_eq.
-  apply/forallP => i.
-  rewrite /ubs_r /lbs_r /set_nth_vector !mxE.
-  have [Hiaux | Hiaux] := boolP (i == aux).
-      move/eqP: Hiaux => Hiaux.
-      rewrite Hiaux Hxaux0. auto.
-  have [Hib | Hib] := boolP (i == b).
-    move/eqP: Hib => Hib.
-    rewrite Hib Hxb /=. 
-    move: (Hbound b) => H_test.
-    by move/andP: H_test => [H_lb H_ub].
-  move: (Hbound i) => /andP [Hlb Hub].
-  by move: (Hbound i) => H_test.
+  - move/eqP: Hmax; rewrite /Relu.compute_relu => Hxf_eq.
+    have Hmax_b : Num.max (x 0 b) 0 = x 0 b.
+      + rewrite Order.TotalTheory.maxC; apply/maxr_idPr; exact Hxb.
+    by rewrite Hmax_b in Hxf_eq.
+  - have Hxaux0 : x 0 aux = 0%R.
+    + move/eqP: Haux => Haux_eq; rewrite Hxf_b addrK in Haux_eq; exact Haux_eq.
+    apply/forallP => i; rewrite /ubs_r /lbs_r /set_nth_vector !mxE /=.
+    have [Hiaux | Hiaux] := boolP (i == aux).
+    + move/eqP: Hiaux => Hiaux; subst i.
+      rewrite Hxaux0; apply/andP; split => //; exact/lexx.
+    + have [Hib | Hib] := boolP (i == b).
+      * move/eqP: Hib => Hib; subst i.
+        move: (Hbound b) => /andP [Hlb Hub].
+        by rewrite Hxb Hub.
+      * move: (Hbound i) => /andP [Hlb Hub].
+        by apply/andP; split.
 Qed.
 
 Print le_anti.
