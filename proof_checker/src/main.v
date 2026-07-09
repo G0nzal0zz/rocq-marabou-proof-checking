@@ -3,17 +3,14 @@ From mathcomp Require Import all_ssreflect all_algebra.
 Require Import gen_certificates.
 Require Import checker.
 
-Print check_tree.
+Import ParsedCertificates.
+
 Section Main.
 
-Variable (R' : numDomainType).
-Variable (n : nat).
-Variable (m : nat).
 
-Definition check_tree' := check_tree R' n.
+Definition is_unsat := Checker.check_proof_tree tableau ub lb constraints proof_tree.
 
-
-(*Definition result : bool := check_tree' ... .*)
+Compute (is_unsat).
 
 End Main.
 

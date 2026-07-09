@@ -73,9 +73,9 @@ Definition check_proof_tree
   (upper_bounds : Tightening.t_bounds)
   (lower_bounds : Tightening.t_bounds)
   (constraints : seq Constraint.t)
-  (proof_node : ProofTree.t)
+  (proof_tree : ProofTree.t)
   : bool :=
-  check_tree (Cert.mk_eq_constraints tableau) upper_bounds lower_bounds constraints proof_node.
+  check_tree (Cert.mk_eq_constraints tableau) upper_bounds lower_bounds constraints proof_tree.
 
 End Checker.
 

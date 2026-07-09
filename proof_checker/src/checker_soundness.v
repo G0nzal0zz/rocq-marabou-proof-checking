@@ -194,3 +194,4 @@ elim: proof_tree ub lb => [split tleft IHleft tright IHright | contradiction] ub
   by apply: (check_tree_soundness_node tableau ub lb constraints split tleft tright x IHleft IHright).
 - by apply: (check_tree_soundness_leaf tableau ub lb constraints contradiction x).
 Qed.
+
