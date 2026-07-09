@@ -131,53 +131,27 @@ Proof.
   rewrite /Relu.eval_relu => /andP [Hneq_bf /andP [Hneq_baux /andP [Hneq_faux /andP [Hf Haux]]]].
   have Hphase: (x 0 b <= 0) || (0 <= x 0 b) := Order.TotalTheory.le_total (x 0 b) 0.
   case/orP: Hphase => Hx.
-  - have Hf0 : x 0 f = 0.
-      have Hmax : Relu.compute_relu (x 0 b) = 0.
-        rewrite /Relu.compute_relu /Num.max.
-        case/boolP: (x 0 b < 0) => Hlt.
-        - by [].
-        - have Hge : 0 <= x 0 b.
-             rewrite Order.TotalTheory.ltNge /= in Hlt. 
-             by apply negbNE in Hlt.
-        apply: le_anti.
-        - by rewrite Hx Hge. 
-        - move: (maxr_idPr (x 0 b) 0 Hx) => H_maxr. 
-      unfold Relu.compute_relu in Hf, Hmax.
-      rewrite  Order.TotalTheory.maxC in H_maxr.
-      move/eqP: Hf => Hf.
-      by rewrite Hmax in Hf.
-  - right.
-    split.
-  - exact Hx.
-      - by [].
-      - admit.
-  - left.
-      split.
-      - (* 0 <= x 0 f *)
-        move/eqP: Hf => Hf.
-        rewrite /Relu.compute_relu  in Hf.
-        move: (maxr_idPr 0 (x 0 b) Hx) => H_maxr. 
-        rewrite  Order.TotalTheory.maxC in H_maxr.
-        rewrite H_maxr in Hf.
-        by rewrite Hf.
-      - (* x 0 aux = 0 *)
-        move/eqP: Haux => Haux.
-        move/eqP: Hf => Hf.
-        rewrite /Relu.compute_relu in Hf.
-        move: (maxr_idPr 0 (x 0 b) Hx) => H_maxr. 
-        rewrite  Order.TotalTheory.maxC in H_maxr.
-        rewrite H_maxr in Hf.
-        rewrite Hf in Haux.
-      rewrite -addrA in Haux.
-      by rewrite subrr addr0 in Haux.
-
-      - (* x 0 b = x 0 f *)
-        move/eqP: Hf => Hf.
-        rewrite /Relu.compute_relu  in Hf.
-        move: (maxr_idPr 0 (x 0 b) Hx) => H_maxr. 
-        rewrite  Order.TotalTheory.maxC in H_maxr.
-        by rewrite H_maxr in Hf.
-Admitted.
+  - have Hmax0 : Relu.compute_relu (x 0 b) = 0.
+      rewrite /Relu.compute_relu; apply/maxr_idPr; exact Hx.
+    have Hf0 : x 0 f = 0.
+      by move/eqP: Hf; rewrite Hmax0.
+    have Haux_nonneg : 0 <= x 0 aux.
+      move/eqP: Haux => Haux_eq.
+      rewrite Hf0 subr0 in Haux_eq.
+      have Haux_val : x 0 aux = - (x 0 b).
+        move/eqP: Haux_eq; rewrite addr_eq0; move/eqP; by [].
+      rewrite Haux_val; rewrite (oppr_ge0 (x 0 b)); exact Hx.
+    right; split; [exact Hx | exact Hf0 | exact Haux_nonneg].
+  -     have Hmax_b : Relu.compute_relu (x 0 b) = x 0 b.
+      rewrite /Relu.compute_relu; rewrite Order.TotalTheory.maxC; apply/maxr_idPr; exact Hx.
+    have Hf_b : x 0 f = x 0 b.
+      by move/eqP: Hf; rewrite Hmax_b.
+    have Haux0 : x 0 aux = 0.
+      move/eqP: Haux => Haux_eq.
+      rewrite Hf_b addrK in Haux_eq.
+      exact Haux_eq.
+    left; split; [rewrite Hf_b; exact Hx | exact Haux0 | by rewrite Hf_b].
+Qed.
 
 Lemma soundness_relu_split_bounded
   (ub lb: Tightening.t_bounds)
