@@ -36,21 +36,20 @@ Lemma bounded_inactive_phase
   Arithmetic.bounded x ubs_l lbs_l.
 Proof.
   move=> lbs_l ubs_l Hxb /forallP Hbound /andP [_ /andP [_ /andP [_ /andP [Hmax _]]]].
-  apply/forallP => i.
-  rewrite /ubs_l /lbs_l /set_nth_vector !mxE.
-  rewrite /ubs_l /lbs_l /set_nth_vector /=.
+  apply/forallP => i; rewrite /ubs_l /lbs_l /set_nth_vector !mxE /=.
   have [Hif | Hif] := boolP (i == f).
-    move/eqP: Hif => Hif; subst i.
+  - move/eqP: Hif => Hif; subst i.
     have Hxf : x 0 f = 0%R.
-      move: Hmax; rewrite /Relu.compute_relu => /eqP ->.
-      by move: (maxr_idPr (x 0 b) 0 Hxb) => H_maxr. 
-      (*rewrite maxC; exact: max_l _ _ Hxb.*)
+      move/eqP: Hmax; rewrite /Relu.compute_relu => Hxf_eq.
+      have Hmax0 : Num.max (x 0 b) 0 = 0 by apply/maxr_idPr; exact Hxb.
+      by rewrite Hmax0 in Hxf_eq.
     by rewrite Hxf; apply/andP; split => //; exact/lexx.
-  have [Hib | Hib] := boolP (i == b).
-    move/eqP: Hib => Hib; subst i.
-    move: (Hbound b) => /andP [Hlb Hub].
-    by rewrite Hlb Hxb.
-  by move: (Hbound i) => /andP [Hlb Hub].
+  - have [Hib | Hib] := boolP (i == b).
+    + move/eqP: Hib => Hib; subst i.
+      move: (Hbound b) => /andP [Hlb Hub].
+      by rewrite Hlb Hxb.
+    + move: (Hbound i) => /andP [Hlb Hub].
+      by apply/andP; split.
 Qed.
 
 Lemma bounded_active_phase
