@@ -54,7 +54,6 @@ Fixpoint check_tree
     valid_split && valid_left && valid_right
   end.
 
-
 (* Main entry point to verify the proof tree.
    - perform sanity checks on the tableau and upper and lower bound vector dimensions.
    - check the tree recursively starting from the root. We use pattern matching to check
