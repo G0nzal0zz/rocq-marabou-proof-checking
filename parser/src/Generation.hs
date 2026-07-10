@@ -1,74 +1,92 @@
-module Generation (generateRocq) where
+module Generation (generateRocq, generateCertificateSpecs) where
 
 import Data.List (intercalate)
+import Data.Ratio (denominator, numerator)
+
 import Parser
+import Utils
 import ProofTree
 import Split
-import Utils
 
--- TODO: Generate Constraints
--- Fix Tableau Generation
--- Add a comment at the beginning of the file stating that the file has been automatically generated.
 generateRocq :: ProofCertificate -> ProofTree -> String
 generateRocq cert proofTree =
-  unlines
-    [ "From Stdlib Require Import Reals.",
-      "From Stdlib Require Import List.",
-      "Require Import Certificate.",
-      "Import ListNotations.",
-      "Open Scope R_scope.",
+  let n_val = length (lowerBounds cert)
+      (Tableau rows) = tableau cert
+      denseRows = map (\row -> tableauToList (n_val - 1) row) rows
+  in unlines
+    [ "From mathcomp Require Import all_ssreflect all_algebra.",
+      "Require Import certificate_specs.",
+      "Require Import tightening.",
+      "Require Import constraint.",
+      "Require Import proof_tree.",
+      "Require Import split.",
+      "Require Import util.",
+      "Import CertificateSpecs.",
+      "Open Scope ring_scope.",
       "",
+      "Module ParsedCertificates.",
       "",
-      -- tableauToRocq (tableau cert) tableauWidth,
+      "  Definition lb : Tightening.t_bounds :=",
+      "    \\row_(j < n) (nth 0%R [:: " ++ intercalate "; " (map ratToString (lowerBounds cert)) ++ "] j).",
       "",
-      listToRocq "lower_bounds" (lowerBounds cert),
+      "  Definition ub : Tightening.t_bounds :=",
+      "    \\row_(j < n) (nth 0%R [:: " ++ intercalate "; " (map ratToString (upperBounds cert)) ++ "] j).",
       "",
-      listToRocq "upper_bounds" (upperBounds cert),
+      "  Definition constraints : seq Constraint.t :=",
+      "    [:: " ++ intercalate "; " (map constraintToRocq (constraints cert)) ++ " ].",
       "",
-      proofTreeToRocq proofTree
+      "  Definition tableau : (m.+2).-tuple ('rV[R]_n) :=",
+      "    [tuple nth (\\row_(j < n) 0%R) [::",
+      intercalate ";\n" (map rowToRocq denseRows),
+      "    ] i | i < m.+2].",
+      "",
+      "  Definition proof_tree : ProofTree.t :=",
+      "    " ++ proofTreeToRocq proofTree ++ ".",
+      "",
+      "End ParsedCertificates."
     ]
-  where
-    tableauWidth = length $ lowerBounds cert
 
-rocqDefinition :: String -> String -> String -> String
-rocqDefinition name t value = "Definition " ++ name ++ " : " ++ t ++ " := " ++ value ++ "."
+ratToString :: Rational -> String
+ratToString r =
+  let n = numerator r
+      d = denominator r
+  in if d == 1
+     then if n < 0 then "(" ++ show n ++ ")%R" else show n ++ "%:R"
+     else if n < 0
+          then "-(" ++ show (abs n) ++ " %:R / " ++ show d ++ " %:R)%R"
+          else "(" ++ show n ++ " %:R / " ++ show d ++ " %:R)%R"
 
---- =====================================================
--- Tableau
--- =====================================================
+constraintToRocq :: Constraint -> String
+constraintToRocq (Constraint _ vs) = case vs of
+  (b : f : aux : _) ->
+    "((inord " ++ show b ++ " : 'I_n), (inord " ++ show f ++ " : 'I_n), (inord " ++ show aux ++ " : 'I_n))"
+  _ -> error "Constraint must have at least 3 variables"
 
--- tableauToRocq :: Tableau -> Int -> String
--- tableauToRocq tableau width = listToRocq "tableau" (tableauToList width tableau)
+rowToRocq :: [Rational] -> String
+rowToRocq vals =
+  "        \\row_(j < n) (nth 0%R [:: " ++ intercalate "; " (map ratToString vals) ++ "] j)"
 
---- =====================================================
--- List
--- =====================================================
-
-listToRocq :: String -> [Float] -> String
-listToRocq name item = rocqDefinition name "list R" ("[" ++ intercalate "; " (map show item) ++ "]")
-
---- =====================================================
--- Proof Tree
--- =====================================================
+proofTreeToRocq :: ProofTree -> String
+proofTreeToRocq (Leaf xs) =
+  "ProofTree.leaf [tuple nth 0%R [:: " ++ intercalate "; " (map ratToString xs) ++ "] i | i < m.+2]"
+proofTreeToRocq (Node s l r) =
+  "ProofTree.node (" ++ splitToRocq s ++ ")\n      ("
+  ++ proofTreeToRocq l ++ ")\n      ("
+  ++ proofTreeToRocq r ++ ")"
 
 splitToRocq :: Split -> String
 splitToRocq (SingleSplit v x) =
-  "single " ++ show v ++ " " ++ show x
+  "Split.single (inord " ++ show v ++ " : 'I_n) " ++ ratToString x
 splitToRocq (ReluSplit b f aux) =
-  "relu " ++ show b ++ " " ++ show f ++ " " ++ show aux
+  "Split.relu (inord " ++ show b ++ " : 'I_n) (inord " ++ show f ++ " : 'I_n) (inord " ++ show aux ++ " : 'I_n)"
 
-proofTreeToValue :: ProofTree -> String
-proofTreeToValue (Leaf xs) =
-  "leaf [" ++ intercalate "; " (map show xs) ++ "]"
-proofTreeToValue (Node s l r) =
-  "node "
-    ++ splitToRocq s
-    ++ " ("
-    ++ proofTreeToValue l
-    ++ ") ("
-    ++ proofTreeToValue r
-    ++ ")"
-
-proofTreeToRocq :: ProofTree -> String
-proofTreeToRocq tree =
-  rocqDefinition "tree" "proof_tree" (proofTreeToValue tree)
+generateCertificateSpecs :: Int -> Int -> String
+generateCertificateSpecs nVal mVal =
+  unlines
+    [ "From mathcomp Require Import all_ssreflect all_algebra.",
+      "",
+      "Module ParsedCertificateSpecs.",
+      "  Definition n : nat := " ++ show nVal ++ ".",
+      "  Definition m : nat := " ++ show mVal ++ ".",
+      "End ParsedCertificateSpecs."
+    ]

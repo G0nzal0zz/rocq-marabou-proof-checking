@@ -1,14 +1,15 @@
 module Main where
 
-import Generation (generateRocq)
+import Generation (generateCertificateSpecs, generateRocq)
 import Options.Applicative
-import Parser (ProofCertificate (constraints, proof, upperBounds), parseProofCertificates)
+import Parser (ProofCertificate (constraints, proof, tableau, upperBounds), parseProofCertificates, Tableau (Tableau))
 import ProofTree (buildProofTree)
 import Text.Printf (printf)
 
 data Arguments = Arguments
   { input :: String,
-    output :: String
+    output :: String,
+    specsOutput :: String
   }
 
 arguments :: Parser Arguments
@@ -24,8 +25,15 @@ arguments =
       ( long "output"
           <> metavar "FILE"
           <> short 'o'
-          <> value "certificates.v"
+          <> value "parsed_certificate.v"
           <> help "File where the generated Rocq data types will be placed"
+      )
+    <*> strOption
+      ( long "specs-output"
+          <> metavar "FILE"
+          <> short 's'
+          <> value "parsed_certificate_specs.v"
+          <> help "File where the generated certificate specs will be placed"
       )
 
 main :: IO ()
@@ -39,12 +47,17 @@ main = do
       putStrLn "Failed to parse JSON"
       putStrLn err
     Right cert ->
-      case buildProofTree (proof cert) (constraints cert) (length (upperBounds cert)) of
+      let n_val = length (upperBounds cert)
+          (Tableau rows) = tableau cert
+          rowCount = length rows
+      in case buildProofTree (proof cert) (constraints cert) n_val rowCount of
         Nothing ->
           putStrLn "Error while generating Proof Tree"
         Just tree -> do
           writeFile (output args) (generateRocq cert tree)
           printf "Generated %s\n" (output args)
+          writeFile (specsOutput args) (generateCertificateSpecs n_val (rowCount - 2))
+          printf "Generated %s\n" (specsOutput args)
   where
     opts =
       info

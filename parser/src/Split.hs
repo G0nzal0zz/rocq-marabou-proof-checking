@@ -9,7 +9,7 @@ import Parser (Constraint (..), RawSplit (..))
 --     | ReluSplit of int * int * int (* participating relu variables: b, f, aux *)
 
 data Split
-  = SingleSplit Int Float -- (* variable, value *)
+  = SingleSplit Int Rational -- (* variable, value *)
   | ReluSplit Int Int Int -- (* participating relu variables: b, f, aux *)
 
 -- (* check that some split corresponds to a single variable split *)

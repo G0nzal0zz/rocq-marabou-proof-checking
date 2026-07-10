@@ -14,11 +14,11 @@ import Utils (tableauToList)
 
 data ProofTree
   = Node Split ProofTree ProofTree -- (*  left child, right child *)
-  | Leaf [Float] -- (* contradiction vector *)
+  | Leaf [Rational] -- (* contradiction vector *)
 
 
-buildProofTree :: Proof -> [Constraint] -> Int -> Maybe ProofTree
-buildProofTree Proof {children = ch, contradiction = contra} cons tableauWidth =
+buildProofTree :: Proof -> [Constraint] -> Int -> Int -> Maybe ProofTree
+buildProofTree Proof {children = ch, contradiction = contra} cons n_val rowCount =
   case (ch, contra) of
     (Just _, Just _) ->
       Nothing
@@ -28,23 +28,23 @@ buildProofTree Proof {children = ch, contradiction = contra} cons tableauWidth =
       Just (Node splitVal left right)
       where
         splitVal = matchSplit (split c1) (split c2) cons
-        left = buildProofTreeChild c1 cons tableauWidth
-        right = buildProofTreeChild c2 cons tableauWidth
+        left = buildProofTreeChild c1 cons n_val rowCount
+        right = buildProofTreeChild c2 cons n_val rowCount
     (Just _, Nothing) ->
       Nothing -- wrong number of children
-    (Nothing, Just contra) ->
-      Just $ Leaf (tableauToList tableauWidth contra)
+    (Nothing, Just c) ->
+      Just $ Leaf (tableauToList (rowCount - 1) c)
 
-buildProofTreeChild :: Child -> [Constraint] -> Int -> ProofTree
-buildProofTreeChild Child {children = ch, contradiction = contra} cons tableauWidth =
+buildProofTreeChild :: Child -> [Constraint] -> Int -> Int -> ProofTree
+buildProofTreeChild Child {children = ch, contradiction = contra} cons n_val rowCount =
   case (ch, contra) of
     (Just (Children [c1, c2]), Nothing) ->
       Node splitVal left right
       where
         splitVal = matchSplit (split c1) (split c2) cons
-        left = buildProofTreeChild c1 cons tableauWidth
-        right = buildProofTreeChild c2 cons tableauWidth
-    (Nothing, Just contra) ->
-      Leaf (tableauToList tableauWidth contra)
+        left = buildProofTreeChild c1 cons n_val rowCount
+        right = buildProofTreeChild c2 cons n_val rowCount
+    (Nothing, Just c) ->
+      Leaf (tableauToList (rowCount - 1) c)
     _ ->
       error "Invalid child"

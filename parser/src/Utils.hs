@@ -1,14 +1,20 @@
 module Utils where
 
-import Parser (TableauItem (TableauItem))
+import Data.Ratio ((%))
 
-tableauToList :: Int -> [TableauItem] -> [Float]
+import Parser (TableauItem (TableauItem), Tableau (Tableau))
+
+tableauToList :: Int -> [TableauItem] -> [Rational]
 tableauToList len items =
   if len < 0
     then []
     else tableauToList (len - 1) items ++ [lookupVar items len]
 
-lookupVar :: [TableauItem] -> Int -> Float
-lookupVar [] _ = 0
+lookupVar :: [TableauItem] -> Int -> Rational
+lookupVar [] _ = 0 % 1
 lookupVar (TableauItem var val : xs) n =
   if var == n then val else lookupVar xs n
+
+tableauToDenseRows :: Tableau -> Int -> [[Rational]]
+tableauToDenseRows (Tableau rows) n_val =
+  map (\row -> tableauToList (n_val - 1) row) rows

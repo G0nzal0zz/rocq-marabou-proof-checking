@@ -9,7 +9,7 @@ import GHC.Generics (Generic)
 
 data TableauItem = TableauItem
   { var :: Int,
-    val :: Float
+    val :: Rational
   }
   deriving (Show, Generic)
 
@@ -30,7 +30,7 @@ instance Data.Aeson.FromJSON Constraint
 
 data RawSplit = RawSplit
   { var :: Int,
-    val :: Float,
+    val :: Rational,
     bound :: String
   }
   deriving (Show, Generic)
@@ -40,7 +40,7 @@ instance Data.Aeson.FromJSON RawSplit
 data Lemma = Lemmas
   { affVar :: Int,
     affBound :: String,
-    bound :: Float,
+    bound :: Rational,
     causVar :: Int,
     causBound :: String,
     constraint :: Int,
@@ -76,8 +76,8 @@ instance Data.Aeson.FromJSON Proof where
 
 data ProofCertificate = ProofCertificate
   { tableau :: Tableau,
-    lowerBounds :: [Float],
-    upperBounds :: [Float],
+    lowerBounds :: [Rational],
+    upperBounds :: [Rational],
     constraints :: [Constraint],
     proof :: Proof
   }
