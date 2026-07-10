@@ -81,8 +81,6 @@ Proof.
         by apply/andP; split.
 Qed.
 
-Print le_anti.
-
 Lemma eval_relu_inequalities (b f aux : 'I_n) (x : 'rV[R]_n) :
   Relu.eval_relu b f aux x ->
   [/\ 0 <= x 0 f, x 0 aux = 0 & x 0 b = x 0 f] \/ [/\ x 0 b <= 0, x 0 f = 0 & 0 <= x 0 aux].

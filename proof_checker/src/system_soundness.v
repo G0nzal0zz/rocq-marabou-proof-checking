@@ -76,8 +76,7 @@ Proof.
   have Hlast : (Cert.mk_bound_poly n i coeff bound) 0 ord_max *
     (Arithmetic.cv_addn1_succ (col_mx (trmx x) 1%:M)) ord_max 0 = bound.
   { have -> : (Cert.mk_bound_poly n i coeff bound) 0 ord_max = bound.
-    { rewrite /Cert.mk_bound_poly mxE /=.
-      by rewrite /ord_max /= eqxx. }
+    { by rewrite /Cert.mk_bound_poly mxE /=. }
     by rewrite FarkasSoundness.col_mx_max1 mulr1. }
   rewrite Hlast.
   rewrite [X in X + _ = _](bigD1 i) //=.
