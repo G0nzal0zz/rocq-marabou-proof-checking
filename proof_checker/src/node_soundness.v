@@ -1,7 +1,7 @@
 From mathcomp Require Import all_ssreflect all_algebra.
 
 Require Import certificate_specs.
-Require Import tightening.
+
 Require Import constraint.
 Require Import split.
 Require Import split_soundness.
@@ -25,7 +25,7 @@ Module NodeSoundness.
 [@@fc]*)
 Lemma soundness_split
   (tableau : (m.+2).-tuple ('rV[R]_n))
-  (ub lb: Tightening.t_bounds)
+  (ub lb: 'rV[R]_n)
   (constraints : seq Constraint.t)
   (split : Split.t)
   (x : 'rV[R]_n) :
@@ -57,7 +57,7 @@ Qed.
 [@@fc]*)
 Lemma soundness_split_contra
   (tableau : (m.+2).-tuple ('rV[R]_n))
-  (ub lb: Tightening.t_bounds)
+  (ub lb: 'rV[R]_n)
   (constraints : seq Constraint.t)
   (split : Split.t)
   (x : 'rV[R]_n) :

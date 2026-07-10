@@ -1,7 +1,7 @@
 From mathcomp Require Import all_ssreflect all_algebra.
 
 Require Import certificate_specs.
-Require Import tightening.
+
 Require Import constraint.
 Require Import split.
 Require Import sat.
@@ -48,7 +48,7 @@ Qed.
     bounded xs (set_nth us i k) ls
     [@@by auto]*)
 Lemma bounded_set_nth
-  (ub lb: Tightening.t_bounds)
+  (ub lb: 'rV[R]_n)
   (i : 'I_n)
   (k : R)
   (x : 'rV[R]_n) :
@@ -80,7 +80,7 @@ Qed.
    [@@by auto]*)
 Theorem soundness_single_var_split
   (tableau : (m.+2).-tuple ('rV[R]_n))
-  (ub lb: Tightening.t_bounds)
+  (ub lb: 'rV[R]_n)
   (constraints : seq Constraint.t)
   (i : 'I_n)
   (k : R)

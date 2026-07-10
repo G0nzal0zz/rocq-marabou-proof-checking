@@ -6,7 +6,6 @@ Require Import proof_tree.
 Require Import constraint.
 Require Import farkas.
 Require Import split.
-Require Import tightening.
 Require Import arithmetic.
 
 Import CertificateSpecs.
@@ -23,8 +22,8 @@ Module Checker.
 Definition check_contradiction
   (contradiction : (m.+2).-tuple R)
   (tableau : system m n)
-  (upper_bounds : Tightening.t_bounds)
-  (lower_bounds : Tightening.t_bounds)
+  (upper_bounds : 'rV[R]_n)
+  (lower_bounds : 'rV[R]_n)
   : bool :=
   let sys := Cert.mk_system_contradiction tableau upper_bounds lower_bounds in
   let certificate := Cert.mk_contradiction_certificate contradiction tableau upper_bounds lower_bounds in
@@ -38,7 +37,7 @@ Definition check_contradiction
 
 Fixpoint check_tree
   (tableau : system m n)
-  (ub lb : Tightening.t_bounds)
+  (ub lb : 'rV[R]_n)
   (constraints : seq Constraint.t)
   (proof_node : ProofTree.t)
   : bool :=
@@ -69,8 +68,8 @@ Fixpoint check_tree
 
 Definition check_proof_tree
   (tableau : (m.+2).-tuple ('rV[R]_n))
-  (upper_bounds : Tightening.t_bounds)
-  (lower_bounds : Tightening.t_bounds)
+  (upper_bounds : 'rV[R]_n)
+  (lower_bounds : 'rV[R]_n)
   (constraints : seq Constraint.t)
   (proof_tree : ProofTree.t)
   : bool :=

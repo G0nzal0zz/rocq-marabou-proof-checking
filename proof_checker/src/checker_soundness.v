@@ -2,7 +2,7 @@ From mathcomp Require Import all_ssreflect all_fingroup all_algebra zmodp ssrnum
 
 Require Import certificate_specs.
 Require Import farkas.
-Require Import tightening.
+
 Require Import constraint.
 Require Import proof_tree.
 Require Import checker.
@@ -11,7 +11,6 @@ Require Import certificate.
 Require Import split.
 Require Import leaf_soundness.
 Require Import node_soundness.
-
 
 Import Farkas.
 Import CertificateSpecs.
@@ -32,7 +31,7 @@ Import CertificateSpecs.
 [@@disable update_bounds, unsat, Checker.well_formed_tableau_bounds, List.length, Checker.check_tree, check_split]*)
 Lemma check_tree_soundness_leaf
   (tableau : (m.+2).-tuple ('rV[R]_n))
-  (ub lb: Tightening.t_bounds)
+  (ub lb: 'rV[R]_n)
   (constraints : seq Constraint.t)
   (contradiction : (m.+2).-tuple R)
   (x : 'rV[R]_n) :
@@ -57,7 +56,7 @@ Qed.
 [@@fc] *)
 Lemma check_tree_parent_imply_check_tree_children
   (tableau : Farkas.system m n)
-  (ub lb: Tightening.t_bounds)
+  (ub lb: 'rV[R]_n)
   (constraints : seq Constraint.t)
   (split : Split.t)
   (tleft tright : ProofTree.t)
@@ -91,7 +90,7 @@ Qed.
    [@@timeout 120]*)
 Lemma unsat_children_imply_unsat_parent
   (tableau : (m.+2).-tuple ('rV[R]_n))
-  (ub lb: Tightening.t_bounds)
+  (ub lb: 'rV[R]_n)
   (constraints : seq Constraint.t)
   (split : Split.t)
   (tleft tright : ProofTree.t)
@@ -138,7 +137,7 @@ Qed.
    [@@timeout 120]*)
 Lemma  check_tree_soundness_node
   (tableau : (m.+2).-tuple ('rV[R]_n))
-  (ub lb: Tightening.t_bounds)
+  (ub lb: 'rV[R]_n)
   (constraints : seq Constraint.t)
   (split : Split.t)
   (tleft tright : ProofTree.t)
@@ -182,7 +181,7 @@ Qed.
 [@@timeout 300]*)
 Theorem check_tree_soundness
   (tableau : (m.+2).-tuple ('rV[R]_n))
-  (ub lb : Tightening.t_bounds)
+  (ub lb : 'rV[R]_n)
   (constraints : seq Constraint.t)
   (proof_tree : ProofTree.t)
   (x : 'rV[R]_n) :

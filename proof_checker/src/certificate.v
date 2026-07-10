@@ -2,7 +2,7 @@ From mathcomp Require Import all_ssreflect all_algebra matrix.
 
 Require Import certificate_specs.
 Require Import farkas.
-Require Import tightening.
+
 Require Import arithmetic.
 
 Import CertificateSpecs.
@@ -60,7 +60,7 @@ Definition mk_bound_poly (n : nat) (i : nat) (coeff : R) (bound : R) : Farkas.po
 (*  | u::bounds -> let i = size - (List.length upper_bounds) in*)
 (*      Geq (mk_bound_poly size i (-1.) u) :: mk_upper_bounds_constraints size bounds*)
 
-Definition mk_upper_bounds_constraints (upper_bounds : Tightening.t_bounds) : n.-tuple (Farkas.expr n) :=
+Definition mk_upper_bounds_constraints (upper_bounds : 'rV[R]_n) : n.-tuple (Farkas.expr n) :=
   [tuple (Farkas.Geq n (mk_bound_poly n j (-1)%R (upper_bounds 0%R j))) | j < n].
 
 (* remove iterator to make it easier to prove *)
@@ -69,7 +69,7 @@ Definition mk_upper_bounds_constraints (upper_bounds : Tightening.t_bounds) : n.
 (*  | [] -> []*)
 (*  | l::bounds -> let i = size - (List.length lower_bounds) in*)
 (*    Geq (mk_bound_poly size i 1. (-. l)) :: mk_lower_bounds_constraints size bounds*)
-Definition mk_lower_bounds_constraints (lower_bounds : Tightening.t_bounds) : n.-tuple (Farkas.expr n) :=
+Definition mk_lower_bounds_constraints (lower_bounds : 'rV[R]_n) : n.-tuple (Farkas.expr n) :=
   [tuple (Farkas.Geq n (mk_bound_poly n j 1%R (- lower_bounds 0%R j))) | j < n].
 
 (*
@@ -92,7 +92,7 @@ Definition mk_eq_constraints (tableau : (m.+2).-tuple ('rV[R]_n)) : (m.+2).-tupl
 (*  let size = List.length upper_bounds in*)
 (*  (mk_upper_bounds_constraints size upper_bounds) @ (mk_lower_bounds_constraints size lower_bounds)*)
 
-Definition mk_geq_constraints (upper_bounds lower_bounds : Tightening.t_bounds) : (n + n).-tuple (Farkas.expr n) :=
+Definition mk_geq_constraints (upper_bounds lower_bounds : 'rV[R]_n) : (n + n).-tuple (Farkas.expr n) :=
   cat_tuple (mk_upper_bounds_constraints upper_bounds) (mk_lower_bounds_constraints lower_bounds).
 
 (*let mk_contradiction_certificate (contradiction: Real.t list) (tableau: expr list) (upper_bounds: Real.t list) (lower_bounds: Real.t list) =*)
@@ -101,8 +101,8 @@ Definition mk_geq_constraints (upper_bounds lower_bounds : Tightening.t_bounds) 
 Definition mk_contradiction_certificate
   (contradiction : (m.+2).-tuple R)
   (tableau : Farkas.system m n)
-  (upper_bounds : Tightening.t_bounds)
-  (lower_bounds : Tightening.t_bounds)
+  (upper_bounds : 'rV[R]_n)
+  (lower_bounds : 'rV[R]_n)
   : (m.+2 + (n + n)).-tuple R :=
   let lc := Arithmetic.compute_combination contradiction tableau in
   let upper_bound_cert := mk_upper_bound_certificate lc in
@@ -114,7 +114,7 @@ Definition mk_contradiction_certificate
 (*  tableau @ (mk_geq_constraints upper_bounds lower_bounds)*)
 Definition mk_system_contradiction
   (tableau : Farkas.system m n)
-  (upper_bounds lower_bounds : Tightening.t_bounds)
+  (upper_bounds lower_bounds : 'rV[R]_n)
   : Farkas.system m' n :=
   cat_tuple tableau (mk_geq_constraints upper_bounds lower_bounds).
 

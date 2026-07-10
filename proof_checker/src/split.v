@@ -3,7 +3,7 @@ From mathcomp Require Import all_ssreflect all_algebra seq.
 Require Import certificate_specs.
 Require Import constraint.
 Require Import util.
-Require Import tightening.
+
 Require Import relu.
 
 Import CertificateSpecs.
@@ -29,10 +29,10 @@ Inductive t :=
 (*        (lbs_l, ubs_l), (lbs_r, ubs_r)*)
 
 Definition update_bounds_from_split
-  (ubs : Tightening.t_bounds)
-  (lbs: Tightening.t_bounds)
+  (ubs : 'rV[R]_n)
+  (lbs: 'rV[R]_n)
   (split : t)
-  : ((Tightening.t_bounds * Tightening.t_bounds)  * (Tightening.t_bounds  * Tightening.t_bounds)) :=
+  : (('rV[R]_n * 'rV[R]_n)  * ('rV[R]_n  * 'rV[R]_n)) :=
   match split with
   | single i k => ((lbs, set_nth_vector ubs i k), (set_nth_vector lbs i k, ubs))
   | relu b f aux =>

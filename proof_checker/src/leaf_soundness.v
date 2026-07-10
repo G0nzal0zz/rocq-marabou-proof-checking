@@ -2,7 +2,7 @@ From mathcomp Require Import all_algebra all_ssreflect.
 
 Require Import certificate_specs.
 Require Import proof_tree.
-Require Import tightening.
+
 Require Import constraint.
 Require Import certificate.
 Require Import checker.
@@ -30,7 +30,7 @@ Module LeafSoundness.
 [@@fc] *)
 Lemma check_tree_implies_check_cert
   (tableau : Farkas.system m n)
-  (ub lb : Tightening.t_bounds)
+  (ub lb : 'rV[R]_n)
   (constraints : seq Constraint.t)
   (contradiction : (m.+2).-tuple R)
   (x : 'rV[R]_n) :
@@ -58,7 +58,7 @@ Qed.
 [@@fc]*)
 Lemma check_cert_implies_not_eval_system
   (tableau : Farkas.system m n)
-  (ub lb : Tightening.t_bounds)
+  (ub lb : 'rV[R]_n)
   (constraints : seq Constraint.t)
   (contradiction : (m.+2).-tuple R)
   (x : 'rV[R]_n) :
@@ -87,7 +87,7 @@ Qed.
 (* WARN: This lemma is not being used *)
 Lemma soundness_eval_sys_composition_unused
   (tableau : (m.+2).-tuple ('rV[R]_n))
-  (ub lb : Tightening.t_bounds)
+  (ub lb : 'rV[R]_n)
   (x : 'rV[R]_n) :
     let sys := Cert.mk_system_contradiction (Cert.mk_eq_constraints tableau) ub lb in
     FarkasSoundness.eval_system sys (trmx x)
@@ -116,7 +116,7 @@ Qed.
    [@@fc]*)
 Lemma soundness_check_cert_composition
   (tableau : (m.+2).-tuple ('rV[R]_n))
-  (ub lb : Tightening.t_bounds)
+  (ub lb : 'rV[R]_n)
   (x : 'rV[R]_n) :
   let sys := Cert.mk_system_contradiction (Cert.mk_eq_constraints tableau) ub lb in
   (FarkasSoundness.eval_system sys (trmx x)) = false
@@ -146,7 +146,7 @@ Qed.
 [@@timeout 120] *)
 Lemma not_eval_system_implies_unsat
   (tableau : (m.+2).-tuple ('rV[R]_n))
-  (ub lb : Tightening.t_bounds)
+  (ub lb : 'rV[R]_n)
   (constraints : seq Constraint.t)
   (contradiction : (m.+2).-tuple R)
   (x : 'rV[R]_n) :
@@ -181,7 +181,7 @@ Qed.
    [@@timeout 120] *)
 Lemma leaf_soundness
   (tableau : (m.+2).-tuple ('rV[R]_n))
-  (ub lb : Tightening.t_bounds)
+  (ub lb : 'rV[R]_n)
   (constraints : seq Constraint.t)
   (contradiction : (m.+2).-tuple R)
   (x : 'rV[R]_n) :

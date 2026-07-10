@@ -5,7 +5,7 @@ Require Import certificate.
 Require Import arithmetic.
 Require Import farkas.
 Require Import farkas_soundness.
-Require Import tightening.
+
 Require Import constraint.
 
 Import CertificateSpecs GRing.Theory Num.Theory.
@@ -101,7 +101,7 @@ Proof.
 Qed.
 
 Lemma system_soundness_geq
-  (ub lb : Tightening.t_bounds)
+  (ub lb : 'rV[R]_n)
   (x : 'rV[R]_n) :
   Arithmetic.bounded x ub lb ->
   FarkasSoundness.eval_system (Cert.mk_geq_constraints ub lb) (trmx x).
@@ -136,7 +136,7 @@ Proof.
     [@@fc]*)
 Theorem system_soundness
   (tableau : (m.+2).-tuple ('rV[R]_n))
-  (ub lb : Tightening.t_bounds)
+  (ub lb : 'rV[R]_n)
   (x : 'rV[R]_n) :
   Arithmetic.is_in_kernel tableau x && Arithmetic.bounded x ub lb ->
   let sys := Cert.mk_system_contradiction (Cert.mk_eq_constraints tableau) ub lb in

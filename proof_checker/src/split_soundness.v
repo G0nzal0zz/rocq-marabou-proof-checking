@@ -2,7 +2,7 @@ From mathcomp Require Import all_ssreflect all_algebra.
 From mathcomp Require Import ssrnum.
 
 Require Import certificate_specs.
-Require Import tightening.
+
 Require Import constraint.
 Require Import split.
 Require Import sat.
@@ -29,7 +29,7 @@ Module SplitSoundness.
    [@@by auto]*)
 Theorem soundness_single_var_split
   (tableau : (m.+2).-tuple ('rV[R]_n))
-  (ub lb: Tightening.t_bounds)
+  (ub lb: 'rV[R]_n)
   (constraints : seq Constraint.t)
   (i : 'I_n)
   (k : R)
@@ -68,7 +68,7 @@ Qed.
 [@@fc] *)
 Theorem soundness_relu_split
   (tableau : (m.+2).-tuple ('rV[R]_n))
-  (ub lb: Tightening.t_bounds)
+  (ub lb: 'rV[R]_n)
   (constraints : seq Constraint.t)
   (b f aux : 'I_n)
   (x : 'rV[R]_n) :

@@ -2,7 +2,7 @@ From mathcomp Require Import all_ssreflect all_algebra.
 From mathcomp Require Import ssrnum.
 
 Require Import certificate_specs.
-Require Import tightening.
+
 Require Import constraint.
 Require Import split.
 Require Import sat.
@@ -27,7 +27,7 @@ Proof.
 Qed.
 
 Lemma bounded_inactive_phase
-  (ub lb : Tightening.t_bounds) (b f aux : 'I_n) (x : 'rV[R]_n) :
+  (ub lb : 'rV[R]_n) (b f aux : 'I_n) (x : 'rV[R]_n) :
   let lbs_l := set_nth_vector lb f 0%R in
   let ubs_l := set_nth_vector (set_nth_vector ub b 0%R) f 0%R in
   x 0 b <= 0 ->
@@ -53,7 +53,7 @@ Proof.
 Qed.
 
 Lemma bounded_active_phase
-  (ub lb : Tightening.t_bounds) (b f aux : 'I_n) (x : 'rV[R]_n) :
+  (ub lb : 'rV[R]_n) (b f aux : 'I_n) (x : 'rV[R]_n) :
   let lbs_r := set_nth_vector (set_nth_vector lb b 0%R) aux 0%R in
   let ubs_r := set_nth_vector ub aux 0%R in
   0 <= x 0 b ->
@@ -111,7 +111,7 @@ Proof.
 Qed.
 
 Lemma soundness_relu_split_bounded
-  (ub lb: Tightening.t_bounds)
+  (ub lb: 'rV[R]_n)
   (constraints : seq Constraint.t)
   (b f aux : 'I_n)
   (x : 'rV[R]_n) :
