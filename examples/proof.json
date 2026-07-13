@@ -1,0 +1,325 @@
+{
+"tableau" : [
+[{"var" : 0, "val" : 0.420428186}, {"var" : 1, "val" : 0.1858797375}, {"var" : 2, "val" : -0.0363290001}, {"var" : 3, "val" : 0.3763281692}, {"var" : 4, "val" : 0.1297135164}, {"var" : 5, "val" : -1.0}, {"var" : 36, "val" : -1.0}],
+[{"var" : 0, "val" : 0.2604105914}, {"var" : 1, "val" : -0.2874633759}, {"var" : 2, "val" : -0.1331733893}, {"var" : 3, "val" : 0.0727535304}, {"var" : 4, "val" : -0.1894075762}, {"var" : 6, "val" : -1.0}, {"var" : 37, "val" : -1.0}],
+[{"var" : 0, "val" : -0.0421553831}, {"var" : 1, "val" : -0.2890792919}, {"var" : 2, "val" : -0.1294533468}, {"var" : 3, "val" : 0.1090353691}, {"var" : 4, "val" : -0.0162352839}, {"var" : 7, "val" : -1.0}, {"var" : 38, "val" : -1.0}],
+[{"var" : 0, "val" : -0.0529496433}, {"var" : 1, "val" : -0.082929881}, {"var" : 2, "val" : -0.2634637314}, {"var" : 3, "val" : 0.1476146319}, {"var" : 4, "val" : 0.2547989626}, {"var" : 8, "val" : -1.0}, {"var" : 39, "val" : -1.0}],
+[{"var" : 0, "val" : -0.2590561003}, {"var" : 1, "val" : 0.1580802755}, {"var" : 2, "val" : -0.3490633949}, {"var" : 3, "val" : 0.0212444878}, {"var" : 4, "val" : -0.2450549803}, {"var" : 9, "val" : -1.0}, {"var" : 40, "val" : -1.0}],
+[{"var" : 0, "val" : 0.420428186}, {"var" : 1, "val" : 0.1858797375}, {"var" : 2, "val" : -0.0363290001}, {"var" : 3, "val" : 0.3763281692}, {"var" : 4, "val" : 0.1297135164}, {"var" : 10, "val" : -1.0}, {"var" : 41, "val" : -1.0}],
+[{"var" : 0, "val" : 0.2604105914}, {"var" : 1, "val" : -0.2874633759}, {"var" : 2, "val" : -0.1331733893}, {"var" : 3, "val" : 0.0727535304}, {"var" : 4, "val" : -0.1894075762}, {"var" : 11, "val" : -1.0}, {"var" : 42, "val" : -1.0}],
+[{"var" : 0, "val" : -0.0421553831}, {"var" : 1, "val" : -0.2890792919}, {"var" : 2, "val" : -0.1294533468}, {"var" : 3, "val" : 0.1090353691}, {"var" : 4, "val" : -0.0162352839}, {"var" : 12, "val" : -1.0}, {"var" : 43, "val" : -1.0}],
+[{"var" : 0, "val" : -0.0529496433}, {"var" : 1, "val" : -0.082929881}, {"var" : 2, "val" : -0.2634637314}, {"var" : 3, "val" : 0.1476146319}, {"var" : 4, "val" : 0.2547989626}, {"var" : 13, "val" : -1.0}, {"var" : 44, "val" : -1.0}],
+[{"var" : 0, "val" : -0.2590561003}, {"var" : 1, "val" : 0.1580802755}, {"var" : 2, "val" : -0.3490633949}, {"var" : 3, "val" : 0.0212444878}, {"var" : 4, "val" : -0.2450549803}, {"var" : 14, "val" : -1.0}, {"var" : 45, "val" : -1.0}],
+[{"var" : 15, "val" : 0.6519876716}, {"var" : 16, "val" : -0.1221289322}, {"var" : 17, "val" : -0.7548309968}, {"var" : 18, "val" : 0.6936870971}, {"var" : 19, "val" : 0.4892227755}, {"var" : 20, "val" : -0.6519876716}, {"var" : 21, "val" : 0.1221289322}, {"var" : 22, "val" : 0.7548309968}, {"var" : 23, "val" : -0.6936870971}, {"var" : 24, "val" : -0.4892227755}, {"var" : 25, "val" : -1.0}, {"var" : 46, "val" : -1.0}],
+[{"var" : 5, "val" : -1.0}, {"var" : 15, "val" : 1.0}, {"var" : 26, "val" : -1.0}, {"var" : 47, "val" : -1.0}],
+[{"var" : 6, "val" : -1.0}, {"var" : 16, "val" : 1.0}, {"var" : 27, "val" : -1.0}, {"var" : 48, "val" : -1.0}],
+[{"var" : 7, "val" : -1.0}, {"var" : 17, "val" : 1.0}, {"var" : 28, "val" : -1.0}, {"var" : 49, "val" : -1.0}],
+[{"var" : 8, "val" : -1.0}, {"var" : 18, "val" : 1.0}, {"var" : 29, "val" : -1.0}, {"var" : 50, "val" : -1.0}],
+[{"var" : 9, "val" : -1.0}, {"var" : 19, "val" : 1.0}, {"var" : 30, "val" : -1.0}, {"var" : 51, "val" : -1.0}],
+[{"var" : 10, "val" : -1.0}, {"var" : 20, "val" : 1.0}, {"var" : 31, "val" : -1.0}, {"var" : 52, "val" : -1.0}],
+[{"var" : 11, "val" : -1.0}, {"var" : 21, "val" : 1.0}, {"var" : 32, "val" : -1.0}, {"var" : 53, "val" : -1.0}],
+[{"var" : 12, "val" : -1.0}, {"var" : 22, "val" : 1.0}, {"var" : 33, "val" : -1.0}, {"var" : 54, "val" : -1.0}],
+[{"var" : 13, "val" : -1.0}, {"var" : 23, "val" : 1.0}, {"var" : 34, "val" : -1.0}, {"var" : 55, "val" : -1.0}],
+[{"var" : 14, "val" : -1.0}, {"var" : 24, "val" : 1.0}, {"var" : 35, "val" : -1.0}, {"var" : 56, "val" : -1.0}]
+], 
+"upperBounds" : [10.0, 10.0, 10.0, 10.0, 10.0, 11.5388802831, 9.5103729148, 0.0, 8.2370396129, 10.0814001831, 0.0, 9.5103729148, 6.022323917, 8.2370396129, 10.0814001831, 11.5388802831, 9.4261103212, 0.0, 7.6832343894, 7.4908391805, 0.0, 9.4261103212, 5.5160338276, 7.6832343894, 7.4908391805, 0.0, 7.1759241143, 6.7496904342, 5.6968495798, 0.0, 10.5222473699, 7.1759241143, 6.7496904342, 5.6968495798, 0.0, 10.5222473699, -0.0520941903, -0.0782882835, -0.1627371686, -0.21947111, 0.2435922039, -0.0520941903, -0.0782882835, -0.1627371686, -0.21947111, 0.2435922039, -10.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+"lowerBounds" : [0.0, -10.0, -10.0, -10.0, -10.0, -11.4346919025, -9.3537963478, -5.6968495798, -7.7980973928, -10.5685845909, -11.4346919025, -9.3537963478, -5.6968495798, -7.7980973928, -10.5685845909, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -13.8765148199, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.0520941903, -0.0782882835, -0.1627371686, -0.21947111, 0.2435922039, -0.0520941903, -0.0782882835, -0.1627371686, -0.21947111, 0.2435922039, -10.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+"constraints" : [
+{"constraintType" : 0, "vars" : [5, 15, 26, 47]},
+{"constraintType" : 0, "vars" : [6, 16, 27, 48]},
+{"constraintType" : 0, "vars" : [7, 17, 28, 49]},
+{"constraintType" : 0, "vars" : [8, 18, 29, 50]},
+{"constraintType" : 0, "vars" : [9, 19, 30, 51]},
+{"constraintType" : 0, "vars" : [10, 20, 31, 52]},
+{"constraintType" : 0, "vars" : [11, 21, 32, 53]},
+{"constraintType" : 0, "vars" : [12, 22, 33, 54]},
+{"constraintType" : 0, "vars" : [13, 23, 34, 55]},
+{"constraintType" : 0, "vars" : [14, 24, 35, 56]}
+],
+"proof" : { 
+"lemmas" : [
+{"affVar" : 17, "affBound" : "U", "bound" : 6.022323917, "causVar" : 7, "causBound" : "U", "constraint" : 0,
+"expl" : [ {"var" : 2, "val" : 1.0} ]},
+{"affVar" : 29, "affBound" : "U", "bound" : 7.7980973928, "causVar" : 8, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 3, "val" : 1.0} ]},
+{"affVar" : 18, "affBound" : "U", "bound" : 8.2370396129, "causVar" : 8, "causBound" : "U", "constraint" : 0,
+"expl" : [ {"var" : 3, "val" : 1.0} ]},
+{"affVar" : 22, "affBound" : "U", "bound" : 6.022323917, "causVar" : 12, "causBound" : "U", "constraint" : 0,
+"expl" : [ {"var" : 7, "val" : 1.0} ]},
+{"affVar" : 34, "affBound" : "U", "bound" : 7.7980973928, "causVar" : 13, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 8, "val" : 1.0} ]},
+{"affVar" : 23, "affBound" : "U", "bound" : 8.2370396129, "causVar" : 13, "causBound" : "U", "constraint" : 0,
+"expl" : [ {"var" : 8, "val" : 1.0} ]},
+{"affVar" : 31, "affBound" : "U", "bound" : 11.4346919025, "causVar" : 10, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 16, "val" : 1.0} ]},
+{"affVar" : 31, "affBound" : "U", "bound" : 11.4346919025, "causVar" : 10, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 16, "val" : 1.0} ]},
+{"affVar" : 31, "affBound" : "U", "bound" : 11.4346919025, "causVar" : 10, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 16, "val" : 1.0} ]},
+{"affVar" : 31, "affBound" : "U", "bound" : 11.4346919025, "causVar" : 10, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 16, "val" : 1.0} ]},
+{"affVar" : 31, "affBound" : "U", "bound" : 11.4346919025, "causVar" : 10, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 16, "val" : 1.0} ]},
+{"affVar" : 31, "affBound" : "U", "bound" : 11.4346919025, "causVar" : 10, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 16, "val" : 1.0} ]},
+{"affVar" : 20, "affBound" : "U", "bound" : 11.5388802831, "causVar" : 10, "causBound" : "U", "constraint" : 0,
+"expl" : [ {"var" : 16, "val" : 1.0} ]},
+{"affVar" : 31, "affBound" : "U", "bound" : 11.4346919025, "causVar" : 10, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 16, "val" : 1.0} ]},
+{"affVar" : 20, "affBound" : "U", "bound" : 11.5388802831, "causVar" : 10, "causBound" : "U", "constraint" : 0,
+"expl" : [ {"var" : 16, "val" : 1.0} ]},
+{"affVar" : 31, "affBound" : "U", "bound" : 11.4346919025, "causVar" : 10, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 16, "val" : 1.0} ]},
+{"affVar" : 20, "affBound" : "U", "bound" : 11.5388802831, "causVar" : 10, "causBound" : "U", "constraint" : 0,
+"expl" : [ {"var" : 16, "val" : 1.0} ]},
+{"affVar" : 31, "affBound" : "U", "bound" : 11.4346919025, "causVar" : 10, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 16, "val" : 1.0} ]},
+{"affVar" : 20, "affBound" : "U", "bound" : 11.5388802831, "causVar" : 10, "causBound" : "U", "constraint" : 0,
+"expl" : [ {"var" : 16, "val" : 1.0} ]},
+{"affVar" : 31, "affBound" : "U", "bound" : 11.4346919025, "causVar" : 10, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 16, "val" : 1.0} ]},
+{"affVar" : 20, "affBound" : "U", "bound" : 11.5388802831, "causVar" : 10, "causBound" : "U", "constraint" : 0,
+"expl" : [ {"var" : 16, "val" : 1.0} ]},
+{"affVar" : 31, "affBound" : "U", "bound" : 11.4346919025, "causVar" : 10, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 16, "val" : 1.0} ]},
+{"affVar" : 20, "affBound" : "U", "bound" : 11.5388802831, "causVar" : 10, "causBound" : "U", "constraint" : 0,
+"expl" : [ {"var" : 16, "val" : 1.0} ]},
+{"affVar" : 31, "affBound" : "U", "bound" : 11.4346919025, "causVar" : 10, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 16, "val" : 1.0} ]},
+{"affVar" : 20, "affBound" : "U", "bound" : 11.5388802831, "causVar" : 10, "causBound" : "U", "constraint" : 0,
+"expl" : [ {"var" : 16, "val" : 1.0} ]},
+{"affVar" : 31, "affBound" : "U", "bound" : 11.4346919025, "causVar" : 10, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 16, "val" : 1.0} ]},
+{"affVar" : 20, "affBound" : "U", "bound" : 11.5388802831, "causVar" : 10, "causBound" : "U", "constraint" : 0,
+"expl" : [ {"var" : 16, "val" : 1.0} ]},
+{"affVar" : 31, "affBound" : "U", "bound" : 11.4346919025, "causVar" : 10, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 16, "val" : 1.0} ]},
+{"affVar" : 20, "affBound" : "U", "bound" : 11.5388802831, "causVar" : 10, "causBound" : "U", "constraint" : 0,
+"expl" : [ {"var" : 16, "val" : 1.0} ]},
+{"affVar" : 31, "affBound" : "U", "bound" : 11.4346919025, "causVar" : 10, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 16, "val" : 1.0} ]},
+{"affVar" : 20, "affBound" : "U", "bound" : 11.5388802831, "causVar" : 10, "causBound" : "U", "constraint" : 0,
+"expl" : [ {"var" : 16, "val" : 1.0} ]},
+{"affVar" : 31, "affBound" : "U", "bound" : 11.4346919025, "causVar" : 10, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 16, "val" : 1.0} ]},
+{"affVar" : 20, "affBound" : "U", "bound" : 11.5388802831, "causVar" : 10, "causBound" : "U", "constraint" : 0,
+"expl" : [ {"var" : 16, "val" : 1.0} ]},
+{"affVar" : 31, "affBound" : "U", "bound" : 11.4346919025, "causVar" : 10, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 16, "val" : 1.0} ]},
+{"affVar" : 20, "affBound" : "U", "bound" : 11.5388802831, "causVar" : 10, "causBound" : "U", "constraint" : 0,
+"expl" : [ {"var" : 16, "val" : 1.0} ]},
+{"affVar" : 31, "affBound" : "U", "bound" : 11.4346919025, "causVar" : 10, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 16, "val" : 1.0} ]},
+{"affVar" : 20, "affBound" : "U", "bound" : 11.5388802831, "causVar" : 10, "causBound" : "U", "constraint" : 0,
+"expl" : [ {"var" : 16, "val" : 1.0} ]}
+],
+"children" : [
+{
+"split" : [{"var" : 0, "val" : 0.0, "bound" : "U"}],
+"lemmas" : [
+{"affVar" : 31, "affBound" : "U", "bound" : 11.4346919025, "causVar" : 10, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 16, "val" : 1.0} ]},
+{"affVar" : 20, "affBound" : "U", "bound" : 11.5388802831, "causVar" : 10, "causBound" : "U", "constraint" : 0,
+"expl" : [ {"var" : 16, "val" : 1.0} ]}
+],
+"children" : [
+{
+"split" : [{"var" : 10, "val" : 0.0, "bound" : "L"}, {"var" : 31, "val" : 0.0, "bound" : "U"}],
+"lemmas" : [
+{"affVar" : 26, "affBound" : "U", "bound" : 11.2427269407, "causVar" : 5, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 0, "val" : 1.0}, {"var" : 5, "val" : -1.0} ]},
+{"affVar" : 15, "affBound" : "U", "bound" : 7.3345984228, "causVar" : 5, "causBound" : "U", "constraint" : 0,
+"expl" : [ {"var" : 0, "val" : 1.0} ]},
+{"affVar" : 27, "affBound" : "U", "bound" : 9.3166847792, "causVar" : 6, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 1, "val" : 1.0}, {"var" : 5, "val" : -0.1933247} ]},
+{"affVar" : 16, "affBound" : "U", "bound" : 6.9062670011, "causVar" : 6, "causBound" : "U", "constraint" : 0,
+"expl" : [ {"var" : 1, "val" : 1.0} ]},
+{"affVar" : 28, "affBound" : "U", "bound" : 5.2196768178, "causVar" : 7, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 2, "val" : 1.0}, {"var" : 5, "val" : -0.2897348061} ]},
+{"affVar" : 29, "affBound" : "U", "bound" : 7.1933027503, "causVar" : 8, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 3, "val" : 1.0}, {"var" : 5, "val" : -0.3922497544} ]},
+{"affVar" : 30, "affBound" : "U", "bound" : 7.9671867773, "causVar" : 9, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 4, "val" : 1.0}, {"var" : 5, "val" : -0.0564520265} ]},
+{"affVar" : 32, "affBound" : "U", "bound" : 9.3166847792, "causVar" : 11, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 5, "val" : -0.1933247}, {"var" : 6, "val" : 1.0} ]},
+{"affVar" : 21, "affBound" : "U", "bound" : 6.9062670011, "causVar" : 11, "causBound" : "U", "constraint" : 0,
+"expl" : [ {"var" : 6, "val" : 1.0} ]},
+{"affVar" : 33, "affBound" : "U", "bound" : 5.2196768178, "causVar" : 12, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 5, "val" : -0.2897348061}, {"var" : 7, "val" : 1.0} ]},
+{"affVar" : 34, "affBound" : "U", "bound" : 7.1933027503, "causVar" : 13, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 5, "val" : -0.3922497544}, {"var" : 8, "val" : 1.0} ]},
+{"affVar" : 35, "affBound" : "U", "bound" : 7.9671867773, "causVar" : 14, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 5, "val" : -0.0564520265}, {"var" : 9, "val" : 1.0} ]}
+],
+"children" : [
+{
+"split" : [{"var" : 7, "val" : 0.0, "bound" : "L"}, {"var" : 28, "val" : 0.0, "bound" : "U"}],
+"contradiction" : [ {"var" : 0, "val" : -0.8637531771}, {"var" : 2, "val" : 1.0}, {"var" : 3, "val" : -0.9189965702}, {"var" : 4, "val" : -0.6481222653}, {"var" : 5, "val" : 0.8637531771}, {"var" : 7, "val" : -1.0}, {"var" : 8, "val" : 0.9189965702}, {"var" : 9, "val" : 0.6481222653}, {"var" : 10, "val" : -1.3247998615}, {"var" : 11, "val" : 0.8637531771}, {"var" : 13, "val" : -1.0}, {"var" : 14, "val" : 0.9189965702}, {"var" : 15, "val" : 0.6481222653}, {"var" : 16, "val" : -0.8637531771}, {"var" : 18, "val" : 1.0}, {"var" : 19, "val" : -0.9189965702}, {"var" : 20, "val" : -0.6481222653} ]
+},
+{
+"split" : [{"var" : 7, "val" : 0.0, "bound" : "U"}, {"var" : 17, "val" : 0.0, "bound" : "U"}],
+"lemmas" : [
+{"affVar" : 23, "affBound" : "U", "bound" : 0.0, "causVar" : 34, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 0, "val" : 0.9398872695}, {"var" : 2, "val" : -1.0881433429}, {"var" : 3, "val" : 1.0}, {"var" : 4, "val" : 0.7052499283}, {"var" : 5, "val" : -0.9398872695}, {"var" : 7, "val" : 1.0881433429}, {"var" : 8, "val" : -1.0}, {"var" : 9, "val" : -0.7052499283}, {"var" : 10, "val" : 1.4415721499}, {"var" : 11, "val" : -0.9398872695}, {"var" : 13, "val" : 1.0881433429}, {"var" : 14, "val" : -1.0}, {"var" : 15, "val" : -0.7052499283}, {"var" : 16, "val" : 0.9398872695}, {"var" : 18, "val" : -1.0881433429}, {"var" : 19, "val" : 1.0}, {"var" : 20, "val" : 0.7052499283} ]},
+{"affVar" : 24, "affBound" : "U", "bound" : 0.0, "causVar" : 35, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 0, "val" : 1.3327009785}, {"var" : 2, "val" : -1.5429187571}, {"var" : 3, "val" : 1.4179370459}, {"var" : 4, "val" : 1.0}, {"var" : 5, "val" : -1.3327009785}, {"var" : 7, "val" : 1.5429187571}, {"var" : 8, "val" : -1.4179370459}, {"var" : 9, "val" : -1.0}, {"var" : 10, "val" : 2.0440585558}, {"var" : 11, "val" : -1.3327009785}, {"var" : 13, "val" : 1.5429187571}, {"var" : 14, "val" : -1.4179370459}, {"var" : 15, "val" : -1.0}, {"var" : 16, "val" : 1.3327009785}, {"var" : 18, "val" : -1.5429187571}, {"var" : 19, "val" : 1.4179370459}, {"var" : 20, "val" : 1.0} ]},
+{"affVar" : 18, "affBound" : "U", "bound" : 1.9801524347, "causVar" : 8, "causBound" : "U", "constraint" : 0,
+"expl" : [ {"var" : 0, "val" : -0.6838083835}, {"var" : 3, "val" : 0.2724570216}, {"var" : 4, "val" : -0.6666708461}, {"var" : 5, "val" : 0.6925932748}, {"var" : 6, "val" : 0.6330695087}, {"var" : 7, "val" : -0.7916710486}, {"var" : 9, "val" : 0.5130996334}, {"var" : 10, "val" : -1.0488056956}, {"var" : 11, "val" : 0.6838083835}, {"var" : 14, "val" : 0.7275429784}, {"var" : 15, "val" : 0.6666708461}, {"var" : 16, "val" : -0.6838083835}, {"var" : 17, "val" : -0.6330695087}, {"var" : 18, "val" : 0.7916710486}, {"var" : 20, "val" : -0.5130996334} ]}
+],
+"contradiction" : [ {"var" : 0, "val" : -40.574061961}, {"var" : 1, "val" : 2.4762016985}, {"var" : 2, "val" : 31.6697083442}, {"var" : 3, "val" : -43.169072798}, {"var" : 4, "val" : -20.5258431125}, {"var" : 5, "val" : 48.7972061295}, {"var" : 7, "val" : -40.4009706549}, {"var" : 8, "val" : 29.1043533482}, {"var" : 9, "val" : 8.9191423837}, {"var" : 10, "val" : -62.2313330848}, {"var" : 11, "val" : 40.574061961}, {"var" : 12, "val" : -2.4762016985}, {"var" : 13, "val" : -31.6697083442}, {"var" : 14, "val" : 43.169072798}, {"var" : 15, "val" : 20.5258431125}, {"var" : 16, "val" : -40.574061961}, {"var" : 18, "val" : 40.4009706549}, {"var" : 19, "val" : -29.1043533482}, {"var" : 20, "val" : -8.9191423837} ]
+}
+]
+},
+{
+"split" : [{"var" : 10, "val" : 0.0, "bound" : "U"}, {"var" : 20, "val" : 0.0, "bound" : "U"}],
+"lemmas" : [
+{"affVar" : 26, "affBound" : "U", "bound" : 11.4346919025, "causVar" : 5, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 0, "val" : 1.0}, {"var" : 5, "val" : -1.0}, {"var" : 16, "val" : 1.0} ]},
+{"affVar" : 15, "affBound" : "U", "bound" : 0.0, "causVar" : 5, "causBound" : "U", "constraint" : 0,
+"expl" : [ {"var" : 0, "val" : 1.0}, {"var" : 5, "val" : -1.0} ]},
+{"affVar" : 35, "affBound" : "U", "bound" : 8.3618156365, "causVar" : 14, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 5, "val" : -0.0564520265}, {"var" : 9, "val" : 1.0}, {"var" : 16, "val" : 0.0564520265} ]},
+{"affVar" : 24, "affBound" : "U", "bound" : 10.0511392868, "causVar" : 14, "causBound" : "U", "constraint" : 0,
+"expl" : [ {"var" : 5, "val" : -0.0564520265}, {"var" : 9, "val" : 1.0} ]},
+{"affVar" : 35, "affBound" : "U", "bound" : 8.3618156365, "causVar" : 14, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 5, "val" : -0.0564520265}, {"var" : 9, "val" : 1.0}, {"var" : 16, "val" : 0.0564520265} ]}
+],
+"children" : [
+{
+"split" : [{"var" : 6, "val" : 0.0, "bound" : "L"}, {"var" : 27, "val" : 0.0, "bound" : "U"}],
+"lemmas" : [
+{"affVar" : 24, "affBound" : "U", "bound" : 9.3434407408, "causVar" : 14, "causBound" : "U", "constraint" : 0,
+"expl" : [ {"var" : 1, "val" : 0.4563625938}, {"var" : 5, "val" : -0.144678188}, {"var" : 9, "val" : 1.0} ]},
+{"affVar" : 28, "affBound" : "U", "bound" : 2.7782404436, "causVar" : 7, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 0, "val" : -0.0847313032}, {"var" : 1, "val" : -1.0604102987}, {"var" : 2, "val" : 1.0}, {"var" : 11, "val" : 0.0847313032} ]},
+{"affVar" : 17, "affBound" : "U", "bound" : 6.022323917, "causVar" : 7, "causBound" : "U", "constraint" : 0,
+"expl" : [ {"var" : 2, "val" : 1.0} ]},
+{"affVar" : 32, "affBound" : "U", "bound" : 0.0, "causVar" : 11, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 1, "val" : -1.0}, {"var" : 6, "val" : 1.0} ]},
+{"affVar" : 33, "affBound" : "U", "bound" : 2.7782404436, "causVar" : 12, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 0, "val" : -0.0847313032}, {"var" : 1, "val" : -1.0604102987}, {"var" : 7, "val" : 1.0}, {"var" : 11, "val" : 0.0847313032} ]},
+{"affVar" : 28, "affBound" : "U", "bound" : 2.7782404436, "causVar" : 7, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 13, "val" : 1.0} ]},
+{"affVar" : 17, "affBound" : "U", "bound" : 6.022323917, "causVar" : 7, "causBound" : "U", "constraint" : 0,
+"expl" : [ {"var" : 13, "val" : 1.0} ]},
+{"affVar" : 29, "affBound" : "U", "bound" : 7.2686009594, "causVar" : 8, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 3, "val" : 1.0} ]},
+{"affVar" : 30, "affBound" : "U", "bound" : 7.9780235884, "causVar" : 9, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 4, "val" : 1.0} ]},
+{"affVar" : 22, "affBound" : "U", "bound" : 6.022323917, "causVar" : 12, "causBound" : "U", "constraint" : 0,
+"expl" : [ {"var" : 7, "val" : 1.0} ]},
+{"affVar" : 34, "affBound" : "U", "bound" : 7.2686009594, "causVar" : 13, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 8, "val" : 1.0} ]},
+{"affVar" : 35, "affBound" : "U", "bound" : 7.9780235884, "causVar" : 14, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 9, "val" : 1.0} ]},
+{"affVar" : 34, "affBound" : "U", "bound" : 0.0, "causVar" : 23, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 0, "val" : 0.0340362957}, {"var" : 1, "val" : -0.1760576674}, {"var" : 10, "val" : 1.4415721499}, {"var" : 11, "val" : -0.0340362957}, {"var" : 12, "val" : 0.1760576674} ]},
+{"affVar" : 29, "affBound" : "U", "bound" : 0.0, "causVar" : 8, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 0, "val" : 0.0340362957}, {"var" : 1, "val" : -0.1760576674}, {"var" : 3, "val" : 1.0}, {"var" : 8, "val" : -1.0}, {"var" : 10, "val" : 1.4415721499}, {"var" : 11, "val" : -0.0340362957}, {"var" : 12, "val" : 0.1760576674}, {"var" : 19, "val" : 1.0} ]}
+],
+"contradiction" : [ {"var" : 1, "val" : 0.1617963925}, {"var" : 3, "val" : -0.9189965702}, {"var" : 4, "val" : -0.6481222653}, {"var" : 6, "val" : -0.1617963925}, {"var" : 8, "val" : 0.9189965702}, {"var" : 9, "val" : 0.6481222653}, {"var" : 10, "val" : -1.3247998615}, {"var" : 12, "val" : -0.1617963925}, {"var" : 14, "val" : 0.9189965702}, {"var" : 15, "val" : 0.6481222653}, {"var" : 17, "val" : 0.1617963925}, {"var" : 19, "val" : -0.9189965702}, {"var" : 20, "val" : -0.6481222653} ]
+},
+{
+"split" : [{"var" : 6, "val" : 0.0, "bound" : "U"}, {"var" : 16, "val" : 0.0, "bound" : "U"}],
+"lemmas" : [
+{"affVar" : 23, "affBound" : "U", "bound" : 0.0, "causVar" : 34, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 1, "val" : -0.1760576674}, {"var" : 3, "val" : 1.0}, {"var" : 4, "val" : 0.7052499283}, {"var" : 6, "val" : 0.1760576674}, {"var" : 8, "val" : -1.0}, {"var" : 9, "val" : -0.7052499283}, {"var" : 10, "val" : 1.4415721499}, {"var" : 12, "val" : 0.1760576674}, {"var" : 14, "val" : -1.0}, {"var" : 15, "val" : -0.7052499283}, {"var" : 17, "val" : -0.1760576674}, {"var" : 19, "val" : 1.0}, {"var" : 20, "val" : 0.7052499283} ]},
+{"affVar" : 18, "affBound" : "U", "bound" : 0.0, "causVar" : 29, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 1, "val" : -0.1760576674}, {"var" : 4, "val" : 0.7052499283}, {"var" : 6, "val" : 0.1760576674}, {"var" : 9, "val" : -0.7052499283}, {"var" : 10, "val" : 1.4415721499}, {"var" : 12, "val" : 0.1760576674}, {"var" : 15, "val" : -0.7052499283}, {"var" : 17, "val" : -0.1760576674}, {"var" : 20, "val" : 0.7052499283} ]}
+],
+"contradiction" : [ {"var" : 2, "val" : 1.0881433429}, {"var" : 4, "val" : -0.7052499283}, {"var" : 7, "val" : -1.0881433429}, {"var" : 9, "val" : 0.7052499283}, {"var" : 10, "val" : -1.4415721499}, {"var" : 13, "val" : -1.0881433429}, {"var" : 15, "val" : 0.7052499283}, {"var" : 18, "val" : 1.0881433429}, {"var" : 20, "val" : -0.7052499283} ]
+}
+]
+}
+]
+},
+{
+"split" : [{"var" : 0, "val" : 0.0, "bound" : "L"}],
+"children" : [
+{
+"split" : [{"var" : 7, "val" : 0.0, "bound" : "L"}, {"var" : 28, "val" : 0.0, "bound" : "U"}],
+"lemmas" : [
+{"affVar" : 31, "affBound" : "U", "bound" : 7.2304100422, "causVar" : 10, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 5, "val" : 1.0} ]},
+{"affVar" : 31, "affBound" : "U", "bound" : 7.2304100422, "causVar" : 10, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 5, "val" : 1.0} ]}
+],
+"children" : [
+{
+"split" : [{"var" : 10, "val" : 0.0, "bound" : "L"}, {"var" : 31, "val" : 0.0, "bound" : "U"}],
+"lemmas" : [
+{"affVar" : 23, "affBound" : "U", "bound" : 8.2370396129, "causVar" : 13, "causBound" : "U", "constraint" : 0,
+"expl" : [ {"var" : 19, "val" : 1.0} ]},
+{"affVar" : 34, "affBound" : "U", "bound" : 0.0, "causVar" : 23, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 0, "val" : 0.9398872695}, {"var" : 1, "val" : -0.1760576674}, {"var" : 2, "val" : -1.0881433429}, {"var" : 5, "val" : -0.9398872695}, {"var" : 6, "val" : 0.1760576674}, {"var" : 7, "val" : 1.0881433429}, {"var" : 10, "val" : 1.4415721499}, {"var" : 11, "val" : -0.9398872695}, {"var" : 12, "val" : 0.1760576674}, {"var" : 13, "val" : 1.0881433429}, {"var" : 16, "val" : 0.9398872695}, {"var" : 17, "val" : -0.1760576674}, {"var" : 18, "val" : -1.0881433429} ]},
+{"affVar" : 35, "affBound" : "U", "bound" : 0.0, "causVar" : 24, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 0, "val" : 1.3327009785}, {"var" : 1, "val" : -0.2496386888}, {"var" : 2, "val" : -1.5429187571}, {"var" : 5, "val" : -1.3327009785}, {"var" : 6, "val" : 0.2496386888}, {"var" : 7, "val" : 1.5429187571}, {"var" : 10, "val" : 2.0440585558}, {"var" : 11, "val" : -1.3327009785}, {"var" : 12, "val" : 0.2496386888}, {"var" : 13, "val" : 1.5429187571}, {"var" : 16, "val" : 1.3327009785}, {"var" : 17, "val" : -0.2496386888}, {"var" : 18, "val" : -1.5429187571} ]}
+],
+"contradiction" : [ {"var" : 0, "val" : -3.5391219787}, {"var" : 1, "val" : 0.662940738}, {"var" : 2, "val" : 4.0973765104}, {"var" : 5, "val" : 3.5391219787}, {"var" : 6, "val" : -0.331197606}, {"var" : 7, "val" : -4.0973765104}, {"var" : 8, "val" : 1.6687626284}, {"var" : 9, "val" : 1.4787062216}, {"var" : 10, "val" : -5.4282038337}, {"var" : 11, "val" : 3.5391219787}, {"var" : 12, "val" : -0.662940738}, {"var" : 13, "val" : -4.0973765104}, {"var" : 16, "val" : -3.5391219787}, {"var" : 17, "val" : 0.331197606}, {"var" : 18, "val" : 4.0973765104}, {"var" : 19, "val" : -1.6687626284}, {"var" : 20, "val" : -1.4787062216} ]
+},
+{
+"split" : [{"var" : 10, "val" : 0.0, "bound" : "U"}, {"var" : 20, "val" : 0.0, "bound" : "U"}],
+"lemmas" : [
+{"affVar" : 35, "affBound" : "U", "bound" : 0.0, "causVar" : 24, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 0, "val" : -0.0482613246}, {"var" : 2, "val" : -1.5429187571}, {"var" : 3, "val" : 1.4179370459}, {"var" : 6, "val" : 0.2496386888}, {"var" : 7, "val" : 1.5429187571}, {"var" : 8, "val" : -1.4179370459}, {"var" : 10, "val" : 2.0440585558}, {"var" : 11, "val" : 0.0482613246}, {"var" : 13, "val" : 1.5429187571}, {"var" : 14, "val" : -1.4179370459}, {"var" : 17, "val" : -0.2496386888}, {"var" : 18, "val" : -1.5429187571}, {"var" : 19, "val" : 1.4179370459} ]},
+{"affVar" : 23, "affBound" : "U", "bound" : 0.0, "causVar" : 34, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 0, "val" : -0.0340362957}, {"var" : 2, "val" : -1.0881433429}, {"var" : 3, "val" : 1.0}, {"var" : 6, "val" : 0.1760576674}, {"var" : 7, "val" : 1.0881433429}, {"var" : 8, "val" : -1.0}, {"var" : 10, "val" : 1.4415721499}, {"var" : 11, "val" : 0.0340362957}, {"var" : 13, "val" : 1.0881433429}, {"var" : 14, "val" : -1.0}, {"var" : 17, "val" : -0.1760576674}, {"var" : 18, "val" : -1.0881433429}, {"var" : 19, "val" : 1.0} ]}
+],
+"contradiction" : [ {"var" : 0, "val" : 0.0680725915}, {"var" : 2, "val" : 2.1762866857}, {"var" : 3, "val" : -1.0}, {"var" : 6, "val" : -0.3521153347}, {"var" : 7, "val" : -2.1762866857}, {"var" : 8, "val" : 1.0}, {"var" : 10, "val" : -2.8831442999}, {"var" : 11, "val" : -0.0680725915}, {"var" : 13, "val" : -2.1762866857}, {"var" : 14, "val" : 1.0}, {"var" : 17, "val" : 0.3521153347}, {"var" : 18, "val" : 2.1762866857}, {"var" : 19, "val" : -1.0} ]
+}
+]
+},
+{
+"split" : [{"var" : 7, "val" : 0.0, "bound" : "U"}, {"var" : 17, "val" : 0.0, "bound" : "U"}],
+"lemmas" : [
+{"affVar" : 34, "affBound" : "U", "bound" : 7.7980973928, "causVar" : 13, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 3, "val" : -1.0}, {"var" : 8, "val" : 1.0}, {"var" : 14, "val" : 1.0} ]},
+{"affVar" : 26, "affBound" : "U", "bound" : 7.1759241143, "causVar" : 5, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 0, "val" : 1.0}, {"var" : 2, "val" : 0.6430060636} ]},
+{"affVar" : 27, "affBound" : "U", "bound" : 6.7496904342, "causVar" : 6, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 1, "val" : 1.0} ]},
+{"affVar" : 16, "affBound" : "U", "bound" : 9.4261103212, "causVar" : 6, "causBound" : "U", "constraint" : 0,
+"expl" : [ {"var" : 1, "val" : 1.0}, {"var" : 2, "val" : -0.9944101289} ]},
+{"affVar" : 18, "affBound" : "U", "bound" : 7.6832343894, "causVar" : 8, "causBound" : "U", "constraint" : 0,
+"expl" : [ {"var" : 2, "val" : -0.2868758964}, {"var" : 3, "val" : 1.0} ]},
+{"affVar" : 30, "affBound" : "U", "bound" : 10.5222473699, "causVar" : 9, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 2, "val" : 0.5468405378}, {"var" : 4, "val" : 1.0} ]},
+{"affVar" : 19, "affBound" : "U", "bound" : 7.4908391805, "causVar" : 9, "causBound" : "U", "constraint" : 0,
+"expl" : [ {"var" : 4, "val" : 1.0} ]},
+{"affVar" : 31, "affBound" : "U", "bound" : 7.1759241143, "causVar" : 10, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 2, "val" : 0.6430060636}, {"var" : 5, "val" : 1.0} ]},
+{"affVar" : 32, "affBound" : "U", "bound" : 6.7496904342, "causVar" : 11, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 6, "val" : 1.0} ]},
+{"affVar" : 21, "affBound" : "U", "bound" : 9.4261103212, "causVar" : 11, "causBound" : "U", "constraint" : 0,
+"expl" : [ {"var" : 2, "val" : -0.9944101289}, {"var" : 6, "val" : 1.0} ]},
+{"affVar" : 22, "affBound" : "U", "bound" : 5.5160338276, "causVar" : 12, "causBound" : "U", "constraint" : 0,
+"expl" : [ {"var" : 2, "val" : -1.0}, {"var" : 7, "val" : 1.0} ]},
+{"affVar" : 23, "affBound" : "U", "bound" : 7.6832343894, "causVar" : 13, "causBound" : "U", "constraint" : 0,
+"expl" : [ {"var" : 2, "val" : -0.2868758964}, {"var" : 8, "val" : 1.0} ]},
+{"affVar" : 35, "affBound" : "U", "bound" : 10.5222473699, "causVar" : 14, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 2, "val" : 0.5468405378}, {"var" : 9, "val" : 1.0} ]},
+{"affVar" : 24, "affBound" : "U", "bound" : 7.4908391805, "causVar" : 14, "causBound" : "U", "constraint" : 0,
+"expl" : [ {"var" : 9, "val" : 1.0} ]}
+],
+"children" : [
+{
+"split" : [{"var" : 10, "val" : 0.0, "bound" : "L"}, {"var" : 31, "val" : 0.0, "bound" : "U"}],
+"contradiction" : [ {"var" : 0, "val" : -1.0}, {"var" : 1, "val" : 0.1873178551}, {"var" : 5, "val" : 1.0}, {"var" : 6, "val" : -0.1873178551}, {"var" : 10, "val" : -1.5337713326}, {"var" : 11, "val" : 1.0}, {"var" : 12, "val" : -0.1873178551}, {"var" : 16, "val" : -1.0}, {"var" : 17, "val" : 0.1873178551} ]
+},
+{
+"split" : [{"var" : 10, "val" : 0.0, "bound" : "U"}, {"var" : 20, "val" : 0.0, "bound" : "U"}],
+"lemmas" : [
+{"affVar" : 34, "affBound" : "U", "bound" : 0.0, "causVar" : 23, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 0, "val" : 0.9398872695}, {"var" : 1, "val" : -0.1760576674}, {"var" : 5, "val" : -0.9398872695}, {"var" : 6, "val" : 0.1760576674}, {"var" : 10, "val" : 1.4415721499}, {"var" : 11, "val" : -0.9398872695}, {"var" : 12, "val" : 0.1760576674}, {"var" : 16, "val" : 0.9398872695}, {"var" : 17, "val" : -0.1760576674} ]},
+{"affVar" : 29, "affBound" : "U", "bound" : 0.0, "causVar" : 8, "causBound" : "L", "constraint" : 0,
+"expl" : [ {"var" : 0, "val" : 0.9398872695}, {"var" : 1, "val" : -0.1760576674}, {"var" : 3, "val" : 1.0}, {"var" : 5, "val" : -0.9398872695}, {"var" : 6, "val" : 0.1760576674}, {"var" : 8, "val" : -1.0}, {"var" : 10, "val" : 1.4415721499}, {"var" : 11, "val" : -0.9398872695}, {"var" : 12, "val" : 0.1760576674}, {"var" : 16, "val" : 0.9398872695}, {"var" : 17, "val" : -0.1760576674}, {"var" : 19, "val" : 1.0} ]}
+],
+"contradiction" : [ {"var" : 1, "val" : 0.1873178551}, {"var" : 3, "val" : -1.0639573834}, {"var" : 6, "val" : -0.1873178551}, {"var" : 8, "val" : 1.0639573834}, {"var" : 10, "val" : -1.5337713326}, {"var" : 12, "val" : -0.1873178551}, {"var" : 14, "val" : 1.0639573834}, {"var" : 17, "val" : 0.1873178551}, {"var" : 19, "val" : -1.0639573834} ]
+}
+]
+}
+]
+}
+]
+}
+}
