@@ -3,6 +3,6 @@
 From mathcomp Require Import all_ssreflect all_algebra.
 
 Module ParsedCertificateSpecs.
-  Definition n : nat := 169.
-  Definition m : nat := 64.
+  Definition n : nat := 57.
+  Definition m : nat := 19.
 End ParsedCertificateSpecs.
