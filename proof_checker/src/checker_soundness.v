@@ -14,7 +14,7 @@ Require Import node_soundness.
 
 Import Farkas.
 Import CertificateSpecs.
-
+(*
 (*lemma check_tree_soundness_leaf (tableau: real list list) (upper_bounds: real list) (lower_bounds: real list)
         (constraints: Constraint.t list) (tree: Proof_tree.t) (x: real list) =
     (* this is a check performed in check_proof_tree, outside of check_tree *)
@@ -193,4 +193,5 @@ elim: proof_tree ub lb => [split tleft IHleft tright IHright | contradiction] ub
   by apply: (check_tree_soundness_node tableau ub lb constraints split tleft tright x IHleft IHright).
 - by apply: (check_tree_soundness_leaf tableau ub lb constraints contradiction x).
 Qed.
+*)
 

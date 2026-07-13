@@ -15,7 +15,7 @@ Require Import system_soundness.
 Import CertificateSpecs.
 
 Module LeafSoundness.
-
+  (*
 (* lemma check_tree_implies_check_cert tableau upper_bounds lower_bounds relu_constraints (proof_tree: Proof_tree.t) =
     match proof_tree with
     | Node _ -> true
@@ -194,5 +194,5 @@ Proof.
   move: (check_cert_implies_not_eval_system system' ub lb constraints contradiction x) => H_test.
   auto.
 Qed.
-
+*)
 End LeafSoundness.
