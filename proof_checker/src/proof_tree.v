@@ -8,11 +8,9 @@ Import CertificateSpecs.
 Module ProofTree.
 
 Inductive t : Type :=
+  (*  split information, left child, right child *)
   | node : Split.t -> t -> t -> t
-  (* WARN:
-     It might not be necessary to use m.+2. instead of m.
-     If that is the case, it should be changed.
-  *)
+  (* contradiction vector *)
   | leaf : (m.+2).-tuple R -> t.
 
 End ProofTree.
