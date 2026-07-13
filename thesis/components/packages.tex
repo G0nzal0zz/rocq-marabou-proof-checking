@@ -32,5 +32,13 @@
 \usetikzlibrary{positioning, arrows}
 \tikzstyle{arrow}=[draw, -latex]
 
-\usepackage{tabularx} % add to preamble
-\usepackage{booktabs} % add to preamble
+\usepackage{tabularx}
+\usepackage{booktabs}
+
+% MAKE EACH SECTION START ON A NEW PAGE
+\usepackage{etoolbox}
+\preto{\section}{\clearpage}
+
+% TODO: REMOVE BEFORE DELIVERY
+% TODO NOTES
+\usepackage{todonotes}

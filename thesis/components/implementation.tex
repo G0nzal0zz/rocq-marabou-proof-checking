@@ -1,0 +1,65 @@
+\section{Implementation}
+
+The implementation of the certified proof checker consists of three main components:
+\begin{itemize}
+    \item \textbf{Certificate Parser.}  % TODO: Add description.
+    \item \textbf{Proof Checker.} % TODO: Add description.
+    \item \textbf{Proof Checker Soundness.} % TODO: Add description.
+\end{itemize}
+
+Figure X provides an overview of the architecture of the developed system. When Marabou determines that a verification query is UNSAT, it produces a proof certificates of the result in JSON format. These certificate is passed to the certificate parser, which converts them into Rocq source files containing equivalent Gallina definitions. The generated files are then imported by the proof checker where it verifies the certificates. Finally, the soundness theorems establishes that any certificate accepted by the proof checker constitutes a valid UNSAT proof of the corresponding verification result.
+
+\missingfigure{System overview.}
+
+\subsection{Certificate Parser}
+To reason about the proof certificates produced by Marabou in the UNSAT case, they must first be imported into the proof checker. In the original Imandra development, this is achieved within the same program: since Imandra is embedded in a subset of OCaml, it can leverage OCaml parsing libraries to read and translate the proof certificates directly at execution time. Consequently, no external preprocessing stage is required.
+
+This approach is not directly transferable to Rocq. The proof checker developed in this work is implemented in Gallina, which cannot invoke arbitrary OCaml parsing code during proof checking. Therefore, a separate preprocessing stage was introduced. A Haskell program parses the JSON proof certificates produced by Marabou and generates Rocq source files containing equivalent Gallina definitions. These generated files are then imported into the proof checker, allowing it to reason about the certificates using native Rocq data structures.
+% TODO: Cite SMTCoq
+
+Marabou's proof certificates are not organised in a way that is convenient for recursive verification. In particular, the tightening information is associated with parent nodes, whereas the proof checker benefits from a representation in which this information is readily available when processing each proof step. Consequently, before verification, the parsed certificates should be translated into data types better suited to the recursive structure of the proof checker.
+
+\todo[inline]{Should I be mentioning the information below here or should I do it in the "Evaluation" section?} The point at which this translation is performed differs between the two implementations. In the original Imandra development, the transformation is carried out within the Imandra code after the certificates have been parsed. In this work, the transformation is instead performed by the Haskell parser while generating the Rocq files. As a result, the Rocq implementation operates directly on the representation expected by the proof checker, keeping the Gallina code focused solely on certificate verification.
+
+
+\subsection{Proof Checker}
+
+As it was mentioned earlier, Marabou DNN verifier produces 
+The proof checker has exactly one job, to determine if an unsat proof certificate is really unsatifiable. In order to conclude whether the parsed proof certificates are really unsatisfiable,
+\begin{itemize}
+    \item \textbf{Upper/Lower Bounds.}  % TODO: Add description.
+    \item \textbf{Constraints.} % TODO: Add description.
+    \item \textbf{Tableau.} % TODO: Add description.
+    \item \textbf{Proof Tree.} % TODO: Add description.
+\end{itemize}
+
+It recurses over the proof tree nodes and leafs. Leafs represent
+
+\begin{lstlisting}[language=Coq, caption={Marabou proof tree as an inductive data type in Rocq.}, label={code:proof_tree}]
+Inductive t : Type :=
+  (*  split information, left child, right child *)
+  | node : Split.t -> t -> t -> t
+  (* contradiction vector *)
+  | leaf : (m.+2).-tuple R -> t.
+\end{lstlisting}
+
+\begin{lstlisting}[language=Coq, caption={Proof checker tree verifier.}, label={code:check_tree}]
+Fixpoint check_tree
+  (tableau : system m n)
+  (ub lb : 'rV[R]_n)
+  (constraints : seq Constraint.t)
+  (proof_node : ProofTree.t)
+  : bool :=
+  match proof_node with
+  | ProofTree.leaf contradiction =>
+    check_contradiction contradiction tableau ub lb
+  | ProofTree.node split tleft tright =>
+    let bounds := Split.update_bounds_from_split ub lb split in
+    let valid_split := Split.check_split split constraints in
+    let valid_left  := check_tree tableau bounds.1.2 bounds.1.1 constraints tleft in
+    let valid_right := check_tree tableau bounds.2.2 bounds.2.1 constraints tright in
+    valid_split && valid_left && valid_right
+  end.
+\end{lstlisting}
+
+

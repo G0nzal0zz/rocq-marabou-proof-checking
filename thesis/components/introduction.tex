@@ -2,7 +2,9 @@
 
 \subsection{Background \& Motivation}
 
+% NOTE: Should I explain that moderns software testing approaches do not apply to DNN verifications sf
 AI, particularly deep neural networks (DNNs), has gained considerable traction in recent years. Consequently, their use in high-risk domains has increased. However, it has become evident that DNNs are not free from potential errors, such as exhibiting erroneous behaviour in response to trivial perturbations in the input \cite{intriguing_properties_of_nn}. Therefore, ensuring the robustness of DNNs rigorously is essential.
+
 
 DNN verifiers address the challenging task of ensuring that a neural network satisfies specific safety, robustness, or fairness properties. However, these verifiers are not free from implementation bugs. Furthermore, most state-of-the-art DNN verifiers rely on floating-point arithmetic, which results in serious scalability concerns due to numerical instability \cite{proof_minimization_in_nn_verification}. These concerns can be exploited in order to compromise a fully verified neural network \cite{exploiting_verified_nn}, thereby defeating the purpose of DNN verifiers by raising unsoundness issues.
 
