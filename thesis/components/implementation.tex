@@ -1,13 +1,13 @@
-\section{Implementation}
+\section{Implementation} \label{sec:implementation}
 
 The implementation of the certified proof checker consists of three main components:
 \begin{itemize}
-    \item \textbf{Certificate Parser.}  % TODO: Add description.
-    \item \textbf{Proof Checker.} % TODO: Add description.
-    \item \textbf{Proof Checker Soundness.} % TODO: Add description.
+    \item \textbf{Certificate Parser.} A Haskell program that reads proof certificates in JSON format and generates Rocq source files containing equivalent Gallina definitions.
+    \item \textbf{Proof Checker.} A Rocq program that verifies whether a parsed proof certificate constitutes a valid proof of unsatisfiability.
+    \item \textbf{Proof Checker Soundness.} A formal proof in Rocq establishing that if the proof checker accepts a certificate, then the original verification query is genuinely unsatisfiable.
 \end{itemize}
 
-Figure X provides an overview of the architecture of the developed system. When Marabou determines that a verification query is UNSAT, it produces a proof certificates of the result in JSON format. These certificate is passed to the certificate parser, which converts them into Rocq source files containing equivalent Gallina definitions. The generated files are then imported by the proof checker where it verifies the certificates. Finally, the soundness theorems establishes that any certificate accepted by the proof checker constitutes a valid UNSAT proof of the corresponding verification result.
+Figure X provides an overview of the architecture of the developed system. When Marabou determines that a verification query is UNSAT, it produces a proof certificate of the result in JSON format. This certificate is passed to the certificate parser, which converts it into Rocq source files containing equivalent Gallina definitions. The generated files are then imported by the proof checker where it verifies the certificate. Finally, the soundness theorem establishes that any certificate accepted by the proof checker constitutes a valid UNSAT proof of the corresponding verification result.
 
 \missingfigure{System overview.}
 
@@ -24,16 +24,18 @@ Marabou's proof certificates are not organised in a way that is convenient for r
 
 \subsection{Proof Checker}
 
-As it was mentioned earlier, Marabou DNN verifier produces 
-The proof checker has exactly one job, to determine if an unsat proof certificate is really unsatifiable. In order to conclude whether the parsed proof certificates are really unsatisfiable,
-\begin{itemize}
-    \item \textbf{Upper/Lower Bounds.}  % TODO: Add description.
-    \item \textbf{Constraints.} % TODO: Add description.
-    \item \textbf{Tableau.} % TODO: Add description.
-    \item \textbf{Proof Tree.} % TODO: Add description.
-\end{itemize}
 
-It recurses over the proof tree nodes and leafs. Leafs represent
+The proof checker has exactly one job: to determine whether an UNSAT proof certificate genuinely certifies unsatisfiability. To do so, it operates over the following data, all of which must be extracted from the certificate and represented in Gallina:
+
+\begin{itemize}
+    \item \textbf{Upper and lower bounds.} Vectors $u$ and $l$ assigning an admissible interval $[l_i, u_i]$ to each variable. These define the search space of the verification query.
+    \item \textbf{Constraints.} A collection of linear constraints representing the network's weights, biases, and the property under verification, alongside the ReLU constraints arising from activation functions.
+    \item \textbf{Tableau.} A matrix $T$ encoding the linear relationships between basic and non-basic variables, as maintained by Marabou's simplex engine during the search.
+    \item \textbf{Proof tree.} A binary tree whose internal nodes record case splits (typically over ReLU phases) and whose leaves carry Farkas coefficients that witness the unsatisfiability of the leaf's sub-problem.
+\end{itemize}
+As it was mentioned earlier, Marabou DNN verifier produces certificates in a tree-like structure.
+
+The proof checker traverses the proof tree recursively. At each leaf, it verifies that the provided Farkas coefficients constitute a valid witness of unsatisfiability for the linear constraints under the current bounds. At each internal node, it checks that the recorded split is consistent with the constraints before recursing into both children.
 
 \begin{lstlisting}[language=Coq, caption={Marabou proof tree as an inductive data type in Rocq.}, label={code:proof_tree}]
 Inductive t : Type :=
@@ -61,5 +63,3 @@ Fixpoint check_tree
     valid_split && valid_left && valid_right
   end.
 \end{lstlisting}
-
-
