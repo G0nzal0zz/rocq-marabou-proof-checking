@@ -1,8 +1,31 @@
 \section{Evaluation} \label{sec:evaluation}
-This section presents the evaluation of the Rocq-based proof checker and compares it with the Imandra proof checker described in \cite{certified_proof_checker}. The evaluation is structured along three complementary dimensions: capability, maintainability, and performance.
+This section presents the evaluation of the Rocq-based proof checker and compares it with the Imandra proof checker described in \cite{certified_proof_checker}. The evaluation is structured along two complementary dimensions: capability and maintainability.
 
 \subsection{Capability Evaluation}
-The capability evaluation compares the functional capabilities of both implementations against the functional requirements defined in \autoref{sec:fun-requirements}. The purpose of this evaluation is to ensure there are no outstanding functional differences between the two implementations.
+
+\autoref{tab:capability-comparison} compares the functional capabilities of the Rocq proof checker against the Imandra baseline. Each feature is marked as supported (\checkmark) or not supported (---).
+
+\begin{table}[h]
+\centering
+\begin{tabularx}{\textwidth}{l c c}
+\toprule
+\textbf{Feature} & \textbf{Imandra} & \textbf{Rocq} \\
+\midrule
+ReLU activation support & \checkmark & \checkmark \\
+Identity activation support & \checkmark & \checkmark \\
+Theory lemmas support & \checkmark & --- \\
+Theory lemmas verification & --- & --- \\
+Proof Checker & \checkmark & \checkmark \\
+Proof Checker Soundness & \checkmark & \checkmark \\
+Executable Proof Checker & \checkmark & --- \\
+\bottomrule
+\end{tabularx}
+\caption{Capability comparison between the Imandra and Rocq proof checkers.}
+\label{tab:capability-comparison}
+\end{table}
+
+TODO: DISCUSS THE CAPABILITIES TABLE
+% The capability comparison shows that the Rocq proof checker achieves functional parity with the Imandra baseline on the core verification features: both support ReLU activation constraints, both include a complete proof checker, and both are accompanied by a formal soundness theorem. The only unimplemented feature is the verification of theory lemmas, which in the Imandra checker are used to validate intermediate bound-tightening deductions within the proof tree. The Rocq checker currently propagates bounds through case splits but does not independently verify the lemma steps that Marabou may include at internal nodes.
 
 
 \subsection{Maintainability Evaluation}
@@ -14,10 +37,4 @@ The maintainability evaluation analyses the codebases of both implementations to
     \item \textbf{External library dependencies.} The number and nature of external libraries relied upon by each implementation.
 \end{itemize}
 
-\subsection{Performance Evaluation}
-The performance evaluation measures the proof checker's runtime performance. Experiments will be conducted on proof certificates of varying sizes to analyse execution time and scalability. The following metrics will be used:
-
-\begin{itemize}
-    \item \textbf{Verification time.} The time taken to check a certificate, measured across certificates of varying sizes.
-    \item \textbf{Scalability.} How verification time grows as the size of the proof tree increases, used to assess the practical viability of the implementation on larger benchmarks.
-\end{itemize}
+TODO WRITE EVALUATION RESULTS.

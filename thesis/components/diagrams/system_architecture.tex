@@ -1,0 +1,51 @@
+\begin{figure}[h]
+\centering
+
+\begin{tikzpicture}[
+    scale=0.85,
+    transform shape,
+    >=latex,
+    node distance=2cm,
+    box/.style={
+        draw,
+        rounded corners,
+        minimum width=2.8cm,
+        minimum height=1cm,
+        align=center
+    },
+    arrow/.style={->, thick},
+    artifact/.style={font=\small}
+]
+
+\node[box, fill=gray!10] (query)
+{Verification\\Query\\$(P,Q)$};
+
+\node[box, fill=blue!10, right=of query] (marabou)
+{Marabou\\(UNSAT)};
+
+\node[box, fill=purple!15, right=3cm of marabou] (parser)
+{Certificate\\Parser\\(Haskell)};
+
+\node[box, fill=green!15, below=2cm of parser] (checker)
+{Proof Checker\\(Rocq)};
+
+\node[box, fill=orange!15, left=3cm of checker] (result)
+{Valid\\UNSAT\\or Invalid};
+
+\node[box, dashed, fill=teal!10, right=1.5cm of checker] (sound)
+{Soundness\\Theorem};
+
+\draw[arrow] (query) -- (marabou);
+\draw[arrow]
+(marabou) --
+node[artifact, above, align=center]
+{JSON proof\\certificate}
+(parser);
+\draw[arrow] (parser) -- node[artifact,right]{Gallina definitions} (checker);
+\draw[arrow] (checker) -- (result);
+\draw[arrow,dashed] (sound) -- (checker);
+\end{tikzpicture}
+
+\caption{Workflow of the implemented proof checker.}
+\label{fig:system-workflow}
+\end{figure}
