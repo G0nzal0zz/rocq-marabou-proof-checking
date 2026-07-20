@@ -3,30 +3,9 @@ This section presents the evaluation of the Rocq-based proof checker and compare
 
 \subsection{Capability Evaluation}
 
-\autoref{tab:capability-comparison} compares the functional capabilities of the Rocq proof checker against the Imandra baseline. Each feature is marked as supported (\checkmark) or not supported (---).
+The Rocq implementation achieves functional parity with the Imandra baseline in terms of core features: both support ReLU activation constraints, correctly parse Marabou proof certificates and formalise their representations in the target language, include a complete proof checker, and are accompanied by a formal soundness theorem.
 
-\begin{table}[h]
-\centering
-\begin{tabularx}{\textwidth}{l c c}
-\toprule
-\textbf{Feature} & \textbf{Imandra} & \textbf{Rocq} \\
-\midrule
-ReLU activation support & \checkmark & \checkmark \\
-Identity activation support & \checkmark & \checkmark \\
-Theory lemmas support & \checkmark & --- \\
-Theory lemmas verification & --- & --- \\
-Proof Checker & \checkmark & \checkmark \\
-Proof Checker Soundness & \checkmark & \checkmark \\
-Executable Proof Checker & \checkmark & --- \\
-\bottomrule
-\end{tabularx}
-\caption{Capability comparison between the Imandra and Rocq proof checkers.}
-\label{tab:capability-comparison}
-\end{table}
-
-TODO: DISCUSS THE CAPABILITIES TABLE
-% The capability comparison shows that the Rocq proof checker achieves functional parity with the Imandra baseline on the core verification features: both support ReLU activation constraints, both include a complete proof checker, and both are accompanied by a formal soundness theorem. The only unimplemented feature is the verification of theory lemmas, which in the Imandra checker are used to validate intermediate bound-tightening deductions within the proof tree. The Rocq checker currently propagates bounds through case splits but does not independently verify the lemma steps that Marabou may include at internal nodes.
-
+Nevertheless, the Rocq implementation is missing some functionalities. First, the Imandra proof checker supports the use of theory lemmas for dynamic bound tightening, which are fundamental for scaling to larger verification problems, although their soundness is not guaranteed. Finally, the most important missing feature is the ability to execute the proof checker. As mentioned previously, the Rocq proof checker uses MathComp matrices, which are not known for their efficiency. As a result, executing the proof checker becomes infeasible due to excessive memory consumption.
 
 \subsection{Maintainability Evaluation}
 The maintainability evaluation analyses the codebases of both implementations to assess their relative maintainability. The following metrics will be used to ensure a fair comparison:

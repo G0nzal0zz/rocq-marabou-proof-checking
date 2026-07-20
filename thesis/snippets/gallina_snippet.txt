@@ -1,0 +1,26 @@
+Definition tableau : (m.+2).-tuple ('rV[R]_n) :=
+  [tuple nth (\row_(j < n) 0%R) [:: 
+    \row_(j < n) (nth 0%R 
+      [:: (210214093 %:R / 500000000 %:R)%R; 
+        (14870379 %:R / 80000000 %:R)%R; 
+        ...]
+    j);
+    ...
+  ] i | i < m.+2].
+
+Definition lb : 'rV[R]_n :=
+  \row_(j < n) (nth 0%R
+    [:: 0%:R; (-10)%R; ...; 0%:R] j).
+
+Definition ub : 'rV[R]_n :=
+  \row_(j < n) (nth 0%R
+    [:: 10%:R; 10%:R; ...; 0%:R] j).
+
+Definition constraints : seq Constraint.t :=
+  [:: ((inord 5, inord 15, inord 26));
+      ((inord 6, inord 16, inord 27)); ... ].
+
+Definition proof_tree : ProofTree.t :=
+  ProofTree.node (Split.single (inord 0) 0%:R)
+    (ProofTree.node (Split.relu ...) ...)
+    (ProofTree.node (Split.relu ...) ...).

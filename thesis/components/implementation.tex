@@ -2,12 +2,12 @@
 
 The implementation of the certified proof checker consists of three main components:
 \begin{itemize}
-    \item \textbf{Certificate Parser.} A Haskell program that reads proof certificates in JSON format and generates Rocq source files containing equivalent Gallina definitions.
+    \item \textbf{Certificate Parser.} A Haskell program that reads Marabou proof certificates in JSON and generates Rocq source files containing equivalent Gallina definitions.
     \item \textbf{Proof Checker.} A Rocq program that verifies whether a parsed proof certificate constitutes a valid proof of unsatisfiability.
     \item \textbf{Proof Checker Soundness.} A formal proof in Rocq establishing that if the proof checker accepts a certificate, then the original verification query is genuinely unsatisfiable.
 \end{itemize}
 
-\autoref{fig:system-workflow} provides an overview of the workflow of the developed system. When Marabou determines that a verification query is UNSAT, it produces a proof certificate of the result in JSON format. This certificate is passed to the certificate parser, which converts it into Rocq source files containing equivalent Gallina definitions. The generated files are then imported by the proof checker where it verifies the certificate. Finally, the soundness theorem establishes that any certificate accepted by the proof checker constitutes a valid UNSAT proof of the corresponding verification result.
+\autoref{fig:system-workflow} provides an overview of the workflow of the developed system. When Marabou determines that a verification query is UNSAT, it produces a proof certificate of the result in JSON format. The certificate parser uses the resulting JSON proof certificate to generate Rocq source files containing Gallina definitions equivalent to the certificate. The generated files are then imported by the proof checker where it verifies the certificate. Finally, the soundness theorem establishes that any certificate accepted by the proof checker constitutes a valid UNSAT proof of the corresponding verification result.
 
 \input{components/diagrams/system_architecture.tex}
 
@@ -20,6 +20,29 @@ Marabou's proof certificates are not organised in a way that is convenient for r
 
 \todo[inline]{Should I be mentioning the information below here or should I do it in the "Evaluation" section?} The point at which this translation is performed differs between the two implementations. In the original Imandra development, the transformation is carried out within the Imandra code after the certificates have been parsed. In this work, the transformation is instead performed by the Haskell parser while generating the Rocq files. As a result, the Rocq implementation operates directly on the representation expected by the proof checker, keeping the Gallina code focused solely on certificate verification.
 
+\autoref{fig:cert-snippets} shows the correspondence between the JSON certificate format and the generated Gallina code. The first tableau row encodes how each basic variable is expressed as a linear combination of non-basic variables; upper and lower bounds assign intervals to each variable; constraints encode the ReLU relationships; and the proof tree captures the case splits and Farkas witnesses. The Gallina representation mirrors this structure exactly, with real numbers represented as rational fractions and variables indexed by dependent types.
+
+\begin{figure}[htbp]
+\centering
+\begin{minipage}[t]{0.48\linewidth}
+  \lstinputlisting[
+    language=json,
+    basicstyle=\tiny\ttfamily
+  ]{snippets/json_snippet.txt}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.48\linewidth}
+  \lstinputlisting[
+    language=Coq,
+    basicstyle=\tiny\ttfamily,
+    breaklines=true
+  ]{snippets/gallina_snippet.txt}
+\end{minipage}
+\caption{Correspondence between JSON certificate and generated Gallina definitions.}
+\label{fig:cert-snippets}
+\end{figure}
+
+The parser translates each JSON field directly into Gallina definitions: bounds become row vectors of rational numbers using \texttt{\%:R} notation, constraints become tuples of dependent indices via \texttt{inord}, and the recursive proof tree structure maps to nested \texttt{ProofTree.node} and \texttt{ProofTree.leaf} constructors.
 
 \subsection{Proof Checker}
 

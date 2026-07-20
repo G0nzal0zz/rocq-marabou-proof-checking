@@ -1,0 +1,25 @@
+{
+  "tableau" : [
+    [
+      {"var": 0, "val": 0.4204},
+      {"var":1,"val": 0.1859}, 
+      ...
+    ],
+    ...
+  ],
+  "upperBounds" : [10.0, 10.0, ...],
+  "lowerBounds" : [0.0, -10.0, ...],
+  "constraints" : [
+    {
+      "constraintType": 0,
+      "vars": [5, 15, 26, 47],
+    },
+    ...
+  ],
+  "tree" : {
+    "split" : [
+      {"var": 0,"val": 0, "bound": "U"}
+    ],
+    "children" : [{...}, {...}]
+  }
+}
