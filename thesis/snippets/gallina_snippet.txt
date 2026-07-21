@@ -1,4 +1,4 @@
-Definition tableau : (m.+2).-tuple ('rV[R]_n) :=
+Definition tableau : m.-tuple ('rV[R]_n) :=
   [tuple nth (\row_(j < n) 0%R) [:: 
     \row_(j < n) (nth 0%R 
       [:: (210214093 %:R / 500000000 %:R)%R; 
@@ -6,7 +6,7 @@ Definition tableau : (m.+2).-tuple ('rV[R]_n) :=
         ...]
     j);
     ...
-  ] i | i < m.+2].
+  ] i | i < m].
 
 Definition lb : 'rV[R]_n :=
   \row_(j < n) (nth 0%R

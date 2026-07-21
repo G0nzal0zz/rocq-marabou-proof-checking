@@ -12,7 +12,44 @@ The implementation of the certified proof checker consists of three main compone
 \input{components/diagrams/system_architecture.tex}
 
 \subsection{Certificate Parser}
-To reason about the proof certificates produced by Marabou in the UNSAT case, they must first be imported into the proof checker. In the original Imandra development, this is achieved within the same program: since Imandra is embedded in a subset of OCaml, it can leverage OCaml parsing libraries to read and translate the proof certificates directly at execution time. Consequently, no external preprocessing stage is required.
+To reason about the proof certificates produced by Marabou in the UNSAT case, they must first be formalised, parsed and then imported into the proof checker.
+
+\subsubsection{Formalisation}
+The proof certificate data produced by Marabou is captured by the following Gallina types which exploit the benefits of dependent types.
+
+\begin{itemize}
+    \item \texttt{n : nat} --- the number of variables in $x$, as in \autoref{sec:queries}.
+
+    \item \texttt{m : nat} --- the number of equations in \autoref{eq:weighted-sum} and \autoref{eq:relu-auxiliary}, as in  \autoref{sec:queries}.
+
+    \item \texttt{lb, ub : 'rV[R]\_n} --- row vectors of length $n$ representing the lower and upper bounds on each variable.
+
+    \item \texttt{constraint : ('I\_n * 'I\_n * 'I\_n)} --- each ReLU constraint is a triple of dependent indices $(b, f, aux)$ representing the basic, forward, and auxiliary variables.
+
+    \item \texttt{tableau : m.-tuple ('rV[R]\_n)} --- a tuple of $m$ row vectors encoding the linear relationships maintained by Marabou's simplex solver.
+
+    \item \texttt{proof tree : ProofTree.t} --- formalised as an inductive type (\autoref{code:proof-tree})with two constructors: \texttt{node}, which carries split information together with left and right subtrees, and \texttt{leaf}, which carries a contradiction vector.
+\begin{lstlisting}[language=Coq, caption={Marabou proof tree as an inductive data type in Rocq.}, label={code:proof-tree}]
+Inductive t : Type :=
+  (*  split information, left child, right child *)
+  | node : Split.t -> t -> t -> t
+  (* contradiction vector *)
+  | leaf : m-tuple R -> t.
+\end{lstlisting}
+
+    \item \texttt{split : Split.t} --- the split information is itself an inductive type (\autoref{code:formalisation-split}), distinguishing single-variable bound tightenings from ReLU phase splits:
+\begin{lstlisting}[language=Coq, caption={Split inductive type for case splits.}, label={code:formalisation-split}]
+Inductive t : Type :=
+  (* variable, value *)
+  | single : 'I_n -> R -> t
+  (* participating relu variables: b, f, aux *)
+  | relu : 'I_n -> 'I_n -> 'I_n -> t.
+\end{lstlisting}
+\end{itemize}
+
+\subsubsection{Parser Implementation}
+
+In the original Imandra development, this is achieved within the same program: since Imandra is embedded in a subset of OCaml, it can leverage OCaml parsing libraries to read and translate the proof certificates directly at execution time. Consequently, no external preprocessing stage is required.
 
 This approach is not directly transferable to Rocq. The proof checker developed in this work is implemented in Gallina, which cannot invoke arbitrary OCaml parsing code during proof checking. Therefore, a separate preprocessing stage was introduced. A Haskell program parses the JSON proof certificates produced by Marabou and generates Rocq source files containing equivalent Gallina definitions. These generated files are then imported into the proof checker, allowing it to reason about the certificates using native Rocq data structures.
 
@@ -47,24 +84,11 @@ The parser translates each JSON field directly into Gallina definitions: bounds 
 \subsection{Proof Checker}
 
 
-The proof checker has exactly one job: to determine whether an UNSAT proof certificate genuinely certifies unsatisfiability. To do so, it operates over the following data, all of which is obtained from the certificate parser in a form of Gallina files. 
+The proof checker has exactly one job: to determine whether an UNSAT proof certificate genuinely certifies unsatisfiability. To do so, it operates over the following data, all of which is obtained from the certificate parser in a form of Gallina files.
 
-\begin{itemize}
-    \item \textbf{Upper and lower bounds.} Vectors $u$ and $l$ assigning an admissible interval to each variable. These define the search space of the verification query.
-    \item \textbf{Constraints.} A collection of linear constraints representing the network's weights, biases, and the property under verification, alongside the ReLU constraints arising from activation functions.
-    \item \textbf{Tableau.} A matrix $T$ encoding the linear relationships between basic and non-basic variables, as maintained by Marabou's simplex engine during the search.
-    \item \textbf{Proof tree.} A binary tree whose internal nodes record case splits (typically over ReLU phases) and whose leaves carry Farkas coefficients that witness the unsatisfiability of the leaf's sub-problem.
-\end{itemize}
 
 As mentioned earlier, the Marabou DNN verifier produces proof certificates in a tree-like structure that the proof checker traverses recursively. \autoref{code:proof-tree} shows the formalisation of Marabou proof trees as an inductive data type. It consists of two constructors: a \texttt{node} and a \texttt{leaf}. Each leaf holds the Farkas contradiction vector, while each node holds the split information required to tighten the bounds, together with references to the left and right child subtrees.
 
-\begin{lstlisting}[language=Coq, caption={Marabou proof tree as an inductive data type in Rocq.}, label={code:proof-tree}]
-Inductive t : Type :=
-  (*  split information, left child, right child *)
-  | node : Split.t -> t -> t -> t
-  (* contradiction vector *)
-  | leaf : (m.+2).-tuple R -> t.
-\end{lstlisting}
 
 The \texttt{check\_tree} function, shown in \autoref{code:check-tree}, recursively traverses the populated proof tree. At each leaf, the proof checker verifies that the provided Farkas coefficients constitute a valid witness of unsatisfiability for the linear constraints under the current bounds. At each internal node, it first tightens the bounds and then checks that the current split is consistent with the constraints before recursively verifying both child subtrees.
 
