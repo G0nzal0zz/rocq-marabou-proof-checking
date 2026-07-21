@@ -10,8 +10,10 @@ Import CertificateSpecs.
 
 Module Split.
 
-Inductive t :=
+Inductive t : Type :=
+  (* variable, value *)
   | single : 'I_n -> R -> t
+  (* participating relu variables: b, f, aux *)
   | relu : 'I_n -> 'I_n -> 'I_n -> t.
 
 (*let update_bounds_from_split (lbs: real list) (ubs: real list) (split: t): *)
