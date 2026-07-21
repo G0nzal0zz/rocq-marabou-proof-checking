@@ -82,9 +82,9 @@ The point at which this translation is performed differs between the two impleme
 \subsection{Proof Checker}
 
 
-The proof checker has exactly one job: to determine whether an UNSAT proof certificate genuinely certifies unsatisfiability. To do so, it operates over the main source of proof, which is the proof tree. As previously mentioned, the inductive type \texttt{ProofTree.t} consists of two constructors: a \texttt{node} and a \texttt{leaf}. Each leaf holds the Farkas contradiction vector, while each node holds the split information required to tighten the bounds, together with references to the left and right child subtrees.
+The entry point for the proof checker is the \texttt{check\_proof\_tree} definition, which constructs the system of equality constraints from the parsed tableau using \texttt{mk\_eq\_constraints} and then passes it to \texttt{check\_tree}. Both functions are shown in \autoref{code:check-tree}.
 
-The entry point for the proof checker is the \texttt{check\_tree} function, shown in \autoref{code:check-tree}, recursively traverses the parsed proof tree. At each leaf, the proof checker verifies that the provided Farkas coefficients constitute a valid witness of unsatisfiability for the linear constraints under the current bounds (line 9). At each internal node, it first tightens the bounds (line 11) and then checks that the current split is consistent with the constraints (line 12) before recursively verifying both child subtrees (lines 13, 14).
+The \texttt{check\_tree} function recursively traverses the parsed proof tree. At each leaf, the proof checker verifies that the provided Farkas coefficients constitute a valid witness of unsatisfiability for the linear constraints under the current bounds (line 9). At each internal node, it first tightens the bounds (line 11) and then checks that the current split is consistent with the constraints (line 12) before recursively verifying both child subtrees (lines 13 and 14). The results of these checks are combined using Boolean conjunction, meaning that a proof tree is accepted only if the split is valid and both child subtrees are successfully verified.
 
 \begin{lstlisting}[language=Coq, caption={Proof checker tree verifier.}, label={code:check-tree}, numbers=left]
 Fixpoint check_tree
@@ -103,13 +103,21 @@ Fixpoint check_tree
     let valid_right := check_tree tableau bounds.2.2 bounds.2.1 constraints tright in
     valid_split && valid_left && valid_right
   end.
+
+Definition check_proof_tree
+  (tableau : m.-tuple ('rV[R]_n))
+  (ub lb : 'rV[R]_n)
+  (constraints : seq Constraint.t)
+  (proof_tree : ProofTree.t)
+  : bool :=
+  check_tree (Cert.mk_eq_constraints tableau) ub lb constraints proof_tree.
 \end{lstlisting}
 
 To determine whether a contradiction vector constitutes a valid proof of unsatisfiability, it is necessary to establish that it is a valid witness. The key contribution of \citet{certified_proof_checker} is the development of a constructive formulation of Farkas lemma in terms of systems of linear polynomial equations. This formulation can then be specialised to the parameters of a DNN verification problem, resulting in a theorem that relates the existence of suitable witness vectors to the unsatisfiability of the corresponding system of linear polynomial equations. These witness vectors form the basis of the UNSAT proof certificates used by Marabou.
 
-The \texttt{check\_contradiction} function, shown in \autoref{code:check-contradiction}, first uses \texttt{\\mk\_system\_contradiction} to create a polynomial representation of the linear constraints from their matrix representation, allowing them to be analysed using the polynomial formulation of Farkas' lemma. It then uses \texttt{mk\_contradiction\_certificate} to compute candidate witnesses, which are subsequently verified by \texttt{check\_cert}.
+The \texttt{check\_contradiction} function, shown in \autoref{code:check-contradiction}, first uses \texttt{\\mk\_system\_contradiction} to create a polynomial representation of the linear constraints from their matrix representation, allowing them to be analysed using the polynomial formulation of Farkas' lemma. It then uses \texttt{mk\_contradiction\_certificate} to compute candidate witnesses, which are subsequently verified by \texttt{check\_cert}. The \texttt{check\_cert} function is based on the Rocq translation of the Farkas development from \citet{certified_proof_checker}, presented in \citet{farkas_rocq}.
 
-\begin{lstlisting}[language=Coq, caption={TODO.}, label={code:check-contradiction}, numbers=left]
+\begin{lstlisting}[language=Coq, caption={Rocq implementation of the contradiction certificate checker.}, label={code:check-contradiction}, numbers=left]
 Definition check_contradiction
   (contradiction : m-tuple R)
   (tableau : system m n)
@@ -121,13 +129,80 @@ Definition check_contradiction
   check_cert sys certificate.
 \end{lstlisting}
 
+Since Marabou uses splits, stored in the proof trees node, to tighten both upper and lower bounds to certify UNSAT in proof tree leafs. We need to replicate the same tightening, while iterating over the proof tree. The function \texttt{update\_bounds\_from\_split} in \autoref{code:update-bounds} takes the current upper and lower bounds, together with a split, and returns a pair of updated bound pairs corresponding to the two resulting branches. For a \texttt{single} split, the bounds are updated according to the specified bound $k$ for variable $i$.
 
+For a \texttt{relu} split, the function considers the two possible phases of the ReLU activation. In the left branch, the ReLU is inactive, and both the pre-activation variable $b$ and the output variable $f$ are constrained to be non-positive. In the right branch, the ReLU is active, and the auxiliary variable is constrained to be non-positive while the pre-activation variable is constrained to be non-negative. These updated bounds are then passed to the corresponding child nodes during the recursive traversal of the proof tree.
 
+\begin{lstlisting}[language=Coq, caption={Rocq implementation of the bound updates associated with a recorded split. The function returns the lower and upper bounds for the two resulting branches.}, label={code:update-bounds}, numbers=left]
+Definition update_bounds_from_split
+  (ubs : 'rV[R]_n)
+  (lbs: 'rV[R]_n)
+  (split : t)
+  : (('rV[R]_n * 'rV[R]_n)  * ('rV[R]_n  * 'rV[R]_n)) :=
+  match split with
+  | single i k => ((lbs, set_nth ubs i k), (set_nth lbs i k, ubs))
+  | relu b f aux =>
+    (* left: inactive phase *)
+    let lbs_l := set_nth lbs f 0%R in
+    let ubs_l := set_nth (set_nth ubs b 0%R) f 0%R in
+    (* right: active phase *)
+    let lbs_r := set_nth (set_nth lbs b 0%R) aux 0%R in
+    let ubs_r := set_nth ubs aux 0%R in
+    ((lbs_l, ubs_l), (lbs_r, ubs_r))
+  end.
+\end{lstlisting}
 
-TODO: DIVE DEEPER INTO THE PROOF CHECKER SYSTEM.
-% The proof checker makes use of dependent types all over the the program.
+Lastly, before proceeding with the recursive call to \texttt{check\_tree} in \autoref{code:check-tree} over the recently computed branches, it is necessary to ensure that the new ReLU split corresponds to a ReLU constraint from the verification query (\autoref{code:check-split}).
+
+\begin{lstlisting}[language=Coq, caption={Split checker that ensures that a ReLU split corresponds to a ReLU constraint.}, label={code:check-split}, numbers=left]
+Definition check_split (split : t) (constraints : seq Constraint.t) : bool :=
+match split with
+| relu b f aux => has (Constraint.constraint_eqb (b, f, aux)) constraints
+| _ => true
+end.
+\end{lstlisting}
+
+If all the steps mentioned previously execute successfully (i.e., return \texttt{true}), the specified proof certificate indeed constitutes a valid proof of unsatisfiability.
 
 \subsection{Proof Checker Soundness}
 
-TODO
+The remaining step towards obtaining a fully certified proof checker is to formally prove that, whenever the \texttt{check\_tree} function accepts a proof certificate as UNSAT, the corresponding verification query is indeed unsatisfiable. \autoref{code:check-tree-soundness} proves this theorem by applying the \texttt{elim} tactic (line 10), which destructs the proof tree into its two possible constructors. The proof then uses the auxiliary lemmas \texttt{check\_tree\_soundness\_node} and \texttt{check\_tree\_soundness\_leaf} (lines 12 and 13) to establish soundness for each case.
+
+\begin{lstlisting}[language=Coq, caption={}, label={code:check-tree-soundness}, breaklines=true, numbers=left]
+Theorem check_tree_soundness
+  (tableau : m.-tuple ('rV[R]_n))
+  (ub lb : 'rV[R]_n)
+  (constraints : seq Constraint.t)
+  (proof_tree : ProofTree.t)
+  (x : 'rV[R]_n) :
+  Checker.check_proof_tree tableau ub lb constraints proof_tree
+  -> Sat.unsat tableau ub lb constraints x.
+Proof.
+elim: proof_tree ub lb => [split tleft IHleft tright IHright | contradiction] ub lb.
+- rewrite /Checker.check_proof_tree in IHleft IHright.
+  by apply: (check_tree_soundness_node tableau ub lb constraints split tleft tright x IHleft IHright).
+- by apply: (check_tree_soundness_leaf tableau ub lb constraints contradiction x).
+Qed.
+\end{lstlisting}
+
+
+\begin{lstlisting}[language=Coq, caption={}, label={code:check-tree-soundness-leaf}, breaklines=true, numbers=left]
+Theorem check_tree_soundness
+  (tableau : m.-tuple ('rV[R]_n))
+  (ub lb : 'rV[R]_n)
+  (constraints : seq Constraint.t)
+  (proof_tree : ProofTree.t)
+  (x : 'rV[R]_n) :
+  Checker.check_proof_tree tableau ub lb constraints proof_tree
+  -> Sat.unsat tableau ub lb constraints x.
+Proof.
+elim: proof_tree ub lb => [split tleft IHleft tright IHright | contradiction] ub lb.
+- rewrite /Checker.check_proof_tree in IHleft IHright.
+  by apply: (check_tree_soundness_node tableau ub lb constraints split tleft tright x IHleft IHright).
+- by apply: (check_tree_soundness_leaf tableau ub lb constraints contradiction x).
+Qed.
+\end{lstlisting}
+
+
+
 
