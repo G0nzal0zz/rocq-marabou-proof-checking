@@ -22,17 +22,11 @@ Module Checker.
 Definition check_contradiction
   (contradiction : (m.+2).-tuple R)
   (tableau : system m n)
-  (upper_bounds : 'rV[R]_n)
+  (ub lb : 'rV[R]_n)
   (lower_bounds : 'rV[R]_n)
   : bool :=
-  let sys := Cert.mk_system_contradiction tableau upper_bounds lower_bounds in
-  let certificate := Cert.mk_contradiction_certificate contradiction tableau upper_bounds lower_bounds in
-  (* WARN:
-     `check_cert` expects `sys` and `certificate` to have the same size.
-     But `sys` and `certificate` both have different sizes.
-     It should be investigated if this fact is an error in my implementation or
-     if the function `check_cert` should expect both arguments to have different sizes.
-  *)
+  let sys := Cert.mk_system_contradiction tableau ub lb in
+  let certificate := Cert.mk_contradiction_certificate contradiction tableau ub lb in
   check_cert sys certificate.
 
 Fixpoint check_tree
