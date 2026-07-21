@@ -2,15 +2,13 @@
 
 \section{Background} \label{sec:background}
 
-\todo[inline]{Should I add a parent "Literature Review" section?}
-
 \subsection{Neural Networks} \mbox{}\\
 
 Neural networks can be traced back to 1943, when McCulloch and Pitts proposed a mathematical model of a biological neuron \cite{ideas_immanent_in_nervous_activity}. Rosenblatt extended this concept in 1958 with the introduction of the Perceptron \cite{perceptron}. The field did not see much progress until the 1980s, when the backpropagation algorithm was popularised \cite{backpropagation}. Over recent years, advances in hardware capabilities have enabled neural networks to perform more complex tasks, leading to their adoption as state-of-the-art solutions across a wide range of applications, including medical diagnosis, autonomous driving, and image recognition.
 
 A feedforward neural network, as it is known today, can be viewed as a directed acyclic graph in which each node, or neuron, performs a computation. \cref{fig:neural-network} illustrates a simple neural network, which can be divided into layers: the left-most layer is called the input layer, and the right-most layer is called the output layer. The layers between the input and output layers are referred to as hidden layers. Each neuron receives one or more inputs, computes a weighted sum followed by an activation function, and passes the resulting output to neurons in the subsequent layer.
 
-To compute the output of a neural network, the input layer propagates the input $x$ forward through its successive layers $h$. At every stage, intermediate results are computed and passed to the next layer until the final output layer $\hat{y}$ is reached. This process is commonly referred to as forward propagation.
+To compute the output of a neural network, the input layer propagates the input $x$ forward through its successive layers. At every stage, intermediate results are computed and passed to the next layer until the final output layer $\hat{y}$ is reached. This process is commonly referred to as forward propagation.
 
 \input{components/diagrams/neural_network.tex}
 
@@ -18,13 +16,26 @@ Since neural networks are graphs, there is no constraint regarding the number of
 
 \input{components/diagrams/mlp.tex}
 
-Neural networks can be modelled as mathematical functions that map a set of real-valued inputs to real-valued outputs. Formally, a neural network can be defined as:
+Neural networks can be modelled as mathematical functions that map real-valued inputs to real-valued outputs. Formally, a neural network can be defined as:
 \[
-N : \mathbb{R}^{k_I} \rightarrow \mathbb{R}^{k_O}
+N : \mathbb{R}^{k_I} \rightarrow \mathbb{R}^{k_O},
 \]
-where $k_I$ and $k_O$ denote the dimensions of the input and output spaces, respectively. The input is represented as a vector $x_I = (x_1, \ldots, x_{k_I})$, and the output as $x_O = (y_1, \ldots, y_{k_O})$.
 
-Each layer in a neural network performs a two-step computation: a linear transformation followed by a non-linear activation function. More specifically, given an input vector, each layer applies a weighted sum combined with a bias term, and then passes the result through a non-linear function such as the Rectified Linear Unit (ReLU). This layered structure enables neural networks to approximate complex, non-linear functions.
+where $k_I$ and $k_O$ denote the dimensions of the input and output spaces, respectively. The input is represented as a vector $x = (x_1, \ldots, x_{k_I})$, and the output as a vector $y = (y_1, \ldots, y_{k_O})$.
+
+Each neuron in a neural network performs two main operations. First, it computes a weighted sum of its inputs, as shown in \autoref{eq:neuron-computation}. The result is then passed through a non-linear activation function, as shown in \autoref{eq:activation-computation}. More specifically, for a neuron $v_j$, the weighted sum $z(v_j)$ is computed over the incoming edges $E$ of the form $\{(v_i, v_j)\}$, and the resulting value $f(v_j)$ is then passed through an activation function $a$, such as the Rectified Linear Unit (ReLU).
+
+\begin{equation}
+z(v_j) = \sum_{(v_i, v_j) \in E} w(v_i, v_j) \cdot f(v_i)
+\label{eq:neuron-computation}
+\end{equation}
+
+\begin{equation}
+f(v_j) = a_{v_j}(z(v_j))
+\label{eq:activation-computation}
+\end{equation}
+
+
 
 \subsection{DNNs}
 
@@ -54,10 +65,7 @@ Consider, for example, a DNN trained to detect the presence of a vehicle in an i
     \label{fig:autonomous-driving-altered-pixels}
 \end{figure}
 
-
 Formal verification addresses the already stated concern by providing mathematical guarantees about the behaviour of a DNN. Rather than sampling a finite set of inputs, it reasons over entire regions of the input space, ensuring that any input within a defined region will map to an output within a defined region.
-
-A DNN verification query is the formal problem that a DNN verifier attempts to solve. It is comprised of a neural network $N$, a pre-condition $P$ that constrains the admissible inputs, and a post-condition $Q$ that specifies a desired property of the outputs. The verifier must determine whether there exists an input $x$ satisfying $P$ for which $N(x)$ violates $Q$.
 
 DNN verification methods can be broadly classified into complete and incomplete approaches \cite{algorithms_for_verifying_dnns}. Both are sound, meaning that if the algorithm reports that a property holds, it is guaranteed to do so. Complete approaches additionally guarantee that if a property holds, the algorithm will always detect it. Incomplete approaches, by contrast, may fail to verify a property even when it holds, as they rely on over-approximations that can be overly conservative.
 
@@ -78,6 +86,45 @@ set of reachable values through the network, rather than reasoning about exact
 values. Instead of encoding the network as a set of constraints, it represents
 sets of possible inputs and outputs as geometric shapes, and propagates them
 through the network layer by layer.
+
+\subsubsection{Queries} \label{sec:queries}
+
+A DNN verification query is the formal problem that a DNN verifier attempts to solve. It comprises a neural network $N$, a pre-condition $P$ that constrains the admissible inputs, and a post-condition $Q$ that specifies a desired property of the outputs. The verifier must determine whether there exists an input $x$ satisfying $P$ for which $N(x)$ violates $Q$.
+
+One of the most important and successful DNN verification algorithms is the Reluplex algorithm. Reluplex makes can be summarised by the following components:
+
+\begin{itemize}
+    \item A variable vector $x$, which contains all the variables in the input $x_I$ and output $x_O$ vectors, as well as $x_{z(v_i)}$ and $x_{f(v_i)}$ for all hidden neurons. Furthermore, for each neuron with the ReLU activation function, an auxiliary variable $x_{\mathrm{aux}_i}$ is also added.
+
+    \item Lower and upper bound vectors for each element in $x$. The values corresponding to the variables in $x_I$ and $x_O$ are given by the verification query, whereas the bounds for the remaining variables are calculated by propagating the lower and upper bounds of $x_I$ through the network using \autoref{eq:neuron-computation} and \autoref{eq:activation-computation}. The auxiliary variables are related to the network variables through \autoref{eq:weighted-sum} and \autoref{eq:relu-auxiliary}.
+
+    \item A matrix $A$, called the tableau, representing a system of equations for each non-input node $v_i$. These equations are given by:
+
+    \begin{equation}
+        \sum_{(v_i, v_j) \in E}
+        w(v_i, v_j) \cdot x_{f(v_i)}
+        - x_{z(v_i)}
+        = 0
+        \label{eq:weighted-sum}
+    \end{equation}
+
+    \begin{equation}
+        x_{f(v_i)}
+        - x_{z(v_i)}
+        - x_{\mathrm{aux}_i}
+        = 0
+        \label{eq:relu-auxiliary}
+    \end{equation}
+
+    The matrix $A$ has dimensions $m \times n$, where $n$ is the size of the vector $x$, and $m$ is the number of equations generated by \autoref{eq:weighted-sum} and \autoref{eq:relu-auxiliary}.
+
+    \item A set $C$ of ReLU constraints for all non-input neurons in $x$. Each constraint represents the relationship between the weighted sum of a neuron and its output after applying the ReLU activation function. For a neuron $v_i$, this relationship is given by:
+    \[
+    x_{f(v_i)} = \operatorname{ReLU}(x_{z(v_i)}).
+    \]
+    These constraints ensure that the values assigned to the variables in $x$ are consistent with the behaviour of the neural network. The ReLU constraints can be combined into a single conjunction $C(x)$, which is satisfied when all the variables in $x$ satisfy their corresponding ReLU constraints.
+\end{itemize}
+
 
 \subsection{SMT Solvers}
 
