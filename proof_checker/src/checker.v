@@ -23,7 +23,6 @@ Definition check_contradiction
   (contradiction : (m.+2).-tuple R)
   (tableau : system m n)
   (ub lb : 'rV[R]_n)
-  (lower_bounds : 'rV[R]_n)
   : bool :=
   let sys := Cert.mk_system_contradiction tableau ub lb in
   let certificate := Cert.mk_contradiction_certificate contradiction tableau ub lb in
@@ -62,12 +61,11 @@ Fixpoint check_tree
 
 Definition check_proof_tree
   (tableau : (m.+2).-tuple ('rV[R]_n))
-  (upper_bounds : 'rV[R]_n)
-  (lower_bounds : 'rV[R]_n)
+  (ub lb : 'rV[R]_n)
   (constraints : seq Constraint.t)
   (proof_tree : ProofTree.t)
   : bool :=
-  check_tree (Cert.mk_eq_constraints tableau) upper_bounds lower_bounds constraints proof_tree.
+  check_tree (Cert.mk_eq_constraints tableau) ub lb constraints proof_tree.
 
 End Checker.
 
