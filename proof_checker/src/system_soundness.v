@@ -12,8 +12,6 @@ Import CertificateSpecs GRing.Theory Num.Theory.
 
 Open Scope ring_scope.
 
-Print mul_col_row.
-
 Module SystemSoundness.
 
 Lemma dot_product_eq_kernel (hd : 'rV[R]_n) (x : 'rV[R]_n) :
@@ -48,39 +46,59 @@ Proof.
   by rewrite dot_product_eq_kernel.
 Qed.
 
+Lemma mk_bound_poly_last (i : 'I_n) (coeff bound : R) :
+  (Cert.mk_bound_poly n i coeff bound) 0 ord_max = bound.
+Proof. by rewrite /Cert.mk_bound_poly mxE /=. Qed.
+
+
+Lemma mk_bound_poly_i (i : 'I_n) (coeff bound : R) :
+  (Cert.mk_bound_poly n i coeff bound) 0 (widen_ord (leqnSn n) i) = coeff.
+Proof.
+  rewrite /Cert.mk_bound_poly mxE /=.
+  have H : (widen_ord (leqnSn n) i : nat) != n
+    by rewrite neq_ltn (ltn_ord i).
+  by rewrite (negbTE H) /widen_ord /= eqxx.
+Qed.
+
+Search (_ == _ _).
+Lemma mk_bound_poly_j (i j : 'I_n) (coeff bound : R) : i != j ->
+  (Cert.mk_bound_poly n i coeff bound) 0 (widen_ord (leqnSn n) j) = 0.
+Proof.
+  move=> Hij.
+  rewrite /Cert.mk_bound_poly mxE /=.
+  have Hn : (widen_ord (leqnSn n) j : nat) != n
+    by rewrite neq_ltn (ltn_ord j).
+  rewrite (negbTE Hn).
+  have Hji : (widen_ord (leqnSn n) j : nat) != (i : nat)
+    by rewrite /widen_ord /= eq_sym.
+  by rewrite (negbTE Hji).
+Qed.
+
+Lemma ext_col_mx_last (x : 'rV[R]_n) :
+  (Arithmetic.cv_addn1_succ (col_mx (trmx x) 1%:M)) ord_max 0 = 1.
+Proof. exact: FarkasSoundness.col_mx_max1. Qed.
+
+Lemma ext_col_mx_i (x : 'rV[R]_n) (i : 'I_n) :
+  (Arithmetic.cv_addn1_succ (col_mx (trmx x) 1%:M)) (widen_ord (leqnSn n) i) 0 = x 0 i.
+Proof.
+  rewrite /Arithmetic.cv_addn1_succ castmxE.
+  have Hcast : cast_ord (esym (addn1 n)) (widen_ord (leqnSn n) i) = lshift 1 i
+    by exact/val_inj.
+  by rewrite Hcast col_mxEu mxE cast_ord_id.
+Qed.
+
 Lemma dot_product_mk_bound_poly (i : 'I_n) (coeff bound : R) (x : 'rV[R]_n) :
   Arithmetic.dot_product (Cert.mk_bound_poly n i coeff bound)
     (Arithmetic.cv_addn1_succ (col_mx (trmx x) 1%:M))
   = coeff * x 0 i + bound.
 Proof.
-  rewrite /Arithmetic.dot_product mxE big_ord_recr.
-  have Hlast : (Cert.mk_bound_poly n i coeff bound) 0 ord_max *
-    (Arithmetic.cv_addn1_succ (col_mx (trmx x) 1%:M)) ord_max 0 = bound.
-  {
-    have -> : (Cert.mk_bound_poly n i coeff bound) 0 ord_max = bound.
-    { by rewrite /Cert.mk_bound_poly mxE /=. }
-    by rewrite FarkasSoundness.col_mx_max1 mulr1.
-  }
-  rewrite Hlast.
-  rewrite [X in X + _ = _](bigD1 i) //=.
-  rewrite /Cert.mk_bound_poly mxE /=.
-  have H_not_n : (widen_ord (leqnSn n) i : nat) != n.
-    by rewrite /widen_ord /= neq_ltn (ltn_ord i).
-  rewrite (negbTE H_not_n) /widen_ord /= eqxx.
-  rewrite /Arithmetic.cv_addn1_succ castmxE.
-  have Hcast : cast_ord (esym (addn1 n)) (widen_ord (leqnSn n) i) = lshift 1 i.
-    exact/val_inj.
-  rewrite Hcast col_mxEu mxE cast_ord_id.
-  rewrite big1 => [|k Hk]; last first.
-   rewrite /Cert.mk_bound_poly mxE /=.
-    have H_not_n' : (widen_ord (leqnSn n) k : nat) != n.
-      by rewrite /widen_ord /= neq_ltn (ltn_ord k).
-    rewrite (negbTE H_not_n').
-    have H_not_i : (widen_ord (leqnSn n) k : nat) != (i : nat).
-      by rewrite /widen_ord /=.
-    by rewrite (negbTE H_not_i) mul0r.
-  rewrite addr0.
-  reflexivity.
+  rewrite /Arithmetic.dot_product mxE big_ord_recr /=.
+  rewrite mk_bound_poly_last ext_col_mx_last mulr1.
+  rewrite (bigD1 i) //= mk_bound_poly_i ext_col_mx_i.
+  rewrite big1 => [|j Hji].
+    - by rewrite addr0.
+    - have Hij : i != j by rewrite eq_sym in Hji.
+        by rewrite mk_bound_poly_j // mul0r.
 Qed.
 
 Lemma system_soundness_geq
