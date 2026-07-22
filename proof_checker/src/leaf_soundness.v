@@ -85,7 +85,7 @@ Qed.
 [@@fc]
 [@@timeout 90] *)
 (* WARN: This lemma is not being used *)
-Lemma soundness_eval_sys_composition_unused
+Lemma soundness_eval_sys_composition
   (tableau : (m.+2).-tuple ('rV[R]_n))
   (ub lb : 'rV[R]_n)
   (x : 'rV[R]_n) :

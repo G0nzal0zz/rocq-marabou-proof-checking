@@ -6,5 +6,6 @@
            mathcomp.algebra
            elpi
            elpi_elpi
-           HB)
+           HB
+           dpdgraph)
  (flags -w -all))
