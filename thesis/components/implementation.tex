@@ -185,6 +185,14 @@ elim: proof_tree ub lb => [split tleft IHleft tright IHright | contradiction] ub
 Qed.
 \end{lstlisting}
 
+\autoref{fig:rocq-graph} shows the dependency graph of all the lemmas used to prove the soundness of the proof checker. The graph can be followed from top to bottom, from the main theorem \texttt{check\_tree\_soundness} to the corollary lemmas used to prove it, and from left to right, from the leaf soundness lemmas to the tree node lemmas. For example, the \texttt{SystemSoundness} module proves facts about the tableau system of linear polynomial equations for the leaf case, while the \texttt{SplitSoundness} module proves the correctness of the case splits for the node case.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\textwidth]{images/rocq_graph.png}
+  \caption{Dependency graph of the lemmas used to prove the soundness of the Rocq proof checker. Yellow boxes represent modules, green circles represent proved lemmas, arrows indicate that a lemma depends on another lemma, and multi-circled nodes denote lemmas that are not used in the final soundness proof.}
+  \label{fig:rocq-graph}
+\end{figure}
 
 \begin{lstlisting}[language=Coq, caption={}, label={code:check-tree-soundness-leaf}, breaklines=true, numbers=left]
 Theorem check_tree_soundness
@@ -203,6 +211,7 @@ elim: proof_tree ub lb => [split tleft IHleft tright IHright | contradiction] ub
 Qed.
 \end{lstlisting}
 
+The check_
 
 
 
