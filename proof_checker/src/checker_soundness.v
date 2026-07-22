@@ -1,4 +1,4 @@
-From mathcomp Require Import all_ssreflect all_fingroup all_algebra zmodp ssrnum ssrnat matrix eqtype.
+From mathcomp Require Import all_ssreflect all_algebra.
 
 Require Import certificate_specs.
 Require Import farkas.
