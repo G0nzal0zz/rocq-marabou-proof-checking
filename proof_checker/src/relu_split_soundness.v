@@ -39,16 +39,16 @@ Proof.
   have [Hif | Hif] := boolP (i == f).
   - move/eqP: Hif => Hif; subst i.
     have Hxf : x 0 f = 0%R.
-    + move/eqP: Hmax; rewrite /Relu.compute_relu => Hxf_eq.
+      move/eqP: Hmax; rewrite /Relu.compute_relu => Hxf_eq.
       have Hmax0 : Num.max (x 0 b) 0 = 0 by apply/maxr_idPr; exact Hxb.
       by rewrite Hmax0 in Hxf_eq.
-    + by rewrite Hxf; apply/andP; split => //; exact/lexx.
+    by rewrite Hxf; apply/andP; split => //; exact/lexx.
   - have [Hib | Hib] := boolP (i == b).
-    + move/eqP: Hib => Hib; subst i.
+      move/eqP: Hib => Hib; subst i.
       move: (Hbound b) => /andP [Hlb Hub].
       by rewrite Hlb Hxb.
-    + move: (Hbound i) => /andP [Hlb Hub].
-      by apply/andP; split.
+    move: (Hbound i) => /andP [Hlb Hub].
+    by apply/andP; split.
 Qed.
 
 Lemma bounded_active_phase
@@ -64,20 +64,20 @@ Proof.
   have Hxf_b : x 0 f = x 0 b.
   - move/eqP: Hmax; rewrite /Relu.compute_relu => Hxf_eq.
     have Hmax_b : Num.max (x 0 b) 0 = x 0 b.
-      + rewrite Order.TotalTheory.maxC; apply/maxr_idPr; exact Hxb.
+      rewrite Order.TotalTheory.maxC; apply/maxr_idPr; exact Hxb.
     by rewrite Hmax_b in Hxf_eq.
   - have Hxaux0 : x 0 aux = 0%R.
-    + move/eqP: Haux => Haux_eq; rewrite Hxf_b addrK in Haux_eq; exact Haux_eq.
-    + apply/forallP => i; rewrite /ubs_r /lbs_r /set_nth_vector !mxE /=.
-      have [Hiaux | Hiaux] := boolP (i == aux).
-      * move/eqP: Hiaux => Hiaux; subst i.
-        rewrite Hxaux0; apply/andP; split => //; exact/lexx.
-      * have [Hib | Hib] := boolP (i == b).
-        -- move/eqP: Hib => Hib; subst i.
-           move: (Hbound b) => /andP [Hlb Hub].
-           by rewrite Hxb Hub.
-      * move: (Hbound i) => /andP [Hlb Hub].
-        by apply/andP; split.
+      move/eqP: Haux => Haux_eq; rewrite Hxf_b addrK in Haux_eq; exact Haux_eq.
+    apply/forallP => i; rewrite /ubs_r /lbs_r /set_nth_vector !mxE /=.
+    have [Hiaux | Hiaux] := boolP (i == aux).
+      move/eqP: Hiaux => Hiaux; subst i.
+      rewrite Hxaux0; apply/andP; split => //; exact/lexx.
+    have [Hib | Hib] := boolP (i == b).
+      move/eqP: Hib => Hib; subst i.
+      move: (Hbound b) => /andP [Hlb Hub].
+      by rewrite Hxb Hub.
+    move: (Hbound i) => /andP [Hlb Hub].
+    by apply/andP; split.
 Qed.
 
 Lemma eval_relu_inequalities (b f aux : 'I_n) (x : 'rV[R]_n) :
@@ -88,22 +88,22 @@ Proof.
   have Hphase: (x 0 b <= 0) || (0 <= x 0 b) := Order.TotalTheory.le_total (x 0 b) 0.
   case/orP: Hphase => Hx.
   - have Hmax0 : Relu.compute_relu (x 0 b) = 0.
-    + rewrite /Relu.compute_relu; apply/maxr_idPr; exact Hx.
+      rewrite /Relu.compute_relu; apply/maxr_idPr; exact Hx.
     have Hf0 : x 0 f = 0.
-    + by move/eqP: Hf; rewrite Hmax0.
+      by move/eqP: Hf; rewrite Hmax0.
     have Haux_nonneg : 0 <= x 0 aux.
-    + move/eqP: Haux => Haux_eq.
+      move/eqP: Haux => Haux_eq.
       rewrite Hf0 subr0 in Haux_eq.
       have Haux_val : x 0 aux = - (x 0 b).
-      * move/eqP: Haux_eq; rewrite addr_eq0; move/eqP; by [].
+        move/eqP: Haux_eq; rewrite addr_eq0; move/eqP; by [].
       rewrite Haux_val; rewrite (oppr_ge0 (x 0 b)); exact Hx.
-    + right; split; [exact Hx | exact Hf0 | exact Haux_nonneg].
+    right; split; [exact Hx | exact Hf0 | exact Haux_nonneg].
   - have Hmax_b : Relu.compute_relu (x 0 b) = x 0 b.
-    + rewrite /Relu.compute_relu; rewrite Order.TotalTheory.maxC; apply/maxr_idPr; exact Hx.
+      rewrite /Relu.compute_relu; rewrite Order.TotalTheory.maxC; apply/maxr_idPr; exact Hx.
     have Hf_b : x 0 f = x 0 b.
-    + by move/eqP: Hf; rewrite Hmax_b.
+      by move/eqP: Hf; rewrite Hmax_b.
     have Haux0 : x 0 aux = 0.
-    + move/eqP: Haux => Haux_eq.
+      move/eqP: Haux => Haux_eq.
       rewrite Hf_b addrK in Haux_eq.
       exact Haux_eq.
     left; split; [rewrite Hf_b; exact Hx | exact Haux0 | by rewrite Hf_b].
@@ -128,15 +128,15 @@ Proof.
   clear H_split.
   have Heval : Relu.eval_relu b f aux x.
   - have Hc_eval : Relu.eval_relu c.1.1 c.1.2 c.2 x.
-    + move: Hc_in H_constraints.
-      elim: constraints => [|c' cs IH] Hc_in H_all.
+     move: Hc_in H_constraints.
+     elim: constraints => [|c' cs IH] Hc_in H_all.
       * by case: Hc_in.
       * move: Hc_in => /predU1P [->|Hc_in_cs].
         -- have /andP [Heval_c' _] : Constraint.check_relu_constraints (c' :: cs) x := H_all.
            exact Heval_c'.
         -- have /andP [_ H_cs] : Constraint.check_relu_constraints (c' :: cs) x := H_all.
            exact: IH Hc_in_cs H_cs.
-    + by rewrite -Heq_c' in Hc_eval.
+    by rewrite -Heq_c' in Hc_eval.
   - have Hphase := eval_relu_phase b f aux x Heval.
     case/orP: Hphase => Hx.
     + apply/orP; left; exact: bounded_inactive_phase Hx H_bound Heval.
