@@ -1,0 +1,151 @@
+\begin{table}[ht]
+\centering
+\label{tab:imandra-formal-results}
+\scriptsize
+\begin{tabularx}{\textwidth}{
+    @{}
+    p{0.20\textwidth}
+    p{0.26\textwidth}
+    c
+    c
+    X
+    @{}
+}
+\toprule
+\textbf{Result} &
+\textbf{Module name} &
+\textbf{L.O.C} &
+\textbf{Aux. Lem.} &
+\textbf{Dependencies} \\
+\midrule
+
+Poly Farkas lemma
+&
+farkas.iml
+&
+194
+&
+21
+&
+Imandra Standard Libraries: Real, List, Polynomials
+\\
+\midrule
+
+Sound application of DNN polynomial Farkas lemma
+&
+\begin{tabular}[t]{@{}l@{}}
+well\_formed\_reduction.iml\\
+bound\_reduction.iml\\
+tableau\_reduction.iml
+\end{tabular}
+&
+\begin{tabular}[t]{@{}c@{}}
+41\\
+359\\
+356
+\end{tabular}
+&
+13
+&
+\begin{tabular}[t]{@{}l@{}}
+farkas.iml, certificate.iml,\\
+arithmetic.iml, util.iml,\\
+tightening.iml, constraint.iml,\\
+proof\_tree.iml, checker.iml,\\
+bound\_reduct\_g.iml,\\
+mk\_bound\_poly.iml
+\end{tabular}
+\\
+\midrule
+
+Soundness of leaf checking
+&
+leaf\_soundness.iml
+&
+145
+&
+40
+&
+\begin{tabular}[t]{@{}l@{}}
+sat.iml, split.iml,\\
+bound\_reduction.iml,\\
+well\_formed\_reduction.iml,\\
+tableau\_reduction.iml
+\end{tabular}
+\\
+\midrule
+
+Single variable splits are covering
+&
+single\_var\_split\_soundness.iml
+&
+81
+&
+10
+&
+\\
+\midrule
+
+ReLU splits are covering
+&
+\begin{tabular}[t]{@{}l@{}}
+relu\_split\_soundness.iml\\
+relu\_case\_1\_bounded.iml\\
+relu\_case\_2\_bounded.iml
+\end{tabular}
+&
+\begin{tabular}[t]{@{}c@{}}
+113\\
+337\\
+338
+\end{tabular}
+&
+18
+&
+relu.iml
+\\
+\midrule
+
+Soundness of node checking
+&
+node\_soundness.iml
+&
+78
+&
+19
+&
+\begin{tabular}[t]{@{}l@{}}
+relu\_split\_soundness.iml,\\
+single\_var\_split\_soundness.iml
+\end{tabular}
+\\
+\midrule
+
+Soundness
+&
+checker\_soundness.iml
+&
+71
+&
+146
+&
+\begin{tabular}[t]{@{}l@{}}
+leaf\_soundness.iml,\\
+node\_soundness.iml
+\end{tabular}
+\\
+\midrule
+
+\textbf{Total:}
+&
+&
+\textbf{2113}
+&
+\textbf{267}
+&
+\\
+
+\bottomrule
+\end{tabularx}
+\caption{Summary of the Imandra formalisation. Extracted from \citet{certified_proof_checker}}
+\end{table}

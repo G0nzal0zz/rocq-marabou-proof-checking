@@ -1,0 +1,152 @@
+\begin{table}[ht]
+\label{tab:rocq-formal-results}
+\centering
+\scriptsize
+\begin{tabularx}{\textwidth}{
+    @{}
+    p{0.20\textwidth}
+    p{0.26\textwidth}
+    c
+    c
+    X
+    @{}}
+\toprule
+\textbf{Result} &
+\textbf{Module name} &
+\textbf{L.O.C} &
+\textbf{Aux. Lem.} &
+\textbf{Dependencies} \\
+\midrule
+
+Poly Farkas lemma
+&
+farkas\_soundness.v
+&
+180
+&
+15
+&
+mathcomp (ssreflect, algebra),
+certificate\_specs.v,
+arithmetic.v, farkas.v
+\\
+\midrule
+
+Sound application of DNN polynomial Farkas lemma
+&
+system\_soundness.v
+&
+124
+&
+10
+&
+mathcomp (ssreflect, algebra, fingroup),
+certificate\_specs.v, certificate.v,
+arithmetic.v, farkas.v,
+farkas\_soundness.v, constraint.v,
+util.v
+\\
+\midrule
+
+Soundness of leaf checking
+&
+leaf\_soundness.v
+&
+167
+&
+6
+&
+mathcomp (ssreflect, algebra),
+certificate\_specs.v, proof\_tree.v,
+constraint.v, certificate.v,
+checker.v, farkas.v,
+farkas\_soundness.v, sat.v,
+arithmetic.v, system\_soundness.v
+\\
+\midrule
+
+Single variable splits are covering
+&
+single\_var\_split\_soundness.v
+&
+82
+&
+4
+&
+mathcomp (ssreflect, algebra),
+certificate\_specs.v, split.v,
+sat.v, arithmetic.v, util.v
+\\
+\midrule
+
+ReLU splits are covering
+&
+\begin{tabular}[t]{@{}l@{}}
+relu\_split\_soundness.v\\
+\end{tabular}
+&
+\begin{tabular}[t]{@{}c@{}}
+123
+\end{tabular}
+&
+7
+&
+mathcomp (ssreflect, algebra),
+certificate\_specs.v, split.v,
+sat.v, arithmetic.v, util.v,
+single\_var\_split\_soundness.v
+\\
+\midrule
+
+Soundness of node checking
+&
+\begin{tabular}[t]{@{}l@{}}
+node\_soundness.v\\
+split\_soundness.v
+\end{tabular}
+&
+\begin{tabular}[t]{@{}c@{}}
+68\\
+70
+\end{tabular}
+&
+4
+&
+mathcomp (ssreflect, algebra),
+certificate\_specs.v, split.v,
+sat.v, constraint.v,
+single\_var\_split\_soundness.v,
+relu\_split\_soundness.v
+\\
+\midrule
+
+Soundness
+&
+checker\_soundness.v
+&
+164
+&
+6
+&
+mathcomp (ssreflect, algebra),
+certificate\_specs.v, farkas.v,
+constraint.v, proof\_tree.v,
+checker.v, sat.v, certificate.v,
+split.v, leaf\_soundness.v,
+node\_soundness.v
+\\
+\midrule
+
+\textbf{Total:}
+&
+&
+\textbf{978}
+&
+\textbf{52}
+&
+\\
+
+\bottomrule
+\end{tabularx}
+\caption{Summary of the Rocq formalisation.}
+\end{table}
