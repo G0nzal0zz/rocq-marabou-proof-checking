@@ -1,1 +1,17 @@
 \section{Conclusion} \label{sec:conclusion}
+
+This dissertation set out to make certified DNN verification accessible within a mature, open-source interactive theorem prover by reimplementing Marabou's proof checker from Imandra into Rocq. The resulting implementation, comprising a certificate parser, a dependent-type-based proof checker, and a soundness theorem verified by Rocq's kernel, demonstrates that the translation is not only feasible but yields a significantly more compact formalisation. The Rocq checker achieves the same verification goals as the Imandra baseline with substantially less code and fewer auxiliary lemmas, reductions attributable to dependent types that encode structural invariants directly and to MathComp's pre-verified algebraic hierarchy.
+
+However, these gains come with trade-offs. The proof checker cannot be executed efficiently due to MathComp's matrix representation, and it lacks support for theory-lemma-based bound tightening. More fundamentally, the project highlights that the choice of ITP fundamentally shapes the structure and cost of a verification effort: Rocq's expressiveness reduces the volume of proof code but demands more explicit tactic-level guidance, while Imandra's automation reduces human effort per lemma but requires more lemmas to guide the prover. Both approaches are viable, and the choice between them depends on whether ecosystem maturity and proof compactness or automation and executability are prioritised.
+
+By making the proof checker available in Rocq, this work integrates certified DNN verification into an established verification ecosystem with a large community and extensive libraries, laying a foundation for future developments in this direction.
+
+\subsection{Future Work} \label{sec:future-work}
+
+There are multiple different areas where the presented work can be extended. The first and foremost track would be optimising the current implementation of the proof checker in order to eradicate the abusive memory consumption. We have identified multiple different plausible solutions which could be carried out:
+\begin{itemize}
+	\item TODO
+\end{itemize}
+
+Another succint development which would hel
+
