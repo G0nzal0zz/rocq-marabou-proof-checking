@@ -309,3 +309,49 @@ abstract="We describe a step-by-step approach to the implementation and formal v
 isbn="978-3-642-32347-8"
 }
 
+@manual{rocq_primitive_objects,
+  author       = {{The Rocq Prover Development Team}},
+  title        = {Primitive Objects},
+  organization = {The Rocq Prover},
+  year         = {2026},
+  url          = {https://rocq-prover.org/doc/master/refman/language/core/primitive.html},
+  note         = {Rocq Prover Reference Manual}
+}
+
+@article{foreign_function_interface_rocq_c,
+author = {Korkut, Joomy and Stark, Kathrin and Appel, Andrew W.},
+title = {A Verified Foreign Function Interface between Coq and C},
+year = {2025},
+issue_date = {January 2025},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+volume = {9},
+number = {POPL},
+url = {https://doi.org/10.1145/3704860},
+doi = {10.1145/3704860},
+abstract = {One can write dependently typed functional programs in Coq, and prove them correct in Coq; one can write low-level programs in C, and prove them correct with a C verification tool. We demonstrate how to write programs partly in Coq and partly in C, and interface the proofs together. The Verified Foreign Function Interface (VeriFFI) guarantees type safety and correctness of the combined program. It works by translating Coq function types (and constructor types) along with Coq functional models into VST function-specifications; if the user can prove in VST that the C functions satisfy those specs, then the C functions behave according to the user-specified functional models (even though the C implementation might be very different) and the proofs of Coq functions that call the C code can rely on that behavior. To achieve this translation, we employ a novel, hybrid deep/shallow description of Coq dependent types.},
+journal = {Proc. ACM Program. Lang.},
+month = jan,
+articleno = {24},
+numpages = {31},
+keywords = {foreign function interface, Coq, C}
+}
+
+@InProceedings{vehicle,
+  author =	{Daggitt, Matthew L. and Kokke, Wen and Atkey, Robert and Komendantskaya, Ekaterina and Slusarz, Natalia and Arnaboldi, Luca},
+  title =	{{Vehicle: Bridging the Embedding Gap in the Verification of Neuro-Symbolic Programs}},
+  booktitle =	{10th International Conference on Formal Structures for Computation and Deduction (FSCD 2025)},
+  pages =	{2:1--2:20},
+  series =	{Leibniz International Proceedings in Informatics (LIPIcs)},
+  ISBN =	{978-3-95977-374-4},
+  ISSN =	{1868-8969},
+  year =	{2025},
+  volume =	{337},
+  editor =	{Fern\'{a}ndez, Maribel},
+  publisher =	{Schloss Dagstuhl -- Leibniz-Zentrum f{\"u}r Informatik},
+  address =	{Dagstuhl, Germany},
+  URL =		{https://drops.dagstuhl.de/entities/document/10.4230/LIPIcs.FSCD.2025.2},
+  URN =		{urn:nbn:de:0030-drops-236172},
+  doi =		{10.4230/LIPIcs.FSCD.2025.2},
+  annote =	{Keywords: Neural Network Verification, Types, Interactive Theorem Provers}
+}

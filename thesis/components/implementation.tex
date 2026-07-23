@@ -186,8 +186,7 @@ elim: proof_tree ub lb => [split tleft IHleft tright IHright | contradiction] ub
 Qed.
 \end{lstlisting}
 
-% TODO: Fix explanation
-\autoref{fig:rocq-graph} shows the dependency graph of all the lemmas used to prove the soundness of the proof checker. The graph can be read from top to bottom, starting with the main theorem \texttt{check\_tree\_soundness} and proceeding to the auxiliary lemmas used in its proof. From left to right, the graph progresses from the lemmas establishing soundness for leaf nodes to those establishing soundness for internal tree nodes. The supporting lemmas for each branch of the proof tree are likewise organised from left to right.
+\autoref{fig:rocq-graph} shows the dependency graph of all the lemmas used to prove the soundness of the proof checker. The graph can be read from top to bottom, starting with the main theorem \texttt{check\_tree\_soundness} and proceeding to the auxiliary lemmas used in its proof. From left to right, the graph progresses from the lemmas establishing soundness for leaf nodes to those establishing soundness for internal tree nodes. The supporting lemmas for each branch of the proof tree are also organised from left to right.
 
 \begin{figure}[ht]
   \centering

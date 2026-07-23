@@ -1,17 +1,22 @@
 \section{Conclusion} \label{sec:conclusion}
 
-This dissertation set out to make certified DNN verification accessible within a mature, open-source interactive theorem prover by reimplementing Marabou's proof checker from Imandra into Rocq. The resulting implementation, comprising a certificate parser, a dependent-type-based proof checker, and a soundness theorem verified by Rocq's kernel, demonstrates that the translation is not only feasible but yields a significantly more compact formalisation. The Rocq checker achieves the same verification goals as the Imandra baseline with substantially less code and fewer auxiliary lemmas, reductions attributable to dependent types that encode structural invariants directly and to MathComp's pre-verified algebraic hierarchy.
+The main objective of the work presented in this dissertation is to make certified DNN verification accessible within a mature, open-source ITP by reimplementing Marabou's certified proof checker from Imandra in Rocq. The resulting implementation provides a certificate parser, proof checker, and soundness certification, thereby achieving the established objectives. The results show that the implementation achieves a considerable reduction in codebase size compared to the original implementation. The Rocq checker achieves the same verification goals as the Imandra baseline with substantially less code and fewer auxiliary lemmas. These results can be attributed to Rocq's richer ecosystem, its dependent type system, which can encode structural invariants directly, and the support for algebraic reasoning provided by the MathComp library.
 
-However, these gains come with trade-offs. The proof checker cannot be executed efficiently due to MathComp's matrix representation, and it lacks support for theory-lemma-based bound tightening. More fundamentally, the project highlights that the choice of ITP fundamentally shapes the structure and cost of a verification effort: Rocq's expressiveness reduces the volume of proof code but demands more explicit tactic-level guidance, while Imandra's automation reduces human effort per lemma but requires more lemmas to guide the prover. Both approaches are viable, and the choice between them depends on whether ecosystem maturity and proof compactness or automation and executability are prioritised.
+However, these gains come with trade-offs. The proof checker cannot be executed efficiently due to MathComp's matrix representation, which prioritises logical reasoning over computational efficiency. The project highlights how the choice of ITP shapes the structure of verification procedures: Rocq's expressiveness and rich ecosystem reduce the volume of proof code but require more explicit proof reasoning, while Imandra's automation reduces the effort required to prove the proposed lemmas but requires more lemma definitions to guide the prover. Both approaches are viable, and the choice between them depends on factors such as the amount of algebraic reasoning required, the strength of the available automation, and the desired level of low-level control over proof resolution.
 
-By making the proof checker available in Rocq, this work integrates certified DNN verification into an established verification ecosystem with a large community and extensive libraries, laying a foundation for future developments in this direction.
+By making the proof checker available in Rocq, this work integrates certified DNN verification into an established verification ecosystem with a large community and extensive libraries, laying the foundation for future developments in this direction.
 
 \subsection{Future Work} \label{sec:future-work}
 
-There are multiple different areas where the presented work can be extended. The first and foremost track would be optimising the current implementation of the proof checker in order to eradicate the abusive memory consumption. We have identified multiple different plausible solutions which could be carried out:
+There are several areas in which this work could be extended. Addressing the proof checker's excessive memory consumption would be one of the most crucial extensions, since it would enable the proof checker to be executed. We have identified two potential solutions:
+
 \begin{itemize}
-	\item TODO
+	\item Using Rocq's primitive objects \cite{rocq_primitive_objects}, in particular primitive arrays, instead of MathComp matrices. The idea would be to compute using primitive arrays while proving structural equivalence to matrices, combining fast computation with a high-level algebraic formalisation.
+
+	\item Implementing computationally intensive procedures in C and integrating them via the verified foreign-function interface presented in \citet{foreign_function_interface_rocq_c}, provided that the correspondence between the C implementation and its Rocq specification is established.
 \end{itemize}
 
-Another succint development which would hel
+Beyond execution, several functional extensions would increase the checker's utility. Support for theory-lemma-based bound tightening, present in the Imandra baseline, would enable the checker to handle larger verification problems. Additional activation functions could be supported, broadening the capabilities of the system.
+
+At the integration level, connecting the proof checker with the Vehicle programming language \cite{vehicle} would allow DNN verification workflows to produce certificates that can be independently checked by a verified component, further strengthening the trustworthiness of the overall pipeline.
 

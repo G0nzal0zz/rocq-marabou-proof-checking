@@ -193,8 +193,6 @@ This difference leads to a trade-off between automation and expressiveness. Iman
 
 From an ecosystem perspective, Rocq offers a mature, open-source platform with extensive libraries, a large community, and a long track record of large-scale verification projects. Imandra's ecosystem is smaller and industry-focused. For the present project, Rocq was chosen precisely because of its established ecosystem, active community, and the long-term maintainability that these factors provide, even though the proof development requires more explicit user guidance than Imandra's highly automated approach.
 
-\todo[inline]{Should I mention here the reason why Rocq was chosen?}
-
 \section{Related Work} \label{sec:related-work}
 
 \subsection{ITP Neural Network Verification}
@@ -229,13 +227,4 @@ The Imandra implementation serves as the direct predecessor of this project. Its
 
 A closely related line of work is the formal verification of SMT solvers and constraint-solving procedures within ITPs. The SMTCoq project \cite{smtcoq} integrates external SAT and SMT solvers into Rocq by checking the proofs they produce. When an SMT solver determines that a formula is valid, it emits a proof certificate that SMTCoq validates inside Rocq's kernel. This architecture is similar to the one proposed in this dissertation: an external solver produces certificates that are independently checked by a verified Rocq component. 
 
-Another interesting aspect of the SMTCoq project that closely relates to the resulting implementation is the role of its preprocessor, implemented in OCaml, which operates independently of both the proof checker and its soundness proof. The preprocessor abstracts the translation from different certificate formats into the representation accepted by SMTCoq. In addition, it performs a series of transformations on the translated certificates to improve their scalability before they are processed by the proof checker. This workflow is analogous to the certificate parser developed in this dissertation, which translates Marabou proof certificates into Gallina data types. Similarly, the parser performs a number of transformations during translation to simplify the subsequent verification process and eliminate the need for additional preprocessing within Rocq.
-
-\todo[inline]{I am talking too much about the work conducted in this Dissertation? i.e., Should I remove the comparison between SMTCoq and the implementation of the Rocq proof checker?}
-
-\subsection{Critical Analysis}
-
-TODO
-% The literature reveals a clear trajectory towards certified DNN verification, yet several gaps remain. The existing certified proof checker in Imandra demonstrates feasibility but is tied to a closed-source, niche ITP. The SMTCoq project shows that certificate checking in Rocq is viable for general SMT, but does not address the DNN-specific proof format. Other ITP-based approaches to neural network verification either embed entire networks (limiting scalability) or target training correctness rather than inference verification.
-%
-% Our work addresses these gaps by implementing a proof checker for Marabou in Rocq, combining the DNN-specific focus of the Imandra checker with the mature ecosystem of Rocq. Challenges remain: the scalability of proof checking to larger DNNs, the integration of additional activation functions, and the broader adoption of proof-producing verification pipelines in practice. However, the trajectory suggests that certified DNN verification is becoming increasingly practical, and tools like the one developed in this project are a step towards making it accessible to a wider community.
+Another interesting aspect of the SMTCoq project that closely relates to proposed implementation is the role of its preprocessor, implemented in OCaml, which is independent from both the proof checker and its soundness proof. The preprocessor abstracts the translation from different certificate formats into the representation accepted by SMTCoq. In addition, it performs a series of transformations on the translated certificates to improve their scalability before they are processed by the proof checker. This workflow is analogous to the certificate parser developed in this dissertation, which translates Marabou proof certificates into Gallina data types. Similarly, the parser performs a number of transformations during translation to simplify the subsequent verification process and eliminate the need for additional preprocessing within Rocq.

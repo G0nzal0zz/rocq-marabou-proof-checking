@@ -12,7 +12,7 @@ Despite the drawback that the proof checker cannot currently be executed and the
 \subsection{Maintainability Evaluation}
 The maintainability evaluation focuses mainly on the codebases of both soundness implementations. Since both Gallina and Imandra (a subset of OCaml) share very similar syntax, we therefore skip the comparison between code related to both proof checkers. The maintainability of the code is assesed through both quantitative and qualitative analyses. In the quantitative analysis, we compare and analyse the overall formalisation complexity through metrics such as lines of code (L.O.C.), auxiliary lemmas, and dependencies. In the qualitative analysis, we compare the overall proof flow and provide a critical analysis of the relative strengths and limitations of each ITP implementation.
 
-\subsubsection{Quantitative Analysis}
+\subsubsection{Quantitative Analysis} \label{sec:quantitative-analysis}
 
 The quantitative analysis focuses on three key metrics across different proof results:
 
@@ -56,11 +56,170 @@ Interestingly, due to its high degree of automation, Imandra's main strength is 
 
 The Rocq formalisation incurs a heavier dependency footprint: it relies on MathComp's comprehensive algebraic library, which introduces additional compilation and verification overhead. However, this dependency is well-established and widely used in the formal verification community, mitigating long-term maintainability risks. The Imandra formalisation, with its self-contained proofs and minimal external dependencies, may be easier to maintain in isolation, but at the cost of significantly more proof code.
 
-\input{components/tables/imandra_result.tex}
-
-\input{components/tables/rocq_result.tex}
-
 \subsubsection{Qualitative Analysis}
+
+The qualitative analysis compares the proof procedures of both implementations, focusing on the structural differences in how lemmas are composed.
+
+Since both proof checkers share the same core structure, the analysis concentrates on one of the most reasoning-intensive modules: the leaf soundness and the underlying application of the DNN polynomial Farkas lemma. The leaf soundness module is particularly instructive because it highlights the main differences and trade-off between both ITPs.
+
+As shown in \autoref{code:leaf-soundness}, both lemmas prove that \texttt{check\_tree} implies \texttt{unsat} for leaf nodes. The main structural difference is that, as discussed in \autoref{sec:quantitative-analysis}, Imandra's statement includes explicit dimension checks (lines 5 and 6 in the Imandra code), whereas Rocq encodes these constraints in the matrix types (lines 2 and 3 in the Rocq code) and therefore omits them from the lemma statement.
+
+\begin{figure}[h]
+\begin{minipage}{0.48\textwidth}
+\begin{lstlisting}[language=Coq, breaklines=true, numbers=left, basicstyle=\tiny\ttfamily]
+Lemma leaf_soundness
+  (tableau : (m.+2).-tuple ('rV[R]_n))
+  (ub lb : 'rV[R]_n)
+  (constraints : seq Constraint.t)
+  (contradiction : (m.+2).-tuple R)
+  (x : 'rV[R]_n) :
+  let system' := Cert.mk_eq_constraints tableau in
+  Checker.check_tree system' ub lb constraints (ProofTree.leaf contradiction) ->
+  Sat.unsat tableau ub lb constraints x.
+Proof.
+  intros system' H.
+  move: (not_eval_system_implies_unsat tableau ub lb constraints contradiction x) => H_eval.
+  move: (check_cert_implies_not_eval_system system' ub lb constraints contradiction x) => H_test.
+  auto.
+Qed.
+\end{lstlisting}
+\end{minipage}
+\hfill
+\begin{minipage}{0.48\textwidth}
+\begin{lstlisting}[language=Imandra, numbers=left, breaklines=true, basicstyle=\tiny\ttfamily]
+lemma soundness_leaf tableau upper_bounds lower_bounds relu_constraints x proof_tree =
+    match proof_tree with
+    | Node _ -> true
+    | Leaf contradiction ->
+        well_formed_tableau_bounds tableau upper_bounds lower_bounds &&
+        List.length x = List.length (List.hd tableau) &&
+        check_tree (mk_eq_constraints tableau) upper_bounds lower_bounds relu_constraints proof_tree
+        ==> 
+        unsat tableau upper_bounds lower_bounds relu_constraints x
+[@@by [%use check_tree_implies_check_cert (mk_eq_constraints tableau) upper_bounds lower_bounds relu_constraints proof_tree]
+   @> [%use not_eval_system_implies_unsat tableau upper_bounds lower_bounds relu_constraints x]
+   @> auto]
+\end{lstlisting}
+\end{minipage}
+\caption{Comparison of \texttt{leaf\_soundness} in Rocq (left) and Imandra (right).}
+\label{code:leaf-soundness}
+\end{figure}
+
+The deeper difference lies in how the intermediate lemmas are proved.  Specifically, how the \texttt{not\_eval\_system\_implies\_unsat} lemma, which bridges the certificate-checking result (the contradiction system evaluates to false) into the formal \texttt{unsat} predicate used by the rest of the proof tree soundness theorem, is proven. The lemma is split into two independent directions: equality and inequality directions.
+
+\autoref{code:system-soundness-eq} compares the equality direction.  The Imandra lemma \texttt{tableau\_reduction\_\\soundness} is proved by induction on the tableau (a list of lists).  The Rocq lemma \texttt{system\_soundness\_eq} uses \texttt{all\_tnthP} to iterate over the typed tuple of rows and \texttt{dot\_product\_eq\_kernel} (itself proved via MathComp's \texttt{mul\_row\_col}) to rewrite each row evaluation into the kernel condition. No explicit induction is needed because the type \texttt{m.-tuple ('rV[R]\_n)} guarantees the shape.
+
+\begin{figure}[h]
+\begin{minipage}{0.48\textwidth}
+\begin{lstlisting}[language=Imandra, numbers=left, breaklines=true, basicstyle=\tiny\ttfamily]
+Lemma dot_product_eq_kernel
+    (hd : 'rV[R]_n) (x : 'rV[R]_n) :
+  Arithmetic.dot_product
+    (Arithmetic.rv_addn1_succ
+      (row_mx hd 0))
+    (Arithmetic.cv_addn1_succ
+      (col_mx (trmx x) 1%:M))
+  = Arithmetic.dot_product
+      hd (trmx x).
+Proof.
+  rewrite /Arithmetic.dot_product
+    /Arithmetic.rv_addn1_succ
+    /Arithmetic.cv_addn1_succ
+    !castmx_id
+    (mul_row_col hd 0 x^T 1%:M)
+    mul0mx addr0.
+Qed.
+
+Lemma system_soundness_eq
+  (tableau : (m.+2).-tuple
+    ('rV[R]_n)) (x : 'rV[R]_n) :
+  Arithmetic.is_in_kernel tableau x ->
+  let sys := Cert.mk_eq_constraints
+    tableau in
+  FarkasSoundness.eval_system
+    sys (trmx x).
+Proof.
+  move=> Hin. apply/all_tnthP => i.
+  rewrite tnth_map
+    /FarkasSoundness.eval_expr.
+  have Hi := (all_tnthP Hin) i.
+  by rewrite dot_product_eq_kernel.
+Qed.
+\end{lstlisting}
+\end{minipage}
+\hfill
+\begin{minipage}{0.48\textwidth}
+\begin{lstlisting}[language=Coq, numbers=left, breaklines=true, basicstyle=\tiny\ttfamily]
+lemma tableau_reduction_soundness tableau x =
+    List.length x =
+      List.length (List.hd tableau) &&
+    well_formed_tableau tableau &&
+    is_in_kernel tableau x
+    ==>
+    eval_system (mk_eq_constraints
+      tableau) x
+[@@by induct ~on_vars:["tableau"] ()]
+\end{lstlisting}
+\end{minipage}
+\caption{Comparison of the equality direction of the system soundness proof between Rocq (left) and Imandra (right).}
+\label{code:system-soundness-eq}
+\end{figure}
+
+\autoref{code:system-soundness-geq} compares the inequality direction.  The Imandra lemma \texttt{mk\_geq\_constraints\_\\reduction\_soundness} chains multiple auxiliary lemmas, each proved by induction on the bounds list.  The Rocq lemma \texttt{system\_soundness\_geq} uses \texttt{forallP} to unpack the predicate, splits the goal with \texttt{all\_cat}, and discharges each half by iterating over indices with \texttt{all\_tnthP} and applying \texttt{subr\_ge0}. 
+
+\begin{figure}[h]
+\begin{minipage}{0.48\textwidth}
+\begin{lstlisting}[language=Imandra, numbers=left, breaklines=true, basicstyle=\tiny\ttfamily]
+Lemma system_soundness_geq
+  (ub lb : 'rV[R]_n) (x : 'rV[R]_n) :
+  Arithmetic.bounded x ub lb ->
+  FarkasSoundness.eval_system
+    (Cert.mk_geq_constraints ub lb)
+    (trmx x).
+Proof.
+  move=> /forallP Hb.
+  rewrite all_cat; apply/andP; split.
+  - refine (introT
+      (all_tnthP _) _) => i.
+    rewrite tnth_mktuple
+      /FarkasSoundness.eval_expr
+      dot_product_mk_bound_poly.
+    have /andP[_ Hu] := Hb i.
+    by rewrite mulN1r addrC subr_ge0.
+  - refine (introT
+      (all_tnthP _) _) => i.
+    rewrite tnth_mktuple
+      /FarkasSoundness.eval_expr
+      dot_product_mk_bound_poly.
+    have /andP[Hl _] := Hb i.
+    by rewrite mul1r subr_ge0.
+Qed.
+\end{lstlisting}
+\end{minipage}
+\hfill
+\begin{minipage}{0.48\textwidth}
+\begin{lstlisting}[language=Coq, numbers=left, breaklines=true, basicstyle=\tiny\ttfamily]
+lemma mk_geq_constraints_reduction_soundness
+    ubs lbs xs =
+    List.length xs = List.length ubs &&
+    List.length xs = List.length lbs &&
+    bounded xs ubs lbs
+    ==>
+    eval_system
+      (mk_geq_constraints ubs lbs) xs
+[@@by [%use bounded_upper xs ubs lbs]
+   @> [%use bounded_lower xs ubs lbs]
+   @> [%use ...eval ubs xs]
+   @> [%use ...eval lbs xs]
+   @> [%use eval_system_concat_invariant]
+   @> auto]
+\end{lstlisting}
+\end{minipage}
+\caption{Comparison of the inequality direction of the system soundness proof between Rocq (left) and Imandra (right).}
+\label{code:system-soundness-geq}
+\end{figure}
+
+Even though Imandra proofs seem much simpler than Rocq's due to the brevity of their proof steps, the reality is that both lemmas rely on multiple auxiliary lemmas that might not be explicitly referenced but still need to be defined. This fact contributes to the minimal length of the proofs, since the reasoning is performed by Imandra's automated reasoning system. However, as seen in \autoref{sec:quantitative-analysis}, the codebase tends to bloat due to the excessive number of auxiliary lemmas that need to be stated. In contrast, Rocq proofs are longer and more complex but depend on fewer auxiliary lemmas, making the reasoning underlying their soundness more explicit and easier to understand.
 
 
 
