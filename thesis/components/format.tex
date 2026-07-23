@@ -130,7 +130,7 @@
     % Automatic breaking of long lines
     breaklines=false,
     % Default style fors listings
-    basicstyle=\footnotesize\ttfamily,
+    basicstyle=\tiny\ttfamily,
     % Position of captions is bottom
     captionpos=b,
     % flexible columns
@@ -179,7 +179,7 @@
 }[keywords,comments,strings]
 
 \lstdefinelanguage{json}{
-    basicstyle=\footnotesize\ttfamily,
+    basicstyle=\tiny\ttfamily,
     showstringspaces=false,
     breaklines=true,
     captionpos=b,
@@ -202,6 +202,145 @@
       {[}{{{\color{delim}{[}}}}{1}
       {]}{{{\color{delim}{]}}}}{1},
 }
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+
+% lstlisting Imandra style
+\lstdefinelanguage{Imandra}{
+    morekeywords=[1]{
+        type,
+        let,
+        rec,
+        and,
+        module,
+        sig,
+        struct,
+        end,
+        open,
+        include,
+        exception,
+        external,
+        class,
+        object,
+        method,
+        inherit,
+        val,
+        mutable,
+        private,
+        virtual,
+        theorem,
+        verify,
+        test,
+        instance,
+        observe,
+        refute,
+        @@by,
+        @@disable,
+        @@timeout,
+        use,
+        expand
+    },
+    morekeywords=[2]{
+        fun,
+        function,
+        match,
+        with,
+        when,
+        as,
+        in,
+        if,
+        then,
+        else,
+        begin,
+        try,
+        for,
+        to,
+        downto,
+        while,
+        do,
+        done
+    },
+    morekeywords=[3]{
+        int,
+        int32,
+        int64,
+        float,
+        bool,
+        char,
+        string,
+        bytes,
+        unit,
+        list,
+        array,
+        option,
+        result,
+        true,
+        false,
+        None,
+        Some,
+        Ok,
+        Error
+    },
+    morekeywords=[4]{
+        prove,
+        check,
+        assume,
+        assert,
+        ensures,
+        requires,
+        invariant,
+        decreases,
+        measure,
+        model,
+        counterexample
+    },
+    morecomment=[s]{(*}{*)},
+    morestring=[b]",
+    morestring=[d]',
+    showstringspaces=false,
+    tabsize=3,
+    extendedchars=false,
+    sensitive=true,
+    breaklines=false,
+    basicstyle=\tiny\ttfamily,
+    captionpos=b,
+    columns=[l]flexible,
+    identifierstyle={\ttfamily\color{black}},
+    keywordstyle=[1]{\ttfamily\color{dkviolet}},
+    keywordstyle=[2]{\ttfamily\color{dkgreen}},
+    keywordstyle=[3]{\ttfamily\color{ltblue}},
+    keywordstyle=[4]{\ttfamily\color{dkred}},
+    stringstyle=\ttfamily,
+    commentstyle={\ttfamily\color{dkgreen}}
+    literate=
+        {<=}{{$\leq\;$}}1
+        {>=}{{$\geq\;$}}1
+        {<>}{{$\neq\;$}}1
+        {->}{{$\rightarrow\;$}}1
+        {<-}{{$\leftarrow\;$}}1
+        {=>}{{$\Rightarrow\;$}}1
+        {<->}{{$\leftrightarrow\;$}}1
+        {&&}{{$\wedge\;$}}1
+        {||}{{$\vee\;$}}1
+        {~}{{$\neg\;$}}1
+        {<>}{{$\neq\;$}}1
+        {==}{{\code{==}\;}}1
+        {!=}{{\code{!=}\;}}1
+        {+}{{\code{+}}}1
+        {-}{{\code{-}}}1
+        {*}{{\code{*}}}1
+        {/}{{\code{/}}}1
+        {^}{{$^\wedge$}}1
+        {::}{{$::$}}1
+        {||}{{$\parallel$}}1
+        {|>}{{$\triangleright$}}1
+        {@}{{$@$}}1
+        {@@}{{$@@$}}1
+        {\\}{{$\backslash$}}1
+}
+
 
 \crefname{lstlisting}{\lstlistingname}{\lstlistingname s}
 \Crefname{lstlisting}{\lstlistingname}{\lstlistingname s}
