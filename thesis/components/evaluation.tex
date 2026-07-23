@@ -68,10 +68,10 @@ As shown in \autoref{code:leaf-soundness}, both lemmas prove that \texttt{check\
 \begin{minipage}{0.48\textwidth}
 \begin{lstlisting}[language=Coq, breaklines=true, numbers=left, basicstyle=\tiny\ttfamily]
 Lemma leaf_soundness
-  (tableau : (m.+2).-tuple ('rV[R]_n))
+  (tableau : m.-tuple ('rV[R]_n))
   (ub lb : 'rV[R]_n)
   (constraints : seq Constraint.t)
-  (contradiction : (m.+2).-tuple R)
+  (contradiction : m.-tuple R)
   (x : 'rV[R]_n) :
   let system' := Cert.mk_eq_constraints tableau in
   Checker.check_tree system' ub lb constraints (ProofTree.leaf contradiction) ->
@@ -131,7 +131,7 @@ Proof.
 Qed.
 
 Lemma system_soundness_eq
-  (tableau : (m.+2).-tuple
+  (tableau : m.-tuple
     ('rV[R]_n)) (x : 'rV[R]_n) :
   Arithmetic.is_in_kernel tableau x ->
   let sys := Cert.mk_eq_constraints

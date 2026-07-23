@@ -35,7 +35,7 @@ Inductive t : Type :=
   (*  split information, left child, right child *)
   | node : Split.t -> t -> t -> t
   (* contradiction vector *)
-  | leaf : m-tuple R -> t.
+  | leaf : m.-tuple R -> t.
 \end{lstlisting}
 
     \item \texttt{split : Split.t} --- formalised as an inductive type (\autoref{code:formalisation-split}), distinguishing single-variable bound tightenings from ReLU splits:
@@ -120,7 +120,7 @@ The \texttt{check\_contradiction} function, shown in \autoref{code:check-contrad
 
 \begin{lstlisting}[language=Coq, caption={Rocq implementation of the contradiction certificate checker.}, label={code:check-contradiction}, numbers=left]
 Definition check_contradiction
-  (contradiction : m-tuple R)
+  (contradiction : m.-tuple R)
   (tableau : system m n)
   (ub lb : 'rV[R]_n)
   (lower_bounds : 'rV[R]_n)
@@ -206,7 +206,7 @@ Lemma check_cert_implies_not_eval_system
   (tableau : Farkas.system m n)
   (ub lb : 'rV[R]_n)
   (constraints : seq Constraint.t)
-  (contradiction : (m.+2).-tuple R)
+  (contradiction : m.-tuple R)
   (x : 'rV[R]_n) :
   let sys := Cert.mk_system_contradiction tableau ub lb in
   let certificate := Cert.mk_contradiction_certificate contradiction tableau ub lb in
@@ -226,10 +226,10 @@ The second implication, \texttt{not\_eval\_system\_implies\_unsat} in \autoref{c
 
 \begin{lstlisting}[language=Coq, caption={From contradiction system evaluation to unsatisfiability.}, label={code:not-eval-system-implies-unsat}, breaklines=true, numbers=left]
 Lemma not_eval_system_implies_unsat
-  (tableau : (m.+2).-tuple ('rV[R]_n))
+  (tableau : m.-tuple ('rV[R]_n))
   (ub lb : 'rV[R]_n)
   (constraints : seq Constraint.t)
-  (contradiction : (m.+2).-tuple R)
+  (contradiction : m.-tuple R)
   (x : 'rV[R]_n) :
   let sys := Cert.mk_system_contradiction (Cert.mk_eq_constraints tableau) ub lb in
   (FarkasSoundness.eval_system sys (trmx x)) = false
@@ -248,7 +248,7 @@ The \texttt{soundness\_check\_cert\_composition} lemma (shown in \autoref{code:s
 
 \begin{lstlisting}[language=Coq, caption={Core case analysis for leaf soundness using \texttt{SystemSoundness}.}, label={code:soundness-check-cert-composition}, breaklines=true, numbers=left]
 Lemma soundness_check_cert_composition
-  (tableau : (m.+2).-tuple ('rV[R]_n))
+  (tableau : m.-tuple ('rV[R]_n))
   (ub lb : 'rV[R]_n)
   (x : 'rV[R]_n) :
   let sys := Cert.mk_system_contradiction (Cert.mk_eq_constraints tableau) ub lb in
@@ -274,7 +274,7 @@ The central lemma, \texttt{check\_tree\_soundness\_node} in \autoref{code:check-
 
 \begin{lstlisting}[language=Coq, caption={Node soundness lemma using induction hypotheses and the unsat parent lemma.}, label={code:check-tree-soundness-node}, breaklines=true, numbers=left]
 Lemma check_tree_soundness_node
-  (tableau : (m.+2).-tuple ('rV[R]_n))
+  (tableau : m.-tuple ('rV[R]_n))
   (ub lb: 'rV[R]_n)
   (constraints : seq Constraint.t)
   (split : Split.t)
@@ -313,7 +313,7 @@ Third, \texttt{unsat\_children\_imply\_unsat\_parent}, shown in \autoref{code:un
 
 \begin{lstlisting}[language=Coq, caption={From child unsatisfiability to parent unsatisfiability using the contrapositive of split soundness.}, label={code:unsat-children-imply-unsat-parent}, breaklines=true, numbers=left]
 Lemma unsat_children_imply_unsat_parent
-  (tableau : (m.+2).-tuple ('rV[R]_n))
+  (tableau : m.-tuple ('rV[R]_n))
   (ub lb: 'rV[R]_n)
   (constraints : seq Constraint.t)
   (split : Split.t)
@@ -347,7 +347,7 @@ The core logical step is performed by \texttt{NodeSoundness.soundness\_split\_co
 
 \begin{lstlisting}[language=Coq, caption={Contrapositive of the split soundness lemma.}, label={code:soundness-split-contra}, breaklines=true, numbers=left]
 Lemma soundness_split_contra
-  (tableau : (m.+2).-tuple ('rV[R]_n))
+  (tableau : m.-tuple ('rV[R]_n))
   (ub lb: 'rV[R]_n)
   (constraints : seq Constraint.t)
   (split : Split.t)
@@ -378,7 +378,7 @@ The forward direction, \texttt{soundness\_split} in \autoref{code:soundness-spli
 
 \begin{lstlisting}[language=Coq, caption={Split soundness: case dispatch between single-variable and ReLU splits.}, label={code:soundness-split}, breaklines=true, numbers=left]
 Lemma soundness_split
-  (tableau : (m.+2).-tuple ('rV[R]_n))
+  (tableau : m.-tuple ('rV[R]_n))
   (ub lb: 'rV[R]_n)
   (constraints : seq Constraint.t)
   (split : Split.t)
