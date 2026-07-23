@@ -58,7 +58,6 @@ Fixpoint check_tree
 (*    well_formed_tableau_bounds tableau upper_bounds lower_bounds*)
 (*    (* && check_all_splits tree constraints *)*)
 (*    && check_tree (mk_eq_constraints tableau) upper_bounds lower_bounds constraints tree*)
-
 Definition check_proof_tree
   (tableau : (m.+2).-tuple ('rV[R]_n))
   (ub lb : 'rV[R]_n)

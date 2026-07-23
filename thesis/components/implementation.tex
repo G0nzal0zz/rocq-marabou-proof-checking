@@ -29,7 +29,8 @@ The proof certificate data produced by Marabou is captured by the following Gall
     \item \texttt{tableau : m.-tuple ('rV[R]\_n)} --- a tuple of $m$ row vectors encoding the linear relationships maintained by Marabou's simplex solver.
 
     \item \texttt{proof tree : ProofTree.t} --- formalised as an inductive type (\autoref{code:proof-tree}) with two constructors: \texttt{node}, which carries split information together with left and right subtrees, and \texttt{leaf}, which carries a contradiction vector.
-\begin{lstlisting}[language=Coq, caption={Marabou proof tree as an inductive data type in Rocq.}, label={code:proof-tree}]
+\begin{lstlisting}[language=Coq, caption={Marabou proof tree as an inductive data type in Rocq.}, label={code:proof-tree}, basicstyle=\footnotesize\ttfamily]
+
 Inductive t : Type :=
   (*  split information, left child, right child *)
   | node : Split.t -> t -> t -> t
@@ -38,7 +39,7 @@ Inductive t : Type :=
 \end{lstlisting}
 
     \item \texttt{split : Split.t} --- formalised as an inductive type (\autoref{code:formalisation-split}), distinguishing single-variable bound tightenings from ReLU splits:
-\begin{lstlisting}[language=Coq, caption={Split inductive type for case splits.}, label={code:formalisation-split}]
+\begin{lstlisting}[language=Coq, caption={Split inductive type for case splits.}, label={code:formalisation-split}, basicstyle=\footnotesize\ttfamily]
 Inductive t : Type :=
   (* variable, value *)
   | single : 'I_n -> R -> t

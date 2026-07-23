@@ -5,7 +5,7 @@ This section presents the evaluation of the implemented Rocq proof checker and c
 
 The Rocq implementation achieves functional parity with the Imandra baseline in terms of core features: both support ReLU activation constraints, correctly parse Marabou proof certificates and formalise their representations in the target language, include a complete proof checker, and are accompanied by a formal soundness theorem.
 
-Nevertheless, the Rocq implementation is missing some functionalities. First, the Imandra proof checker supports the use of theory lemmas for dynamic bound tightening, which are fundamental for scaling to larger verification problems, although their soundness is not guaranteed. Finally, the most important missing feature is the ability to execute the proof checker. The reason is the proof checker's high reliance on inefficient data types such as MathComp matrices \cite{refinement_algebra_rocq}. As a result, executing the checker becomes infeasible due to excessive memory consumption.
+Nevertheless, the Rocq implementation is missing some functionalities. First, the Imandra proof checker supports the use of theory lemmas for dynamic bound tightening, which are fundamental for scaling to larger verification problems, although their soundness is not proven. Finally, the most important missing feature is the ability to execute the proof checker. The reason is the proof checker's high reliance on inefficient data types such as MathComp matrices \cite{refinement_algebra_rocq}. As a result, executing the checker becomes infeasible due to excessive memory consumption.
 
 Despite the drawback that the proof checker cannot currently be executed and therefore cannot be used in real-world scenarios, we have identified multiple plausible solutions in \autoref{sec:future-work}. These solutions should help prevent the proof checker from incurring unreasonable memory usage during execution and enable it to correctly establish the soundness of a proof certificate.
 
@@ -18,22 +18,49 @@ The quantitative analysis focuses on three key metrics across different proof re
 
 \begin{itemize}
     \item \textbf{Lines of code.} The total number of lines of code (excluding code unrelated to proofs) in each file.
-    \item \textbf{Number of auxiliary lemmas.} The number of helper lemmas required to support the proofs in each module. 
+    \item \textbf{Number of auxiliary lemmas.} The number of helper lemmas required to support the proofs in each module.
     \item \textbf{External library dependencies.} The number and nature of external libraries relied upon by each module.
 \end{itemize}
 
-\autoref{tab:imandra-formal-results} gives an overview of the Imandra proof checker formalisation. The total codebase spans 2113 lines of code and relies on 267 auxiliary lemmas to support the proofs. A significant portion of the proof effort is concentrated in two results: \texttt{ReLU splits are covering} and \texttt{Sound application of DNN polynomial Farkas lemma}, which together account for 1563 L.O.C., or 75\%~ of the total. 
+\autoref{tab:imandra-formal-results} gives an overview of the Imandra proof checker formalisation. The total codebase spans 2113 L.O.C of code and relies on 267 auxiliary lemmas to support the proof checker soundness. A significant portion of the proof effort is concentrated in two results: \texttt{ReLU splits are covering} and \texttt{Sound application of DNN polynomial Farkas lemma}, which together account for 1563 L.O.C., or 75\%~ of the total.
 
-\autoref{tab:rocq-formal-results} summarises the Rocq formalisation. The implementation comprises 1000 lines of code supported by 51 auxiliary lemmas, organised across seven theorem modules. The most algebraically-intensive modules, \texttt{Sound application of DNN polynomial Farkas lemma} and \texttt{ReLU splits are covering}, contribute 124 and 145 L.O.C. respectively. The proof structure relies heavily on MathComp's algebraic hierarchy for ring, matrix, and vector-space theories, which provides the foundational reasoning used throughout the formalisation.
+\autoref{tab:rocq-formal-results} summarises the Rocq formalisation. The implementation comprises 978 L.O.C supported by 52 auxiliary lemmas, organised across seven theorem modules. The most proof-intensive results, \texttt{Sound application of DNN polynomial Farkas lemma} and \texttt{ReLU splits are covering}, contribute 124 and 145 L.O.C. respectively. The proof structure relies heavily on MathComp's algebraic hierarchy for ring, matrix, and vector-space theories, which provides the foundational reasoning used throughout the formalisation.
 
-The disparity in code size and lemma count between the two implementations stems primarily from differences in the underlying proof environments. Imandra's proof style encourages explicit, low-level reasoning about algebraic structures, requiring manually constructed induction schemes and detailed case analyses. Rocq, by contrast, leverages the MathComp library's algebraic hierarchy, which provides pre-verified theories for rings, matrices, and vector spaces.
+The disparity in code size and lemma count between the two implementations stems primarily from differences in the underlying proof environments. Imandra's proof style encourages explicit, low-level reasoning about algebraic structures, requiring manually constructed induction schemes and detailed case analyses. Rocq, by contrast, leverages the MathComp library's algebraic hierarchy, which provides pre-verified theories for matrices and vector spaces.
 
-This allows the Rocq formalisation to express algebraic constraints at a higher level of abstraction, offloading routine algebraic reasoning to the library's tactic machinery. For example, operations such as matrix multiplication and dot products are built into MathComp's matrix theory, whereas Imandra requires explicit recursive definitions and lemmas over real-number lists. This difference is reflected in the reduction from 2113 to 1000 L.O.C. (approximately 53\%) and from 267 to 51 auxiliary lemmas (approximately 81\%), with the most substantial savings appearing in the algebraically-intensive modules.
+This allows the Rocq formalisation to express algebraic constraints at a higher level of abstraction. For example, operations such as matrix multiplication and dot products are built into MathComp's matrix theory, whereas Imandra requires explicit recursive definitions and lemmas over real-number lists. This difference is reflected in the reduction from 2113 to 978 L.O.C. (approximately 54\%) and from 267 to 52 auxiliary lemmas (approximately 81\%), with the most substantial savings appearing in the algebraically-intensive modules.
 
-Interestingly, due to its high degree of automation, Imandra's main strength is not reducing total L.O.C. but rather reducing the amount of human-written proof code per theorem. Therefore, an Imandra user will likely spend more time specifying lemmas to guide the prover's automated reasoning than writing explicit proof scripts. This can be seen by comparing the L.O.C. to the number of auxiliary lemmas: Imandra's ratio is 7.9 L.O.C. per lemma (2113 / 267), whereas Rocq's ratio is 19.6 L.O.C. per lemma (1000 / 51). Each Rocq lemma therefore contains more human-written proof code on average, because Rocq requires explicit tactic-level proofs while Imandra handles more of the low-level reasoning automatically through computation and induction.
+Another reason that contributes to the considerable difference in terms of L.O.C. is the exploitation of dependent types in the Rocq implementation. Since Imandra does not have such a feature, it has to enforce the validity of its vectors recursively. An example of this is the \texttt{check\_tree\_soundness} theorem, as can be seen in the Imandra version in \autoref{code:imandra-check-tree-soundness} and the corresponding Rocq version in \autoref{code:check-tree-soundness}. The main difference between both is the usage of \texttt{well\_formed\_vector} and \texttt{well\_formed\_tableau\_bounds}, which ensure structural guarantees of the tableau and bounds size. These functions are not necessary in the Rocq code, since the guarantees are encoded in each type.
 
-The Rocq formalisation incurs a heavier dependency footprint: it relies on MathComp's comprehensive algebraic library, which introduces additional compilation and verification overhead and is one of the main reasons the proof checker cannot be feasibly executed. However, this dependency is well-established and widely used in the formal verification community, mitigating long-term maintainability risks. The Imandra formalisation, with its self-contained proofs and minimal external dependencies, may be easier to maintain in isolation, but at the cost of significantly more proof code.
+\begin{lstlisting}[language=Imandra, caption={Imandra theorem for \texttt{check\_tree\_soundness} with explicit well-formedness preconditions.}, label={code:imandra-check-tree-soundness}, numbers=left, breaklines=true]
+theorem check_tree_soundness (tableau: real list list) (upper_bounds: real list) (lower_bounds: real list)
+        (constraints: Constraint.t list) (tree: Proof_tree.t) (x: real list) =
+    well_formed_vector tableau x
+    && well_formed_tableau_bounds tableau upper_bounds lower_bounds
+    && check_all_splits tree constraints
+    && check_tree (mk_eq_constraints tableau) upper_bounds lower_bounds constraints tree
+    ==>
+    unsat tableau upper_bounds lower_bounds constraints x
+[@@by [%expand "valid_proof"]
+   @> [%expand "well_formed_vector"]
+   @> induction ~id:[%id check_tree] ()
+      @>>| [%use check_tree_soundness_full tableau upper_bounds lower_bounds constraints tree x]
+             @> [%use check_tree_parent_imply_check_tree_children (mk_eq_constraints tableau)
+                      upper_bounds lower_bounds constraints tree]
+             @> [%use well_formed_preservation tableau upper_bounds lower_bounds (split_of_node tree)]
+             @> auto
+    ]
+\end{lstlisting}
+
+Interestingly, due to its high degree of automation, Imandra's main strength is not reducing total L.O.C. but rather reducing the amount of human-written proof code per theorem. Therefore, an Imandra user will likely spend more time specifying lemmas to guide the prover's automated reasoning than writing explicit proof scripts. This can be seen by comparing the L.O.C. to the number of auxiliary lemmas: Imandra's ratio is 7.9 L.O.C. per lemma (2113 / 267), whereas Rocq's ratio is 18.8 L.O.C. per lemma (978 / 52). Each Rocq lemma therefore contains more human-written proof code on average, because Rocq requires explicit tactic-level proofs while Imandra handles more of the low-level reasoning automatically through computation and induction.
+
+The Rocq formalisation incurs a heavier dependency footprint: it relies on MathComp's comprehensive algebraic library, which introduces additional compilation and verification overhead. However, this dependency is well-established and widely used in the formal verification community, mitigating long-term maintainability risks. The Imandra formalisation, with its self-contained proofs and minimal external dependencies, may be easier to maintain in isolation, but at the cost of significantly more proof code.
 
 \input{components/tables/imandra_result.tex}
 
 \input{components/tables/rocq_result.tex}
+
+\subsubsection{Qualitative Analysis}
+
+
+
