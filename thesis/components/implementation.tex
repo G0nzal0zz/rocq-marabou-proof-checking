@@ -376,7 +376,7 @@ Qed.
 
 The forward direction, \texttt{soundness\_split} in \autoref{code:soundness-split}, states that if the parent is satisfiable and the split is valid, then at least one child must be satisfiable. Its proof performs a case analysis on the split type.
 
-\begin{lstlisting}[language=Coq, caption={Split soundness: case dispatch between single-variable and ReLU splits.}, label={code:soundness-split}, breaklines=true, numbers=left]
+\begin{lstlisting}[language=Coq, caption={Split soundness lemma.}, label={code:soundness-split}, breaklines=true, numbers=left]
 Lemma soundness_split
   (tableau : m.-tuple ('rV[R]_n))
   (ub lb: 'rV[R]_n)

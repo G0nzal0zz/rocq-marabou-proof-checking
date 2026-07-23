@@ -32,7 +32,7 @@ This allows the Rocq formalisation to express algebraic constraints at a higher 
 
 Another reason that contributes to the considerable difference in terms of L.O.C. is the exploitation of dependent types in the Rocq implementation. Since Imandra does not have such a feature, it has to enforce the validity of its vectors recursively. An example of this is the \texttt{check\_tree\_soundness} theorem, as can be seen in the Imandra version in \autoref{code:imandra-check-tree-soundness} and the corresponding Rocq version in \autoref{code:check-tree-soundness}. The main difference between both is the usage of \texttt{well\_formed\_vector} and \texttt{well\_formed\_tableau\_bounds}, which ensure structural guarantees of the tableau and bounds size. These functions are not necessary in the Rocq code, since the guarantees are encoded in each type.
 
-\begin{lstlisting}[language=Imandra, caption={Imandra theorem for \texttt{check\_tree\_soundness} with explicit well-formedness preconditions.}, label={code:imandra-check-tree-soundness}, numbers=left, breaklines=true]
+\begin{lstlisting}[language=Imandra, caption={Imandra \texttt{check\_tree\_soundness} theorem.}, label={code:imandra-check-tree-soundness}, numbers=left, breaklines=true]
 theorem check_tree_soundness (tableau: real list list) (upper_bounds: real list) (lower_bounds: real list)
         (constraints: Constraint.t list) (tree: Proof_tree.t) (x: real list) =
     well_formed_vector tableau x
