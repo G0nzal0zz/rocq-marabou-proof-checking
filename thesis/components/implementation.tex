@@ -199,24 +199,6 @@ To prove soundness for a leaf node, the checker must establish that the Farkas c
 
 The entry point is the \texttt{check\_tree\_soundness\_leaf} lemma, which is a trivial wrapper that delegates to \texttt{leaf\_soundness}. The \texttt{leaf\_soundness} lemma, shown in \autoref{code:leaf-soundness}, combines two independent implications using \texttt{auto}.
 
-\begin{lstlisting}[language=Coq, caption={Leaf soundness lemma combining the Farkas check and the unsatisfiability deduction.}, label={code:leaf-soundness}, breaklines=true, numbers=left]
-Lemma leaf_soundness
-  (tableau : (m.+2).-tuple ('rV[R]_n))
-  (ub lb : 'rV[R]_n)
-  (constraints : seq Constraint.t)
-  (contradiction : (m.+2).-tuple R)
-  (x : 'rV[R]_n) :
-  let system' := Cert.mk_eq_constraints tableau in
-  Checker.check_tree system' ub lb constraints (ProofTree.leaf contradiction) ->
-  Sat.unsat tableau ub lb constraints x.
-Proof.
-  intros system' H.
-  move: (not_eval_system_implies_unsat tableau ub lb constraints contradiction x) => H_eval.
-  move: (check_cert_implies_not_eval_system system' ub lb constraints contradiction x) => H_test.
-  auto.
-Qed.
-\end{lstlisting}
-
 The first implication, \texttt{check\_cert\_implies\_not\_eval\_system} in \autoref{code:check-cert-implies-not-eval-system}, connects the success of \texttt{check\_tree} on a leaf to the evaluation of the Farkas contradiction system. It uses the fact that \texttt{check\_tree} on a leaf calls \texttt{check\_contradiction}, which in turn invokes \texttt{check\_cert}. The \texttt{check\_tree\_implies\_check\_cert} lemma makes this connection explicit. With a valid certificate, the \texttt{farkas\_unsat} theorem from the \texttt{FarkasSoundness} module guarantees that the contradiction system evaluates to false.
 
 \begin{lstlisting}[language=Coq, caption={Connecting certificate checks to the evaluation of the contradiction system via Farkas' lemma.}, label={code:check-cert-implies-not-eval-system}, breaklines=true, numbers=left]

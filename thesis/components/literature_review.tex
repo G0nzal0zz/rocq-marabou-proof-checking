@@ -136,7 +136,7 @@ For DNN verification, SMT solvers are used to translate the DNN, including its w
 
 \subsection{Marabou}
 
-Marabou is a complete SMT, constraint-based DNN verifier \cite{marabou} that answers queries over networks. Marabou performs satisfiability checking based on an input query, which is compromised by set properties that specify the property to be checked, a neural network, and a set of linear and non-linear constraints.
+Marabou is a complete SMT, constraint-based DNN verifier \cite{marabou} that answers queries over networks. Marabou performs satisfiability checking based on an input query, which is comprised of a set of properties that specify the property to be checked, a neural network, and a set of linear and non-linear constraints.
 \vspace{0.5cm}
 
 Marabou's architecture can be split into front end and back end components:
@@ -203,7 +203,7 @@ One approach embeds a complete neural network into an ITP and proves properties 
 
 A complementary line of work targets the training process itself, providing verified implementations of gradient computation and weight updates in Rocq. Other projects have formalised aspects of neural network verification in Isabelle/HOL and Lean, though these efforts remain largely exploratory compared to the mature tooling of SMT-based DNN verifiers.
 
-Th work proposed in this dissertation differs from these approaches in a fundamental way: rather than embedding neural networks or training procedures into an ITP, we check the proof certificates produced by an external DNN verifier. This separation of concerns allows the verifier to use efficient, unverified algorithms while the proof checker provides a formal guarantee of correctness.
+The work proposed in this dissertation differs from these approaches in a fundamental way: rather than embedding neural networks or training procedures into an ITP, we check the proof certificates produced by an external DNN verifier. This separation of concerns allows the verifier to use efficient, unverified algorithms while the proof checker provides a formal guarantee of correctness.
 
 \subsection{Proof Production}
 

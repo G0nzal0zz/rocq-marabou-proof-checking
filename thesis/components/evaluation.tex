@@ -10,7 +10,7 @@ Nevertheless, the Rocq implementation is missing some functionalities. First, th
 Despite the drawback that the proof checker cannot currently be executed and therefore cannot be used in real-world scenarios, we have identified multiple plausible solutions in \autoref{sec:future-work}. These solutions should help prevent the proof checker from incurring unreasonable memory usage during execution and enable it to correctly establish the soundness of a proof certificate.
 
 \subsection{Maintainability Evaluation}
-The maintainability evaluation focuses mainly on the codebases of both soundness implementations. Since both Gallina and Imandra (a subset of OCaml) share very similar syntax, we therefore skip the comparison between code related to both proof checkers. The maintainability of the code is assesed through both quantitative and qualitative analyses. In the quantitative analysis, we compare and analyse the overall formalisation complexity through metrics such as lines of code (L.O.C.), auxiliary lemmas, and dependencies. In the qualitative analysis, we compare the overall proof flow and provide a critical analysis of the relative strengths and limitations of each ITP implementation.
+The maintainability evaluation focuses mainly on the codebases of both soundness implementations. Since both Gallina and Imandra (a subset of OCaml) share very similar syntax, we therefore skip the comparison between code related to both proof checkers. The maintainability of the code is assessed through both quantitative and qualitative analyses. In the quantitative analysis, we compare and analyse the overall formalisation complexity through metrics such as lines of code (L.O.C.), auxiliary lemmas, and dependencies. In the qualitative analysis, we compare the overall proof flow and provide a critical analysis of the relative strengths and limitations of each ITP implementation.
 
 \subsubsection{Quantitative Analysis} \label{sec:quantitative-analysis}
 
@@ -60,7 +60,7 @@ The Rocq formalisation incurs a heavier dependency footprint: it relies on MathC
 
 The qualitative analysis compares the proof procedures of both implementations, focusing on the structural differences in how lemmas are composed.
 
-Since both proof checkers share the same core structure, the analysis concentrates on one of the most reasoning-intensive modules: the leaf soundness and the underlying application of the DNN polynomial Farkas lemma. The leaf soundness module is particularly instructive because it highlights the main differences and trade-off between both ITPs.
+Since both proof checkers share the same core structure, the analysis concentrates on one of the most reasoning-intensive modules: the leaf soundness and the underlying application of the DNN polynomial Farkas lemma. The leaf soundness module is particularly instructive because it highlights the main differences and trade-offs between both ITPs.
 
 As shown in \autoref{code:leaf-soundness}, both lemmas prove that \texttt{check\_tree} implies \texttt{unsat} for leaf nodes. The main structural difference is that, as discussed in \autoref{sec:quantitative-analysis}, Imandra's statement includes explicit dimension checks (lines 5 and 6 in the Imandra code), whereas Rocq encodes these constraints in the matrix types (lines 2 and 3 in the Rocq code) and therefore omits them from the lemma statement.
 
@@ -111,7 +111,7 @@ The deeper difference lies in how the intermediate lemmas are proved.  Specifica
 
 \begin{figure}[h]
 \begin{minipage}{0.48\textwidth}
-\begin{lstlisting}[language=Imandra, numbers=left, breaklines=true, basicstyle=\tiny\ttfamily]
+\begin{lstlisting}[language=Coq, numbers=left, breaklines=true, basicstyle=\tiny\ttfamily]
 Lemma dot_product_eq_kernel
     (hd : 'rV[R]_n) (x : 'rV[R]_n) :
   Arithmetic.dot_product
@@ -149,7 +149,7 @@ Qed.
 \end{minipage}
 \hfill
 \begin{minipage}{0.48\textwidth}
-\begin{lstlisting}[language=Coq, numbers=left, breaklines=true, basicstyle=\tiny\ttfamily]
+\begin{lstlisting}[language=Imandra, numbers=left, breaklines=true, basicstyle=\tiny\ttfamily]
 lemma tableau_reduction_soundness tableau x =
     List.length x =
       List.length (List.hd tableau) &&
@@ -165,11 +165,11 @@ lemma tableau_reduction_soundness tableau x =
 \label{code:system-soundness-eq}
 \end{figure}
 
-\autoref{code:system-soundness-geq} compares the inequality direction.  The Imandra lemma \texttt{mk\_geq\_constraints\_\\reduction\_soundness} chains multiple auxiliary lemmas, each proved by induction on the bounds list.  The Rocq lemma \texttt{system\_soundness\_geq} uses \texttt{forallP} to unpack the predicate, splits the goal with \texttt{all\_cat}, and discharges each half by iterating over indices with \texttt{all\_tnthP} and applying \texttt{subr\_ge0}. 
+\autoref{code:system-soundness-geq} compares the inequality direction.  The Imandra lemma \texttt{mk\_geq\_constraints\\\_reduction\_soundness} chains multiple auxiliary lemmas, each proved by induction on the bounds list.  The Rocq lemma \texttt{system\_soundness\_geq} uses \texttt{forallP} to unpack the predicate, splits the goal with \texttt{all\_cat}, and discharges each half by iterating over indices with \texttt{all\_tnthP} and applying \texttt{subr\_ge0}. 
 
 \begin{figure}[h]
 \begin{minipage}{0.48\textwidth}
-\begin{lstlisting}[language=Imandra, numbers=left, breaklines=true, basicstyle=\tiny\ttfamily]
+\begin{lstlisting}[language=Coq, numbers=left, breaklines=true, basicstyle=\tiny\ttfamily]
 Lemma system_soundness_geq
   (ub lb : 'rV[R]_n) (x : 'rV[R]_n) :
   Arithmetic.bounded x ub lb ->
@@ -198,7 +198,7 @@ Qed.
 \end{minipage}
 \hfill
 \begin{minipage}{0.48\textwidth}
-\begin{lstlisting}[language=Coq, numbers=left, breaklines=true, basicstyle=\tiny\ttfamily]
+\begin{lstlisting}[language=Imandra, numbers=left, breaklines=true, basicstyle=\tiny\ttfamily]
 lemma mk_geq_constraints_reduction_soundness
     ubs lbs xs =
     List.length xs = List.length ubs &&
