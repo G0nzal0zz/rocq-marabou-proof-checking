@@ -2,8 +2,11 @@
  (name proof_checker)
  (theories Stdlib
            mathcomp.ssreflect
-           mathcomp.fingroup
+           mathcomp.boot
+           mathcomp.finite_group
            mathcomp.algebra
+           mathcomp.order
+           micromega_plugin
            elpi
            elpi_elpi
            HB
