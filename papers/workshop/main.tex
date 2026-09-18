@@ -1,0 +1,95 @@
+\documentclass[12pt,nonacm,acmlarge,titlepage,screen]{acmart}
+
+% make ACM settings and load extra packages
+\input{components/acm_settings}
+\input{components/packages}
+
+% document details
+\def\docTitle{A Certified Proof Checker for Deep Neural Network Verification in Rocq}
+\def\docAuthor{Gonzalo \textsc{Larroya}}
+\def\docAuthorID{H00509667}
+\def\docSupervisor{Dr. Kathrin \textsc{Stark}}
+\def\docDegree{MSc Artificial Intelligence}
+\def\docType{Masters Dissertation}
+\def\docCourse{F21MP - Masters Project and Dissertation}
+
+% load extra formatting
+\input{components/format}
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% FRONT MATTER
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\input{components/titlepage}
+
+\newpage
+\pagenumbering{roman}
+
+\input{components/declaration}
+
+% Acknowledgements
+% \acknowledgements{
+% Acknowledgements text.
+% }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ABSTRACT
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\input{components/abstract}
+
+% Table of contents
+\input{components/contents}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% MAIN BODY
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\pagenumbering{arabic}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Introduction
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\input{components/introduction}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Background Research
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\input{components/literature_review.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Implementation
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\input{components/implementation.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Evaluation
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\input{components/evaluation.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Conclusion
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\input{components/conclusion.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% BACK MATTER
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% References
+\input{components/references}
+
+% Appendices
+\newpage
+\appendix
+
+\section{Detailed Formalisation Tables}
+\label{app:formalisation-tables}
+
+\input{components/tables/imandra_result.tex}
+
+\newpage
+
+\input{components/tables/rocq_result.tex}
+
+\end{document}

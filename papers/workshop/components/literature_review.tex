@@ -1,0 +1,230 @@
+% \section{Literature Review}
+
+\section{Background} \label{sec:background}
+
+\subsection{Neural Networks} \mbox{}\\
+
+Neural networks can be traced back to 1943, when McCulloch and Pitts proposed a mathematical model of a biological neuron \cite{ideas_immanent_in_nervous_activity}. Rosenblatt extended this concept in 1958 with the introduction of the Perceptron \cite{perceptron}. The field did not see much progress until the 1980s, when the backpropagation algorithm was popularised \cite{backpropagation}. Over recent years, advances in hardware capabilities have enabled neural networks to perform more complex tasks, leading to their adoption as state-of-the-art solutions across a wide range of applications, including medical diagnosis, autonomous driving, and image recognition.
+
+A feedforward neural network, as it is known today, can be viewed as a directed acyclic graph in which each node, or neuron, performs a computation. \cref{fig:neural-network} illustrates a simple neural network, which can be divided into layers: the left-most layer is called the input layer, and the right-most layer is called the output layer. The layers between the input and output layers are referred to as hidden layers. Each neuron receives one or more inputs, computes a weighted sum followed by an activation function, and passes the resulting output to neurons in the subsequent layer.
+
+To compute the output of a neural network, the input layer propagates the input $x$ forward through its successive layers. At every stage, intermediate results are computed and passed to the next layer until the final output layer $\hat{y}$ is reached. This process is commonly referred to as forward propagation.
+
+\input{components/diagrams/neural_network.tex}
+
+Since neural networks are graphs, there is no constraint regarding the number of nodes or layers they can contain. \autoref{fig:mlp} shows a neural network with 4 layers, each with 3 nodes. This type of neural network is called a multilayer perceptron (MLP).
+
+\input{components/diagrams/mlp.tex}
+
+Neural networks can be modelled as mathematical functions that map real-valued inputs to real-valued outputs. Formally, a neural network can be defined as:
+\[
+N : \mathbb{R}^{k_I} \rightarrow \mathbb{R}^{k_O},
+\]
+
+where $k_I$ and $k_O$ denote the dimensions of the input and output spaces, respectively. The input is represented as a vector $x = (x_1, \ldots, x_{k_I})$, and the output as a vector $y = (y_1, \ldots, y_{k_O})$.
+
+Each neuron in a neural network performs two main operations. First, it computes a weighted sum of its inputs, as shown in \autoref{eq:neuron-computation}. The result is then passed through a non-linear activation function, as shown in \autoref{eq:activation-computation}. More specifically, for a neuron $v_j$, the weighted sum $z(v_j)$ is computed over the incoming edges $E$ of the form $\{(v_i, v_j)\}$, and the resulting value $f(v_j)$ is then passed through an activation function $a$, such as the Rectified Linear Unit (ReLU).
+
+\begin{equation}
+z(v_j) = \sum_{(v_i, v_j) \in E} w(v_i, v_j) \cdot f(v_i)
+\label{eq:neuron-computation}
+\end{equation}
+
+\begin{equation}
+f(v_j) = a_{v_j}(z(v_j))
+\label{eq:activation-computation}
+\end{equation}
+
+
+
+\subsection{DNNs}
+
+The term Deep in Deep Neural Networks refers to networks that contain a large number of hidden layers. Deeper networks can learn more complex representations of the input. However, this increase in capability comes at the cost of interpretability. DNNs are often considered \textit{black-box} models, as their internal inference process is not interpretable by humans. As a result, undesirable behaviour may remain hidden within the network. This concern has reflected negatively on their adoption in safety-critical applications \cite{interpretable_machine_learning}.
+
+\subsection{DNN Verification}
+
+% NOTE: Why do we need to prove DNNs?
+Even though the idea of verifying Neural Networks has been studied since the early days of AI, the necessity to prove them correct did not arise until recent days. This is because it was shown that DNNs could carry out tasks that were technically unfeasible before their arrival. As a result, the use of DNNs in safety-critical domains increased rapidly (e.g., in self-driving cars and surgical procedures). As a consequence, the necessity to ensure robustness, safety, and consistency also increased.
+
+% NOTE: Why can't DNN be verified as normal software
+Modern feedforward DNNs often process inputs consisting of thousands of elements, and may operate on multidimensional data such as images or other structured representations. In traditional software, empirical approaches such as testing, that is, verifying the output for a finite set of inputs, are widely used due to their simplicity and scalability in order to guarantee a certain level of correctness. However, the size of the input space in DNNs makes this approach infeasible.
+
+Consider, for example, a DNN trained to detect the presence of a vehicle in an image: one valid input might be the image shown in \autoref{fig:autonomous-driving-pixels}. A visually identical input, but with slightly altered pixel brightness, is shown in \autoref{fig:autonomous-driving-altered-pixels}. In both cases, the DNN should yield the same result: a positive classification. But, since each image have different brightness values, there is no guarantee they will do so. This illustrates why exhaustive testing cannot guarantee correctness, since the space of possible inputs is too large to be fully explored.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{images/autonomous_driving_pixels.pdf}
+    \caption{Autonomous driving input with zoomed pixel values.}
+    \label{fig:autonomous-driving-pixels}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{images/autonomous_driving_altered_pixels.pdf}
+    \caption{Slightly altered autonomous driving input with zoomed pixel values.}
+    \label{fig:autonomous-driving-altered-pixels}
+\end{figure}
+
+Formal verification addresses the already stated concern by providing mathematical guarantees about the behaviour of a DNN. Rather than sampling a finite set of inputs, it reasons over entire regions of the input space, ensuring that any input within a defined region will map to an output within a defined region.
+
+DNN verification methods can be broadly classified into complete and incomplete approaches \cite{algorithms_for_verifying_dnns}. Both are sound, meaning that if the algorithm reports that a property holds, it is guaranteed to do so. Complete approaches additionally guarantee that if a property holds, the algorithm will always detect it. Incomplete approaches, by contrast, may fail to verify a property even when it holds, as they rely on over-approximations that can be overly conservative.
+
+Orthogonally, DNN verification techniques can also be categorised into
+constraint-based and abstraction-based approaches \cite{introduction_to_nn_verification}.
+
+\paragraph*{Constraint-based Verification.} The verification encodes
+the DNN verification problem as a logical satisfiability problem. The network,
+including its weights, biases, and activation functions, is encoded as a set of
+constraints alongside the pre-condition and post-condition. The verifier then
+determines whether there exists an input that satisfies the pre-condition but
+violates the post-condition. If no such input exists, the property is guaranteed
+to hold.
+
+\paragraph*{Abstraction-based Verification.} The verification addresses
+the scalability limitations of constraint-based methods by over-approximating the
+set of reachable values through the network, rather than reasoning about exact
+values. Instead of encoding the network as a set of constraints, it represents
+sets of possible inputs and outputs as geometric shapes, and propagates them
+through the network layer by layer.
+
+\subsubsection{Queries} \label{sec:queries}
+
+A DNN verification query is the formal problem that a DNN verifier attempts to solve. It comprises a neural network $N$, a pre-condition $P$ that constrains the admissible inputs, and a post-condition $Q$ that specifies a desired property of the outputs. The verifier must determine whether there exists an input $x$ satisfying $P$ for which $N(x)$ violates $Q$.
+
+One of the most important and successful DNN verification algorithms is the Reluplex algorithm. Reluplex makes can be summarised by the following components:
+
+\begin{itemize}
+    \item A variable vector $x$, which contains all the variables in the input $x_I$ and output $x_O$ vectors, as well as $x_{z(v_i)}$ and $x_{f(v_i)}$ for all hidden neurons. Furthermore, for each neuron with the ReLU activation function, an auxiliary variable $x_{\mathrm{aux}_i}$ is also added.
+
+    \item Lower and upper bound vectors for each element in $x$. The values corresponding to the variables in $x_I$ and $x_O$ are given by the verification query, whereas the bounds for the remaining variables are calculated by propagating the lower and upper bounds of $x_I$ through the network using \autoref{eq:neuron-computation} and \autoref{eq:activation-computation}. The auxiliary variables are related to the network variables through \autoref{eq:weighted-sum} and \autoref{eq:relu-auxiliary}.
+
+    \item A matrix $A$, called the tableau, representing a system of equations for each non-input node $v_i$. These equations are given by:
+
+    \begin{equation}
+        \sum_{(v_i, v_j) \in E}
+        w(v_i, v_j) \cdot x_{f(v_i)}
+        - x_{z(v_i)}
+        = 0
+        \label{eq:weighted-sum}
+    \end{equation}
+
+    \begin{equation}
+        x_{f(v_i)}
+        - x_{z(v_i)}
+        - x_{\mathrm{aux}_i}
+        = 0
+        \label{eq:relu-auxiliary}
+    \end{equation}
+
+    The matrix $A$ has dimensions $m \times n$, where $n$ is the size of the vector $x$, and $m$ is the number of equations generated by \autoref{eq:weighted-sum} and \autoref{eq:relu-auxiliary}.
+
+    \item A set $C$ of ReLU constraints for all non-input neurons in $x$. Each constraint represents the relationship between the weighted sum of a neuron and its output after applying the ReLU activation function. For a neuron $v_i$, this relationship is given by:
+    \[
+    x_{f(v_i)} = \operatorname{ReLU}(x_{z(v_i)}).
+    \]
+    These constraints ensure that the values assigned to the variables in $x$ are consistent with the behaviour of the neural network. The ReLU constraints can be combined into a single conjunction $C(x)$, which is satisfied when all the variables in $x$ satisfy their corresponding ReLU constraints.
+\end{itemize}
+
+
+\subsection{SMT Solvers}
+
+% NOTE: What are SMT Solvers
+An SMT solver is a tool for determining whether a set of logical formulas is satisfiable. This means whether there exists a set of values for variables for which all logical formulas are true. It is an extension of SAT solvers that can only handle Boolean variables. However, SMT solvers can handle background theories such as linear arithmetic, arrays, bit vectors, and more. This enables more expressive solvers and can be applied to real-world applications.
+
+% NOTE: Why are SMT Solvers useful
+For DNN verification, SMT solvers are used to translate the DNN, including its weights, biases, and activation functions, into a set of arithmetic constraints, along with the pre-condition and post-condition. The solver attempts to find an input that satisfies the pre-condition but fails to satisfy the post-condition. If no such input exists, then it is verified that the property holds. If a counterexample is found, then it is used to prove that the property does not hold. One of the most prominent SMT solvers is Z3 \citet{z3} . DNN-specific solvers such as Marabou extend these ideas with optimisations for DNNs.
+
+\subsection{Marabou}
+
+Marabou is a complete SMT, constraint-based DNN verifier \cite{marabou} that answers queries over networks. Marabou performs satisfiability checking based on an input query, which is comprised of a set of properties that specify the property to be checked, a neural network, and a set of linear and non-linear constraints.
+\vspace{0.5cm}
+
+Marabou's architecture can be split into front end and back end components:
+\paragraph*{Front end.} The front end module provides a way of supplying all the information required to determine the satisfiability of the DNN to the back end, without explicitly interacting with it.
+\paragraph*{Back end.} The back end module's main role is to perform all operations related to DNN verification, from reasoning about the satisfiability of the input query to generating proof certificates. It is comprised of the following components:
+\begin{itemize}
+    \item \textbf{Engine.} The engine module's job is to determine the satisfiability of the DNN against the input query.
+    \item \textbf{Proof module.} The proof module provides a way of generating proof certificates once a problem is classified as UNSAT.
+\end{itemize}
+
+\vspace{0.5cm}
+
+Internally, Marabou's engine follows a set of steps to determine
+whether an input query is satisfiable:
+
+\begin{enumerate}
+    \item \textbf{Encoding.} The input query, comprising the neural network, the input constraints, and the property to verify, is encoded as a system of linear and non-linear constraints.
+    \item \textbf{Linear reasoning.} Simplex \cite{calculus_of_computation} is applied to reason about the linear constraints. If a satisfying assignment is found at this stage, the answer is SAT, and the assignment serves as a counterexample witnessing the violation of the property.
+    \item \textbf{Case-splitting.} When a non-linear constraint is encountered, such as a ReLU activation, Marabou performs case-splitting, dividing the problem into two sub-problems, one for each regime. Each sub-problem is handed back to Simplex.
+    \item \textbf{Recursive search.} Steps 2 and 3 are applied recursively to each sub-problem until every branch is resolved as either SAT, where a satisfying assignment is found, or no solution is found, which implies UNSAT, and a proof certificate is generated.
+    \item \textbf{Conclusion.} If every branch of the search tree is determined to be UNSAT, Marabou concludes that no satisfying assignment exists for the entire query. The Farkas certificates from all branches are combined into a proof tree, which a proof checker can then validate.
+\end{enumerate}
+
+Once the engine has concluded that the input query is UNSAT using the above process, the proof module is responsible for generating a proof certificate. This certificate consists of a proof tree, which mirrors the case-splitting structure generated by the engine. The nodes in the tree consist of the splits generated during the case splitting process. The leaves in the tree correspond to the branches in the case-splitting process that were marked UNSAT by the Simplex procedure. These leaves also include a Farkas vector, a set of coefficients. These coefficients serve to witness the UNSATness of the constraints in the branches. The root in the tree represents the original input query. This tree represents a complete record of the absence of a satisfying assignment.
+
+\subsection{ITPs}
+
+Interactive Theorem Provers (ITPs), also known as interactive proof assistants, are computer tools designed to help users develop formal proofs, which are then verified by the system. ITPs differ from automated theorem provers, whose main objective is to resolve formal proofs without user interaction automatically. ITPs, on the other hand, require continuous human involvement and guidance. ITPs are best used when proving complex theorems, which automated theorem provers cannot reason about.
+
+
+\subsubsection{Imandra}
+
+Imandra is a closed-source interactive theorem prover (ITP) and automated reasoning system developed by Imandra Inc. Its logic is based on a pure of higher-order logic (HOL) subset of OCaml. Imandra combines automated reasoning with interactive theorem proving, allowing many proofs to be proved automatically through symbolic execution, induction, rewriting, and SMT solving while still enabling user guidance when required. Thanks to these characteristics, Imandra has been applied to a variety of industrial and academic verification problems. 
+
+Imandra is founded on a computational fragment of HOL, where every admitted definition corresponds to an executable, terminating program. Unlike traditional theorem provers that distinguish between programs and logical specifications, Imandra adopts a unified computational language in which functions, specifications, and theorems are all expressed using the same executable language (IML). Consequently, proving a theorem is thus equivalent to showing that a boolean-valued function evaluates to \texttt{true} for every possible input, while a false conjecture is refuted by producing a concrete counterexample for which the function evaluates to \texttt{false} \cite{imandra_automated_reasoning_system}.
+
+A fundamental characteristic of Imandra is its emphasis on computation rather than explicit quantification. Instead of expressing existential statements abstractly as in classical logic, users define recursive functions that construct the required witnesses. In this setting, existential quantifiers are effectively replaced by computable functions, allowing the prover to exploit the recursive structure of definitions to automatically derive induction schemes and perform symbolic evaluation. This approach follows the tradition of computational logics such as ACL2 and Boyer--Moore, where recursive definitions form the basis of both programming and reasoning.
+
+To preserve the consistency of its logic, Imandra only admits conservative extensions. Every recursive function must be total, meaning that its termination must be established before it is accepted into the logic, and every algebraic data type must not contain infinite descending chains. This guarantees that defining an equation does not introduce contradictions, and the recursion patterns of functions generate induction principles for proving properties about them. By restricting the set of admissible definitions, Imandra enhances the capabilities of its automated reasoning engine. Since every function is executable and guaranteed to terminate, the automated proof engine can rely on a variety of proof strategies, including simplification, destructor elimination, and induction.
+
+\subsubsection{Rocq}
+
+Formerly known as Coq, is a popular open-source ITP based on the Calculus of Inductive Constructions (CIC), a dependent type theory that serves as both a programming language and a logical framework. In CIC, types can depend on values, enabling propositions to be expressed as types and proofs as terms in the same language, a principle known as the Curry--Howard correspondence. This allows users to state and prove highly expressive properties directly within the type system, including universally and existentially quantified statements over infinite domains.
+
+Rocq follows a kernel-based architecture: all proofs are ultimately reduced to a sequence of type-checking steps performed by a small, trusted kernel. External automation, whether provided by built-in tactics or third-party libraries, constructs proof terms that are then verified by this kernel. This design ensures that soundness rests on a minimal, auditable core, even when sophisticated automation is employed. The primary proof paradigm in Rocq is tactic-based, where users guide proof construction through commands written in Ltac or SSReflect, while the kernel checks each step.
+
+Rocq has a large and active ecosystem. The Mathematical Components (MathComp) library provides extensive formalisation of algebra and discrete mathematics. The Coq Platform bundles core libraries, tools, and packages into a coherent distribution. Notable projects verified in Rocq include the Four Colour Theorem, the CompCert verified C compiler \cite{compcert_rocq}, the Iris concurrent separation logic framework, and the formal proof of the Odd Order Theorem. Its large community, extensive library ecosystem, and long history in both academia and industry make Rocq one of the most established interactive theorem provers available.
+
+\subsubsection{Imandra vs Rocq}
+
+The two ITPs differ fundamentally in their logical foundations and design philosophy. Imandra is built on a computational fragment of HOL, where every definition must be executable and terminating. Propositions are boolean-valued functions; proving a theorem is equivalent to verifying that a function returns \texttt{true} for all inputs. Rocq, by contrast, is built on CIC, a dependent type theory that supports non-computational specifications and impredicative quantification. Propositions are types, and proofs are first-class terms in the same language.
+
+This difference leads to a trade-off between automation and expressiveness. Imandra's restrictions allow it to automatically derive induction principles from recursive definitions, perform symbolic execution, and generate concrete counterexamples for false conjectures. As a result, many proofs can be completed with little or no user interaction. However, this comes at the cost of limiting specifications to properties that can be expressed as executable boolean functions. In contrast, Rocq's dependent type theory supports a wider range of specifications, such as reasoning about infinite sets or expressing non-computational existence. This greater expressiveness requires users to construct proofs interactively using tactics, making proofs more labour-intensive. In return, every proof is checked by Rocq's small trusted kernel.
+
+From an ecosystem perspective, Rocq offers a mature, open-source platform with extensive libraries, a large community, and a long track record of large-scale verification projects. Imandra's ecosystem is smaller and industry-focused. For the present project, Rocq was chosen precisely because of its established ecosystem, active community, and the long-term maintainability that these factors provide, even though the proof development requires more explicit user guidance than Imandra's highly automated approach.
+
+\section{Related Work} \label{sec:related-work}
+
+\subsection{ITP Neural Network Verification}
+
+The topic of formally verifying neural networks within interactive theorem provers is broad, with several distinct lines of work.
+
+One approach embeds a complete neural network into an ITP and proves properties directly. The formally verified neural network converter by \citet{formally_verified_nn_converter} translates ONNX-format networks into Rocq, enabling the verification of individual inferences. While powerful for small networks, this approach does not scale to the larger DNNs targeted by dedicated verifiers like Marabou.
+
+A complementary line of work targets the training process itself, providing verified implementations of gradient computation and weight updates in Rocq. Other projects have formalised aspects of neural network verification in Isabelle/HOL and Lean, though these efforts remain largely exploratory compared to the mature tooling of SMT-based DNN verifiers.
+
+The work proposed in this dissertation differs from these approaches in a fundamental way: rather than embedding neural networks or training procedures into an ITP, we check the proof certificates produced by an external DNN verifier. This separation of concerns allows the verifier to use efficient, unverified algorithms while the proof checker provides a formal guarantee of correctness.
+
+\subsection{Proof Production}
+
+The concept of proof production originates from proof-carrying code \cite{proof_carrying_code}, where a program is accompanied by a formal proof that it satisfies a given safety policy. The verifier checks the proof without needing to trust the code producer. This decoupling of proof generation from proof checking is the same principle found in the DNN verification pipeline used in this project.
+
+The first application of proof production to DNN verification was introduced by \citet{nn_proof_production}, who extended Marabou to generate Farkas-based certificates alongside its UNSAT results. Their work demonstrated that the Simplex-derived Farkas coefficients could serve as witnesses of unsatisfiability in the DNN context, laying the groundwork for subsequent proof-checking efforts.
+
+More recent work by \citet{proof_minimization_in_nn_verification} addresses the size of proof certificates, showing that irrelevant constraints can be pruned from the certificate without compromising correctness. This is important for proof checking, as smaller certificates reduce the verification burden on the checker.
+
+The self-certification paradigm \cite{program_correctness} formalises the broader idea: rather than verifying a program (such as a DNN verifier) once and for all, each execution generates a certificate that is checked independently. This is the model adopted by Marabou's proof module and the proof checker developed in this work.
+
+\subsection{A Certified Proof Checker for Deep Neural Network Verification in Imandra}
+
+\citet{certified_proof_checker} presents the first fully certified proof checker for Marabou, implemented in Imandra. The checker receives a proof certificate in the form of a binary tree whose internal nodes record case splits over ReLU phases and whose leaves carry Farkas coefficients witnessing unsatisfiability. The checker traverses this tree recursively, verifying at each leaf that the provided Farkas vector is a valid witness under the current bounds.
+
+The central theoretical result underlying the checker is the DNN Farkas lemma, which adapts the classical Farkas lemma, a fundamental result in linear programming stating that a system of linear inequalities has no solution if and only if a non-negative linear combination of the inequalities yields a contradiction, to the DNN verification context. In this setting, the lemma certifies that a system of linear constraints, combined with the piecewise-linear constraints arising from ReLU activations, is unsatisfiable. The Imandra checker formalises this lemma and uses it as the basis for leaf verification.
+
+The Imandra implementation serves as the direct predecessor of this project. Its key limitation is its reliance on Imandra, a closed-source ITP with a comparatively small ecosystem. Translating the checker into Rocq addresses this limitation by making the implementation available in a mature, open-source ITP with a larger community and richer library ecosystem.
+
+\subsection{Formal Verification of SMT and Constraint Solvers}
+
+A closely related line of work is the formal verification of SMT solvers and constraint-solving procedures within ITPs. The SMTCoq project \cite{smtcoq} integrates external SAT and SMT solvers into Rocq by checking the proofs they produce. When an SMT solver determines that a formula is valid, it emits a proof certificate that SMTCoq validates inside Rocq's kernel. This architecture is similar to the one proposed in this dissertation: an external solver produces certificates that are independently checked by a verified Rocq component. 
+
+Another interesting aspect of the SMTCoq project that closely relates to proposed implementation is the role of its preprocessor, implemented in OCaml, which is independent from both the proof checker and its soundness proof. The preprocessor abstracts the translation from different certificate formats into the representation accepted by SMTCoq. In addition, it performs a series of transformations on the translated certificates to improve their scalability before they are processed by the proof checker. This workflow is analogous to the certificate parser developed in this dissertation, which translates Marabou proof certificates into Gallina data types. Similarly, the parser performs a number of transformations during translation to simplify the subsequent verification process and eliminate the need for additional preprocessing within Rocq.

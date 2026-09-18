@@ -1,0 +1,407 @@
+\section{Implementation} \label{sec:implementation}
+
+The implementation of the certified proof checker consists of three main components:
+\begin{itemize}
+    \item \textbf{Certificate Parser.} A Haskell program that reads Marabou proof certificates in JSON and generates Rocq source files containing equivalent Gallina definitions.
+    \item \textbf{Proof Checker.} A Rocq program that verifies whether a parsed proof certificate constitutes a valid proof of unsatisfiability.
+    \item \textbf{Proof Checker Soundness.} A formal proof in Rocq establishing that if the proof checker accepts a certificate, then the original verification query is genuinely unsatisfiable.
+\end{itemize}
+
+\autoref{fig:system-workflow} provides an overview of the workflow of the developed system. When Marabou determines that a verification query is UNSAT, it produces a proof certificate of the result in JSON format. The certificate parser uses the resulting JSON proof certificate to generate Rocq source files containing Gallina definitions equivalent to the certificate. The generated files are then imported by the proof checker where it verifies the certificate. Finally, the soundness theorem establishes that any certificate accepted by the proof checker constitutes a valid UNSAT proof of the corresponding verification result.
+
+\input{components/diagrams/system_architecture.tex}
+
+\subsection{Certificate Parser}
+To reason about the proof certificates produced by Marabou in the UNSAT case, they must first be formalised, parsed and then imported into the proof checker.
+
+\subsubsection{Formalisation}
+The proof certificate data produced by Marabou is captured by the following Gallina types which exploit the benefits of dependent types.
+
+\begin{itemize}
+    \item \texttt{n : nat} --- the number of variables in $x$, as in \autoref{sec:queries}.
+
+    \item \texttt{m : nat} --- the number of equations generated in \autoref{eq:weighted-sum} and \autoref{eq:relu-auxiliary}, as in  \autoref{sec:queries}.
+
+    \item \texttt{lb, ub : 'rV[R]\_n} --- row vectors of length $n$ representing the lower and upper bounds on each variable.
+
+    \item \texttt{constraint : ('I\_n * 'I\_n * 'I\_n)} --- each ReLU constraint is a triple of dependent indices $(b, f, aux)$ representing the basic, forward, and auxiliary variables.
+
+    \item \texttt{tableau : m.-tuple ('rV[R]\_n)} --- a tuple of $m$ row vectors encoding the linear relationships maintained by Marabou's simplex solver.
+
+    \item \texttt{proof tree : ProofTree.t} --- formalised as an inductive type (\autoref{code:proof-tree}) with two constructors: \texttt{node}, which carries split information together with left and right subtrees, and \texttt{leaf}, which carries a contradiction vector.
+\begin{lstlisting}[language=Coq, caption={Marabou proof tree as an inductive data type in Rocq.}, label={code:proof-tree}, basicstyle=\footnotesize\ttfamily]
+
+Inductive t : Type :=
+  (*  split information, left child, right child *)
+  | node : Split.t -> t -> t -> t
+  (* contradiction vector *)
+  | leaf : m.-tuple R -> t.
+\end{lstlisting}
+
+    \item \texttt{split : Split.t} --- formalised as an inductive type (\autoref{code:formalisation-split}), distinguishing single-variable bound tightenings from ReLU splits:
+\begin{lstlisting}[language=Coq, caption={Split inductive type for case splits.}, label={code:formalisation-split}, basicstyle=\footnotesize\ttfamily]
+Inductive t : Type :=
+  (* variable, value *)
+  | single : 'I_n -> R -> t
+  (* participating relu variables: b, f, aux *)
+  | relu : 'I_n -> 'I_n -> 'I_n -> t.
+\end{lstlisting}
+\end{itemize}
+
+\subsubsection{Parser Implementation}
+
+In the original Imandra development, the parser is implemented within the same program Imandra program: since Imandra is embedded in a subset of OCaml, it can leverage OCaml parsing libraries to read and translate the proof certificates directly at execution time. Consequently, no external preprocessing stage is required.
+
+This approach is not directly transferable to Rocq. The proof checker developed in this work is implemented in Gallina, which cannot invoke arbitrary OCaml parsing code during proof checking. Therefore, a separate preprocessing stage was introduced. A Haskell program parses the JSON proof certificates produced by Marabou and generates Rocq source files containing equivalent Gallina definitions.
+
+Marabou's proof certificates are not organised in a way that is convenient for recursive verification. In particular, the tightening information is stored in tree root, whereas the proof checker benefits from a representation where each tightening information is stored in their corresponding node. Consequently, before verification, the parsed certificates should be translated into data types better suited to the recursive structure of the proof checker.
+
+The point at which this translation is performed differs between the two implementations. In the original Imandra development, the transformation is carried out within the Imandra code after the certificates have been parsed. In this work, the transformation is instead performed by the Haskell parser while generating the Rocq files. As a result, the Rocq implementation operates directly on the representation expected by the proof checker, keeping the Gallina code focused solely on certificate verification.
+
+\autoref{fig:cert-snippets} shows the correspondence between the JSON certificate and the generated Gallina code. Numerical values are represented as real numbers using \texttt{\%:R}. Decimal values are represented as rational fractions, which are then coerced to the real numbers; for example, (0.420428186) is represented as \texttt{(210214093 \%:R / 500000000 \%:R)\%R}. Finally, bounded values are represented using variable indices encoded with \texttt{inord}, which guarantees valid indices for the corresponding dependent types.
+
+\begin{figure}[htbp]
+\centering
+\begin{minipage}[t]{0.48\linewidth}
+  \lstinputlisting[
+    language=json,
+    basicstyle=\tiny\ttfamily
+  ]{snippets/json_snippet.txt}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.48\linewidth}
+  \lstinputlisting[
+    language=Coq,
+    basicstyle=\tiny\ttfamily,
+    breaklines=true
+  ]{snippets/gallina_snippet.txt}
+\end{minipage}
+\caption{Correspondence between JSON certificate and generated Gallina definitions.}
+\label{fig:cert-snippets}
+\end{figure}
+
+\subsection{Proof Checker}
+
+
+The entry point for the proof checker is the \texttt{check\_proof\_tree} definition, which constructs the system of equality constraints from the parsed tableau using \texttt{mk\_eq\_constraints} and then passes it to \texttt{check\_tree}. Both functions are shown in \autoref{code:check-tree}.
+
+The \texttt{check\_tree} function recursively traverses the parsed proof tree. At each leaf, the proof checker verifies that the provided Farkas coefficients constitute a valid witness of unsatisfiability for the linear constraints under the current bounds (line 9). At each internal node, it first tightens the bounds (line 11) and then checks that the current split is consistent with the constraints (line 12) before recursively verifying both child subtrees (lines 13 and 14). The results of these checks are combined using Boolean conjunction, meaning that a proof tree is accepted only if the split is valid and both child subtrees are successfully verified.
+
+\begin{lstlisting}[language=Coq, caption={Proof checker tree verifier.}, label={code:check-tree}, numbers=left]
+Fixpoint check_tree
+  (tableau : system m n)
+  (ub lb : 'rV[R]_n)
+  (constraints : seq Constraint.t)
+  (proof_node : ProofTree.t)
+  : bool :=
+  match proof_node with
+  | ProofTree.leaf contradiction =>
+    check_contradiction contradiction tableau ub lb
+  | ProofTree.node split tleft tright =>
+    let bounds := Split.update_bounds_from_split ub lb split in
+    let valid_split := Split.check_split split constraints in
+    let valid_left  := check_tree tableau bounds.1.2 bounds.1.1 constraints tleft in
+    let valid_right := check_tree tableau bounds.2.2 bounds.2.1 constraints tright in
+    valid_split && valid_left && valid_right
+  end.
+
+Definition check_proof_tree
+  (tableau : m.-tuple ('rV[R]_n))
+  (ub lb : 'rV[R]_n)
+  (constraints : seq Constraint.t)
+  (proof_tree : ProofTree.t)
+  : bool :=
+  check_tree (Cert.mk_eq_constraints tableau) ub lb constraints proof_tree.
+\end{lstlisting}
+
+% To determine whether a contradiction vector constitutes a valid proof of unsatisfiability, it is necessary to establish that it is a valid witness. One of the key contributions of the \citet{certified_proof_checker} is the development of a constructive formulation of Farkas lemma in terms of systems of linear polynomial equations specialised for DNN verification problems. Resulting in a theorem that relates the existence of suitable witness vectors to the unsatisfiability of the corresponding system of linear polynomial equations. These witness vectors form the basis of the UNSAT proof certificates used by Marabou.
+
+The \texttt{check\_contradiction} function, shown in \autoref{code:check-contradiction}, first uses \texttt{\\mk\_system\_contradiction} to create a polynomial representation of the linear constraints from their matrix representation, allowing them to be analysed using the polynomial formulation of Farkas' lemma. It then uses \texttt{mk\_contradiction\_certificate} to compute candidate witnesses, which are subsequently verified by \texttt{check\_cert}. The \texttt{check\_cert} function is based on the Rocq translation of the Farkas development from \citet{certified_proof_checker}, presented in \citet{farkas_rocq}.
+
+\begin{lstlisting}[language=Coq, caption={Rocq implementation of the contradiction certificate checker.}, label={code:check-contradiction}, numbers=left]
+Definition check_contradiction
+  (contradiction : m.-tuple R)
+  (tableau : system m n)
+  (ub lb : 'rV[R]_n)
+  (lower_bounds : 'rV[R]_n)
+  : bool :=
+  let sys := Cert.mk_system_contradiction tableau ub lb in
+  let certificate := Cert.mk_contradiction_certificate contradiction tableau ub lb in
+  check_cert sys certificate.
+\end{lstlisting}
+
+Since Marabou uses splits, stored in the proof trees node, to tighten both upper and lower bounds to certify UNSAT in proof tree leafs. We need to replicate the same tightening, while iterating over the proof tree. The function \texttt{update\_bounds\_from\_split} in \autoref{code:update-bounds} takes the current upper and lower bounds, together with a split, and returns a pair of updated bound pairs corresponding to the two resulting branches.
+
+For a \texttt{single} split, the bounds are updated according to the specified bound $k$ for variable $i$. For a \texttt{relu} split, the function considers the two possible phases of the ReLU activation. In the left branch, corresponding to the inactive phase, the variable $f$ is constrained to be zero, while the variable $b$ is constrained to be non-positive. In the right branch, corresponding to the active phase, the variable $b$ is constrained to be non-negative, while the auxiliary variable (\texttt{aux}) is constrained to be zero. These updated bounds are then passed to the corresponding child nodes during the recursive traversal of the proof tree.
+
+\begin{lstlisting}[language=Coq, caption={Rocq implementation of the bound updates associated with a recorded split. The function returns the lower and upper bounds for the two resulting branches.}, label={code:update-bounds}, numbers=left]
+Definition update_bounds_from_split
+  (ubs : 'rV[R]_n)
+  (lbs: 'rV[R]_n)
+  (split : t)
+  : (('rV[R]_n * 'rV[R]_n)  * ('rV[R]_n  * 'rV[R]_n)) :=
+  match split with
+  | single i k => ((lbs, set_nth ubs i k), (set_nth lbs i k, ubs))
+  | relu b f aux =>
+    (* left: inactive phase *)
+    let lbs_l := set_nth lbs f 0%R in
+    let ubs_l := set_nth (set_nth ubs b 0%R) f 0%R in
+    (* right: active phase *)
+    let lbs_r := set_nth (set_nth lbs b 0%R) aux 0%R in
+    let ubs_r := set_nth ubs aux 0%R in
+    ((lbs_l, ubs_l), (lbs_r, ubs_r))
+  end.
+\end{lstlisting}
+
+Lastly, before proceeding with the recursive call to \texttt{check\_tree} in \autoref{code:check-tree} over the recently computed branches, it is necessary to ensure that the new ReLU split corresponds to a ReLU constraint from the verification query (\autoref{code:check-split}).
+
+\begin{lstlisting}[language=Coq, caption={Split checker that ensures that a ReLU split corresponds to a ReLU constraint.}, label={code:check-split}, numbers=left]
+Definition check_split (split : t) (constraints : seq Constraint.t) : bool :=
+match split with
+| relu b f aux => has (Constraint.constraint_eqb (b, f, aux)) constraints
+| _ => true
+end.
+\end{lstlisting}
+
+If all the steps mentioned previously execute successfully (i.e., return \texttt{true}), the specified proof certificate indeed constitutes a valid proof of unsatisfiability.
+
+\subsection{Proof Checker Soundness}
+
+The remaining step towards obtaining a fully certified proof checker is to formally prove that, whenever the \texttt{check\_tree} function accepts a proof certificate as UNSAT, the corresponding verification query is indeed unsatisfiable. \autoref{code:check-tree-soundness} proves this theorem by applying the \texttt{elim} tactic (line 10), which destructs the proof tree into its two possible constructors. The proof then uses the auxiliary lemmas \texttt{check\_tree\_soundness\_node} and \texttt{check\_tree\_soundness\_leaf} (lines 12 and 13) to establish soundness for each case.
+
+\begin{lstlisting}[language=Coq, caption={Theorem establishing the soundness of the proof checker.}, label={code:check-tree-soundness}, breaklines=true, numbers=left]
+Theorem check_tree_soundness
+  (tableau : m.-tuple ('rV[R]_n))
+  (ub lb : 'rV[R]_n)
+  (constraints : seq Constraint.t)
+  (proof_tree : ProofTree.t)
+  (x : 'rV[R]_n) :
+  Checker.check_proof_tree tableau ub lb constraints proof_tree
+  -> Sat.unsat tableau ub lb constraints x.
+Proof.
+elim: proof_tree ub lb => [split tleft IHleft tright IHright | contradiction] ub lb.
+- rewrite /Checker.check_proof_tree in IHleft IHright.
+  by apply: (check_tree_soundness_node tableau ub lb constraints split tleft tright x IHleft IHright).
+- by apply: (check_tree_soundness_leaf tableau ub lb constraints contradiction x).
+Qed.
+\end{lstlisting}
+
+\autoref{fig:rocq-graph} shows the dependency graph of all the lemmas used to prove the soundness of the proof checker. The graph can be read from top to bottom, starting with the main theorem \texttt{check\_tree\_soundness} and proceeding to the auxiliary lemmas used in its proof. From left to right, the graph progresses from the lemmas establishing soundness for leaf nodes to those establishing soundness for internal tree nodes. The supporting lemmas for each branch of the proof tree are also organised from left to right.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\textwidth]{images/rocq_graph.png}
+  \caption{Dependency graph of the lemmas used to prove the soundness of the Rocq proof checker. Yellow boxes represent modules, green circles represent proved lemmas, arrows indicate that a lemma depends on another lemma, and multi-circled nodes denote lemmas that are not used in the final soundness proof.}
+  \label{fig:rocq-graph}
+\end{figure}
+
+To prove soundness for a leaf node, the checker must establish that the Farkas contradiction carried by the leaf is a valid witness of unsatisfiability for the system of constraints corresponding to the verification query. The chain of lemmas that establish this result is shown on the left side of \autoref{fig:rocq-graph}.
+
+The entry point is the \texttt{check\_tree\_soundness\_leaf} lemma, which is a trivial wrapper that delegates to \texttt{leaf\_soundness}. The \texttt{leaf\_soundness} lemma, shown in \autoref{code:leaf-soundness}, combines two independent implications using \texttt{auto}.
+
+The first implication, \texttt{check\_cert\_implies\_not\_eval\_system} in \autoref{code:check-cert-implies-not-eval-system}, connects the success of \texttt{check\_tree} on a leaf to the evaluation of the Farkas contradiction system. It uses the fact that \texttt{check\_tree} on a leaf calls \texttt{check\_contradiction}, which in turn invokes \texttt{check\_cert}. The \texttt{check\_tree\_implies\_check\_cert} lemma makes this connection explicit. With a valid certificate, the \texttt{farkas\_unsat} theorem from the \texttt{FarkasSoundness} module guarantees that the contradiction system evaluates to false.
+
+\begin{lstlisting}[language=Coq, caption={Connecting certificate checks to the evaluation of the contradiction system via Farkas' lemma.}, label={code:check-cert-implies-not-eval-system}, breaklines=true, numbers=left]
+Lemma check_cert_implies_not_eval_system
+  (tableau : Farkas.system m n)
+  (ub lb : 'rV[R]_n)
+  (constraints : seq Constraint.t)
+  (contradiction : m.-tuple R)
+  (x : 'rV[R]_n) :
+  let sys := Cert.mk_system_contradiction tableau ub lb in
+  let certificate := Cert.mk_contradiction_certificate contradiction tableau ub lb in
+  Checker.check_tree tableau ub lb constraints (ProofTree.leaf contradiction) ->
+  FarkasSoundness.eval_system sys (trmx x) = false.
+Proof.
+  move: (check_tree_implies_check_cert tableau ub lb constraints contradiction x) => H_cert.
+  move: (@@FarkasSoundness.farkas_unsat
+    (Cert.mk_system_contradiction tableau ub lb)
+    ((Cert.mk_contradiction_certificate contradiction tableau ub lb))
+    (trmx x)) => H_farkas.
+  by [].
+Qed.
+\end{lstlisting}
+
+The second implication, \texttt{not\_eval\_system\_implies\_unsat} in \autoref{code:not-eval-system-implies-unsat}, bridges the gap between the contradiction system evaluating to false and the definition of unsatisfiability. It relies on \texttt{soundness\_check\_cert\_composition}, which performs the core case analysis.
+
+\begin{lstlisting}[language=Coq, caption={From contradiction system evaluation to unsatisfiability.}, label={code:not-eval-system-implies-unsat}, breaklines=true, numbers=left]
+Lemma not_eval_system_implies_unsat
+  (tableau : m.-tuple ('rV[R]_n))
+  (ub lb : 'rV[R]_n)
+  (constraints : seq Constraint.t)
+  (contradiction : m.-tuple R)
+  (x : 'rV[R]_n) :
+  let sys := Cert.mk_system_contradiction (Cert.mk_eq_constraints tableau) ub lb in
+  (FarkasSoundness.eval_system sys (trmx x)) = false
+  ->
+  Sat.unsat tableau ub lb constraints x.
+Proof.
+  intros.
+  rewrite /Sat.unsat.
+  move: (soundness_check_cert_composition tableau ub lb x) => H_comp.
+  have H_final := H_comp H.
+  by rewrite H_final.
+Qed.
+\end{lstlisting}
+
+The \texttt{soundness\_check\_cert\_composition} lemma (shown in \autoref{code:soundness-check-cert-composition}) considers two cases. If $x$ is in the kernel of the tableau and satisfies the bounds, then \texttt{system\_soundness} would force the contradiction system to evaluate to true, contradicting the hypothesis. Otherwise, the conjunction \texttt{is\_in\_kernel} $\land$ \texttt{bounded} is already false, which directly implies \texttt{unsat} by definition.
+
+\begin{lstlisting}[language=Coq, caption={Core case analysis for leaf soundness using \texttt{SystemSoundness}.}, label={code:soundness-check-cert-composition}, breaklines=true, numbers=left]
+Lemma soundness_check_cert_composition
+  (tableau : m.-tuple ('rV[R]_n))
+  (ub lb : 'rV[R]_n)
+  (x : 'rV[R]_n) :
+  let sys := Cert.mk_system_contradiction (Cert.mk_eq_constraints tableau) ub lb in
+  (FarkasSoundness.eval_system sys (trmx x)) = false
+  ->
+  ((Arithmetic.is_in_kernel tableau x) && (Arithmetic.bounded x ub lb)) = false.
+Proof.
+  intros.
+  case H_prop: ((Arithmetic.is_in_kernel tableau x) && (Arithmetic.bounded x ub lb)).
+  - move : (SystemSoundness.system_soundness tableau ub lb x H_prop) => H_unsat.
+    rewrite  <- H.
+    simpl in *.
+    by rewrite H_unsat.
+  - reflexivity.
+Qed.
+\end{lstlisting}
+
+To prove soundness for an internal node, the checker must establish that if the proof tree is accepted, then any vector $x$ that satisfies the tableau, bounds, and ReLU constraints under the original bounds is impossible. The chain of lemmas for the node case is shown on the right side of \autoref{fig:rocq-graph}.
+
+The proof proceeds by structural induction on the proof tree. The induction hypotheses give us that both child subtrees are sound: if the child checks out, then $x$ cannot exist under the tightened bounds produced by the split. The task is to lift this unsatisfiability from the children to the parent.
+
+The central lemma, \texttt{check\_tree\_soundness\_node} in \autoref{code:check-tree-soundness-node}, orchestrates this reasoning in three steps.
+
+\begin{lstlisting}[language=Coq, caption={Node soundness lemma using induction hypotheses and the unsat parent lemma.}, label={code:check-tree-soundness-node}, breaklines=true, numbers=left]
+Lemma check_tree_soundness_node
+  (tableau : m.-tuple ('rV[R]_n))
+  (ub lb: 'rV[R]_n)
+  (constraints : seq Constraint.t)
+  (split : Split.t)
+  (tleft tright : ProofTree.t)
+  (x : 'rV[R]_n)
+  (IHleft : forall ub lb,
+    Checker.check_tree (Cert.mk_eq_constraints tableau) ub lb constraints tleft ->
+    Sat.unsat tableau ub lb constraints x)
+  (IHright : forall ub lb,
+    Checker.check_tree (Cert.mk_eq_constraints tableau) ub lb constraints tright ->
+    Sat.unsat tableau ub lb constraints x) :
+  Checker.check_tree (Cert.mk_eq_constraints tableau) ub lb constraints
+    (ProofTree.node split tleft tright) ->
+  Sat.unsat tableau ub lb constraints x.
+Proof.
+  move=> H_check.
+  move: (check_tree_parent_imply_check_tree_children
+    (Cert.mk_eq_constraints tableau) ub lb constraints split tleft tright x H_check)
+    => /andP [H_left H_right].
+  set bounds := Split.update_bounds_from_split ub lb split.
+  have H_unsat_l := IHleft bounds.1.2 bounds.1.1 H_left.
+  have H_unsat_r := IHright bounds.2.2 bounds.2.1 H_right.
+  apply: (unsat_children_imply_unsat_parent tableau ub lb constraints split tleft tright x).
+  have H_split : Split.check_split split constraints.
+  { move: H_check. by rewrite /Checker.check_tree => /andP[/andP[H_split _] _]. }
+  rewrite /bounds.
+  by rewrite H_split H_unsat_l H_unsat_r.
+Qed.
+\end{lstlisting}
+
+First, \texttt{check\_tree\_parent\_imply\_check\_tree\_children} is a straightforward structural lemma: if a \texttt{Node} checks out, then both its children also check out under their respective updated bounds. Its proof simply unfolds \texttt{check\_tree} and splits the conjunction.
+
+Second, the induction hypotheses \texttt{IHleft} and \texttt{IHright} are applied to give \texttt{unsat} for each child individually.
+
+Third, \texttt{unsat\_children\_imply\_unsat\_parent}, shown in \autoref{code:unsat-children-imply-unsat-parent}, combines these results using \texttt{soundness\_split\_contra} from the \texttt{NodeSoundness} module. The reasoning is contrapositive: if both children are unsatisfiable, then the parent must also be unsatisfiable.
+
+\begin{lstlisting}[language=Coq, caption={From child unsatisfiability to parent unsatisfiability using the contrapositive of split soundness.}, label={code:unsat-children-imply-unsat-parent}, breaklines=true, numbers=left]
+Lemma unsat_children_imply_unsat_parent
+  (tableau : m.-tuple ('rV[R]_n))
+  (ub lb: 'rV[R]_n)
+  (constraints : seq Constraint.t)
+  (split : Split.t)
+  (tleft tright : ProofTree.t)
+  (x : 'rV[R]_n) :
+  Split.check_split split constraints
+  && Sat.unsat tableau (Split.update_bounds_from_split ub lb split).1.2
+                    (Split.update_bounds_from_split ub lb split).1.1 constraints x
+  && Sat.unsat tableau (Split.update_bounds_from_split ub lb split).2.2
+                    (Split.update_bounds_from_split ub lb split).2.1 constraints x
+  ->
+  Sat.unsat tableau ub lb constraints x.
+Proof.
+  move/andP=> [/andP[H_split H_unsat_l] H_unsat_r].
+  have H_sat_l : Sat.sat tableau
+    (Split.update_bounds_from_split ub lb split).1.2
+    (Split.update_bounds_from_split ub lb split).1.1 constraints x = false.
+  { move/eqP: H_unsat_l => H; exact H. }
+  have H_sat_r : Sat.sat tableau
+    (Split.update_bounds_from_split ub lb split).2.2
+    (Split.update_bounds_from_split ub lb split).2.1 constraints x = false.
+  { move/eqP: H_unsat_r => H; exact H. }
+  rewrite Sat.unsat_not_sat.
+  rewrite eqbF_neg.
+  apply: (NodeSoundness.soundness_split_contra tableau ub lb constraints split x).
+  by rewrite H_split H_sat_l H_sat_r.
+Qed.
+\end{lstlisting}
+
+The core logical step is performed by \texttt{NodeSoundness.soundness\_split\_contra}, shown in \autoref{code:soundness-split-contra}. It is the contrapositive of \texttt{soundness\_split}: if neither child is satisfiable, then the parent cannot be satisfiable either.
+
+\begin{lstlisting}[language=Coq, caption={Contrapositive of the split soundness lemma.}, label={code:soundness-split-contra}, breaklines=true, numbers=left]
+Lemma soundness_split_contra
+  (tableau : m.-tuple ('rV[R]_n))
+  (ub lb: 'rV[R]_n)
+  (constraints : seq Constraint.t)
+  (split : Split.t)
+  (x : 'rV[R]_n) :
+  let bounds := Split.update_bounds_from_split ub lb split in
+  Split.check_split split constraints &&
+  ~~ (Sat.sat tableau bounds.1.2 bounds.1.1 constraints x ||
+       Sat.sat tableau bounds.2.2 bounds.2.1 constraints x)
+  ->
+  ~~ Sat.sat tableau ub lb constraints x.
+Proof.
+  move=> bounds.
+  move=> /andP [Hcheck Hnot].
+  apply/negP.
+  move=> Hsat.
+  have Hor :
+    Sat.sat tableau bounds.1.2 bounds.1.1 constraints x ||
+    Sat.sat tableau bounds.2.2 bounds.2.1 constraints x.
+    apply: (soundness_split tableau ub lb constraints split x).
+    by rewrite Hcheck Hsat.
+  move/negP: Hnot.
+  move=> Hcontra.
+  exact: (Hcontra Hor).
+Qed.
+\end{lstlisting}
+
+The forward direction, \texttt{soundness\_split} in \autoref{code:soundness-split}, states that if the parent is satisfiable and the split is valid, then at least one child must be satisfiable. Its proof performs a case analysis on the split type.
+
+\begin{lstlisting}[language=Coq, caption={Split soundness lemma.}, label={code:soundness-split}, breaklines=true, numbers=left]
+Lemma soundness_split
+  (tableau : m.-tuple ('rV[R]_n))
+  (ub lb: 'rV[R]_n)
+  (constraints : seq Constraint.t)
+  (split : Split.t)
+  (x : 'rV[R]_n) :
+  Split.check_split split constraints &&
+  Sat.sat tableau ub lb constraints x
+  ->
+  let bounds := Split.update_bounds_from_split ub lb split in
+  Sat.sat tableau bounds.1.2 bounds.1.1 constraints x ||
+  Sat.sat tableau bounds.2.2 bounds.2.1 constraints x.
+Proof.
+  case: split => [i k | b f aux] /andP [H_check H_sat].
+  - move: (SplitSoundness.soundness_single_var_split
+      tableau ub lb constraints i k x) => H_single.
+    auto.
+  - move: (SplitSoundness.soundness_relu_split
+      tableau ub lb constraints b f aux x) => H_relu.
+    move: H_relu; apply; apply/andP; split => //.
+Qed.
+\end{lstlisting}
+
+For a \texttt{Split.single i k} split, \texttt{soundness\_single\_var\_split} shows that tightening the upper or lower bound of variable $i$ to $k$ preserves satisfiability in at least one branch. It relies on \texttt{bounded\_set\_nth}, which uses the real trichotomy lemma \texttt{lerP} to determine whether $x_i \leq k$ (tighten the upper bound) or $k \leq x_i$ (tighten the lower bound). The corresponding helper lemmas \texttt{bounded\_set\_ub} and \texttt{bounded\_set\_lb} update the relevant bound entry using \texttt{set\_nth\_vector}.
+
+For a \texttt{Split.relu b f aux} split, \texttt{soundness\_relu\_split} delegates to \texttt{\\soundness\_relu\_split\_bounded}. This lemma first locates the corresponding ReLU constraint in the constraint list and evaluates the ReLU relation. The \texttt{eval\_relu\_phase} lemma then determines whether the ReLU is in the active phase ($0 \leq x_b$) or the inactive phase ($x_b \leq 0$). Depending on the phase, \texttt{bounded\_active\_phase} or \texttt{bounded\_inactive\_phase} adjusts the bounds accordingly by setting the relevant variables to zero.
+
+Taken together, these lemmas close the induction: each recursive call to \texttt{check\_tree} on a child reduces the size of the proof tree, and the split soundness lemmas guarantee that unsatisfiability propagates upward from the children to the parent until the leaf case applies the Farkas contradiction.
